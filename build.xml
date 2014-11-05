@@ -31,7 +31,8 @@
    <classpath location="/usr/share/java/junit4.jar"/>
    <classpath location="build/jar/codemancer.jar"/>
    <classpath path="build/test/"/>
-   <arg value="org.codemancer.loader.TestElf"/>
+   <arg value="org.codemancer.loader.TestElf32"/>
+   <arg value="org.codemancer.loader.TestElf64"/>
   </java>
  </target>
 </project>

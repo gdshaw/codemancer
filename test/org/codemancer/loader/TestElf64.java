@@ -17,12 +17,12 @@ import org.junit.Test;
 
 import org.codemancer.loader.elf.ElfFile;
 
-public class TestElf {
+public class TestElf64 {
 	private ElfFile elf;
 
-	public TestElf() throws IOException {
+	public TestElf64() throws IOException {
 		String pathname = "testdata" + File.separatorChar +
-			"loader" + File.separatorChar + "hello_i386";
+			"loader" + File.separatorChar + "hello_amd64";
 		RandomAccessFile file = new RandomAccessFile(pathname, "r");
 		ByteBuffer image = file.getChannel().map(
 			FileChannel.MapMode.READ_ONLY, 0, file.length());
@@ -31,7 +31,7 @@ public class TestElf {
 
 	@Test
 	public void testElfFileClass() {
-		assertEquals(elf.getElfFileClass(), ElfFile.ELFCLASS32);
+		assertEquals(elf.getElfFileClass(), ElfFile.ELFCLASS64);
 	}
 
 	@Test
@@ -41,12 +41,12 @@ public class TestElf {
 
 	@Test
 	public void testArchitecture() {
-		assertEquals(elf.getElfArchitecture(), 3);
+		assertEquals(elf.getElfArchitecture(), 62);
 	}
 
 	@Test
 	public void testEntryPoint() {
-		assertEquals(elf.getEntryPoint(), 0x8048320);
+		assertEquals(elf.getEntryPoint(), 0x400410);
 	}
 
 	@Test

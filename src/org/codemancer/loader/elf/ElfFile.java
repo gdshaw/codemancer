@@ -15,8 +15,9 @@ import java.util.Collections;
 
 import org.codemancer.loader.InvalidFileFormat;
 
-/** A class to represent the content of a 32-bit ELF file.
- * Both little- and big-endian encoding are supported.
+/** A class to represent the content of an ELF file.
+ * Both 32- and 64-bit ELF files are supported, using either
+ * little- or big-endian encoding.
  */
 public class ElfFile {
 	/** A constant equal to the size of the ident field, in bytes. */
@@ -79,15 +80,15 @@ public class ElfFile {
 	private int e_version;
 
 	/** The entry point, or zero if there is no entry point. */
-	private int e_entry;
+	private long e_entry;
 
 	/** The offset in bytes from the start of the file
 	 * to the start of the program header table. */
-	private int e_phoff;
+	private long e_phoff;
 
 	/** The offset in bytes from the start of the file
 	 * to the start of the section header table. */
-	private int e_shoff;
+	private long e_shoff;
 
 	/** The flags word. */
 	private int e_flags;
@@ -132,7 +133,7 @@ public class ElfFile {
 
 		// Extract and validate the file class.
 		ei_class = e_ident[4];
-		if (ei_class != ELFCLASS32) {
+		if ((ei_class != ELFCLASS32) && (ei_class != ELFCLASS64)) {
 			throw new InvalidFileFormat("invalid ELF file class");
 		}
 
@@ -154,12 +155,20 @@ public class ElfFile {
 		}
 
 		// Fetch the remaining fields from the header.
+		// (Note that this must be done after the byte order has
+		// been configured.)
 		e_type = buffer.getShort();
 		e_machine = buffer.getShort();
 		e_version = buffer.getInt();
-		e_entry = buffer.getInt();
-		e_phoff = buffer.getInt();
-		e_shoff = buffer.getInt();
+		if (ei_class == ELFCLASS64) {
+			e_entry = buffer.getLong();
+			e_phoff = buffer.getLong();
+			e_shoff = buffer.getLong();
+		} else {
+			e_entry = buffer.getInt() & 0xFFFFFFFFL;
+			e_phoff = buffer.getInt() & 0xFFFFFFFFL;
+			e_shoff = buffer.getInt() & 0xFFFFFFFFL;
+		}
 		e_flags = buffer.getInt();
 		e_ehsize = buffer.getShort();
 		e_phentsize = buffer.getShort();
@@ -193,7 +202,7 @@ public class ElfFile {
 	/** Get the entry point address.
 	 * @return the entry point, or 0 if none
 	 */
-	public final int getEntryPoint() {
+	public final long getEntryPoint() {
 		return e_entry;
 	}
 
