@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.codemancer.loader.InvalidFileFormat;
+
 /** A class to represent the content of a 32-bit ELF file.
  * Both little- and big-endian encoding are supported.
  */
@@ -125,13 +127,13 @@ public class ElfFile {
 		// Check that magic number is as expected.
 		if ((e_ident[0] != 127) || (e_ident[1] != 'E') ||
 			(e_ident[2] != 'L') || (e_ident[3] != 'F')) {
-			throw new IllegalArgumentException("incorrect ELF magic number");
+			throw new InvalidFileFormat("incorrect ELF magic number");
 		}
 
 		// Extract and validate the file class.
 		ei_class = e_ident[4];
 		if (ei_class != ELFCLASS32) {
-			throw new IllegalArgumentException("invalid ELF file class");
+			throw new InvalidFileFormat("invalid ELF file class");
 		}
 
 		// Extract and validate the data encoding, configuring the
@@ -142,13 +144,13 @@ public class ElfFile {
 		} else if (ei_data == ELFDATA2MSB) {
 			buffer.order(ByteOrder.BIG_ENDIAN);
 		} else {
-			throw new IllegalArgumentException("invalid ELF file encoding");
+			throw new InvalidFileFormat("invalid ELF file encoding");
 		}
 
 		// Extract and validate the file version.
 		ei_version = e_ident[6];
 		if (ei_version != 1) {
-			throw new IllegalArgumentException("invalid ELF file version");
+			throw new InvalidFileFormat("invalid ELF file version");
 		}
 
 		// Fetch the remaining fields from the header.
