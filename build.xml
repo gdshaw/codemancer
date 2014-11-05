@@ -20,4 +20,18 @@
   <mkdir dir="build/jar"/>
   <jar destfile="build/jar/codemancer.jar" basedir="build/classes"/>
  </target>
+
+ <target name="test" depends="jar">
+  <mkdir dir="build/test"/>
+  <javac srcdir="test" destdir="build/test">
+   <classpath location="/usr/share/java/junit4.jar"/>
+   <classpath location="build/jar/codemancer.jar"/>
+  </javac>
+  <java classname="org.junit.runner.JUnitCore">
+   <classpath location="/usr/share/java/junit4.jar"/>
+   <classpath location="build/jar/codemancer.jar"/>
+   <classpath path="build/test/"/>
+   <arg value="org.codemancer.loader.TestElf"/>
+  </java>
+ </target>
 </project>

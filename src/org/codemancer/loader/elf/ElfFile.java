@@ -200,7 +200,7 @@ public class ElfFile {
 	/** Get ELF file flags.
 	 * @return the flags word
 	 */
-	private final int getElfFlags() {
+	public final int getElfFlags() {
 		return e_flags;
 	}
 
