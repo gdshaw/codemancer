@@ -161,6 +161,13 @@ public class ElfSection {
 		return elf;
 	}
 
+	/** Get ELF section name.
+	 * @return the section name
+	 */
+	public final String getElfSectionName() throws IOException {
+		return elf.getElfSectionName(sh_name);
+	}
+
 	/** Get ELF section type.
 	 * @return the section type
 	 */
@@ -173,6 +180,13 @@ public class ElfSection {
 	 */
 	public final long getElfSectionFlags() {
 		return sh_flags;
+	}
+
+	/** Get file offset of this section.
+	 * @return the file offset
+	 */
+	public final long getOffset() {
+		return sh_offset;
 	}
 
 	/** Get address of this section, if applicable.
@@ -200,7 +214,7 @@ public class ElfSection {
 	 * @param out the stream to be written to
 	 */
 	public void dump(PrintWriter out) throws IOException {
-		out.printf("Name: 0x%08x\n", sh_name);
+		out.printf("Name: %s\n", getElfSectionName());
 		out.printf("Type: 0x%08x\n", sh_type);
 		out.printf("Flags: 0x%08x\n", sh_flags);
 		out.printf("Virtual address: 0x%08x\n", sh_addr);

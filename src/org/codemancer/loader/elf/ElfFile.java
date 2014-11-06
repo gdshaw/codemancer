@@ -112,6 +112,10 @@ public class ElfFile {
 	 * used for section names. */
 	private short e_shstrndx;
 
+	/** The offset in bytes from the start of the file to the
+	 * start of the strings section containing the section names. */
+	private long shstroff;
+
 	/** A table of ELF sections that have been parsed.
 	 * The size of this table is equal to e_shnum.
 	 * Entries for unparsed sections are set to null.
@@ -194,6 +198,9 @@ public class ElfFile {
 			Collections.nCopies(e_shnum, (ElfSection)null));
 		segments = new ArrayList<ElfSegment>(
 			Collections.nCopies(e_phnum, (ElfSegment)null));
+
+		// Record the offset to the section name table.
+		shstroff = getElfSection(e_shstrndx).getOffset();
 	}
 
 	/** Get the ELF file class.
@@ -229,6 +236,21 @@ public class ElfFile {
 	 */
 	public final int getElfFlags() {
 		return e_flags;
+	}
+
+	/** Get the name of a section, given the offset into the relevant string table.
+	 * @param offset the offset into the string table
+	 * @return the section name
+	 */
+	public final String getElfSectionName(long offset) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		int absOffset = (int)(shstroff + offset);
+		buffer.position(absOffset);
+		char c;
+		while ((c = (char)buffer.get()) != 0) {
+			sb.append(c);
+		}
+		return sb.toString();
 	}
 
 	/** Get the number of sections.

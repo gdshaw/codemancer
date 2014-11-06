@@ -53,7 +53,8 @@ public class TestElf32 {
 	}
 
 	@Test
-	public void testElfTextSection() {
+	public void testElfTextSection() throws IOException {
+		assertEquals(".text", text.getElfSectionName());
 		assertEquals(ElfSection.SHT_PROGBITS, text.getElfSectionType());
 		assertEquals(6, text.getElfSectionFlags());
 		assertEquals(0x08048320, text.getAddress());
@@ -62,7 +63,8 @@ public class TestElf32 {
 	}
 
 	@Test
-	public void testElfSymTabSection() {
+	public void testElfSymTabSection() throws IOException {
+		assertEquals(".symtab", symtab.getElfSectionName());
 		assertEquals(ElfSection.SHT_SYMTAB, symtab.getElfSectionType());
 		assertEquals(0, symtab.getElfSectionFlags());
 		assertEquals(0, symtab.getAddress());
