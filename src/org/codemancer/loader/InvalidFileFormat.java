@@ -13,7 +13,7 @@ import java.io.IOException;
 @SuppressWarnings("serial")
 public class InvalidFileFormat extends IOException {
 	/** Construct invalid file format exception.
-         * @param message a message describing the cause of the error
+	 * @param message a message describing the cause of the error
 	 */
 	public InvalidFileFormat(String message) {
 		super(message);
