@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import org.codemancer.loader.elf.ElfFile;
 import org.codemancer.loader.elf.ElfSection;
+import org.codemancer.loader.elf.ElfSegment;
 
 // Test file compiled using gcc 4.6.3 for x86_64-linux-gnu.
 // Test values obtained using readelf and/or objdump.
@@ -25,6 +26,8 @@ public class TestElf64 {
 	private ElfFile elf;
 	private ElfSection text;
 	private ElfSection symtab;
+	private ElfSegment loadseg0;
+	private ElfSegment dynseg;
 
 	public TestElf64() throws IOException {
 		String pathname = "testdata" + File.separatorChar +
@@ -35,6 +38,8 @@ public class TestElf64 {
 		elf = new ElfFile(image);
 		text = elf.getElfSection(13);
 		symtab = elf.getElfSection(28);
+		loadseg0 = elf.getElfSegment(2);
+		dynseg = elf.getElfSegment(4);
 	}
 
 	@Test
@@ -63,5 +68,27 @@ public class TestElf64 {
 		assertEquals(0, symtab.getAddress());
 		assertEquals(0x0600, symtab.getSize());
 		assertEquals(8, symtab.getAlignment());
+	}
+
+	@Test
+	public void testElfLoadSegment0() {
+		assertEquals(ElfSegment.PT_LOAD, loadseg0.getElfSegmentType());
+		assertEquals(0x00400000, loadseg0.getVirtualAddress());
+		assertEquals(0x00400000, loadseg0.getPhysicalAddress());
+		assertEquals(0x006dc, loadseg0.getFileSize());
+		assertEquals(0x006dc, loadseg0.getMemorySize());
+		assertEquals(5, loadseg0.getElfSegmentFlags());
+		assertEquals(0x00200000, loadseg0.getAlignment());
+	}
+
+	@Test
+	public void testElfDynamicSegment() {
+		assertEquals(ElfSegment.PT_DYNAMIC, dynseg.getElfSegmentType());
+		assertEquals(0x00600e50, dynseg.getVirtualAddress());
+		assertEquals(0x00600e50, dynseg.getPhysicalAddress());
+		assertEquals(0x00190, dynseg.getFileSize());
+		assertEquals(0x00190, dynseg.getMemorySize());
+		assertEquals(6, dynseg.getElfSegmentFlags());
+		assertEquals(8, dynseg.getAlignment());
 	}
 }
