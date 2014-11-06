@@ -16,41 +16,52 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import org.codemancer.loader.elf.ElfFile;
+import org.codemancer.loader.elf.ElfSection;
+
+// Test file compiled using gcc 4.6.3 for x86_64-linux-gnu.
+// Test values obtained using readelf and/or objdump.
 
 public class TestElf64 {
 	private ElfFile elf;
+	private ElfSection text;
+	private ElfSection symtab;
 
 	public TestElf64() throws IOException {
 		String pathname = "testdata" + File.separatorChar +
-			"loader" + File.separatorChar + "hello_amd64";
+			"loader" + File.separatorChar + "hello-x86_64";
 		RandomAccessFile file = new RandomAccessFile(pathname, "r");
 		ByteBuffer image = file.getChannel().map(
 			FileChannel.MapMode.READ_ONLY, 0, file.length());
 		elf = new ElfFile(image);
+		text = elf.getElfSection(13);
+		symtab = elf.getElfSection(28);
 	}
 
 	@Test
-	public void testElfFileClass() {
-		assertEquals(elf.getElfFileClass(), ElfFile.ELFCLASS64);
+	public void testElfFile() {
+		assertEquals(ElfFile.ELFCLASS64, elf.getElfFileClass());
+		assertEquals(ElfFile.ET_EXEC, elf.getElfFileType());
+		assertEquals(62, elf.getElfArchitecture(), 62);
+		assertEquals(0x00400410, elf.getEntryPoint());
+		assertEquals(0, elf.getElfFlags());
+		assertEquals(30, elf.getElfSectionCount());
 	}
 
 	@Test
-	public void testElfFileType() {
-		assertEquals(elf.getElfFileType(), ElfFile.ET_EXEC);
+	public void testElfTextSection() {
+		assertEquals(ElfSection.SHT_PROGBITS, text.getElfSectionType());
+		assertEquals(6, text.getElfSectionFlags());
+		assertEquals(0x00400410, text.getAddress());
+		assertEquals(0x01d8, text.getSize());
+		assertEquals(16, text.getAlignment());
 	}
 
 	@Test
-	public void testArchitecture() {
-		assertEquals(elf.getElfArchitecture(), 62);
-	}
-
-	@Test
-	public void testEntryPoint() {
-		assertEquals(elf.getEntryPoint(), 0x400410);
-	}
-
-	@Test
-	public void testElfFlags() {
-		assertEquals(elf.getElfFlags(), 0);
+	public void testElfSymTabSection() {
+		assertEquals(ElfSection.SHT_SYMTAB, symtab.getElfSectionType());
+		assertEquals(0, symtab.getElfSectionFlags());
+		assertEquals(0, symtab.getAddress());
+		assertEquals(0x0600, symtab.getSize());
+		assertEquals(8, symtab.getAlignment());
 	}
 }

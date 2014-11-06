@@ -19,5 +19,10 @@ class DumpElf {
 		ByteBuffer image = file.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, file.length());
 		ElfFile elf = new ElfFile(image);
 		elf.dump(out);
+		for (short i = 0; i != elf.getElfSectionCount(); ++i) {
+			out.println();
+			out.printf("Section: %d\n", i);
+			elf.getElfSection(i).dump(out);
+		}
 	}
 }

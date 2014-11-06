@@ -112,6 +112,12 @@ public class ElfFile {
 	 * used for section names. */
 	private short e_shstrndx;
 
+	/** A table of ELF sections that have been parsed.
+	 * The size of this table is equal to e_shnum.
+	 * Entries for unparsed sections are set to null.
+	 */
+	private final ArrayList<ElfSection> sections;
+
 	/** Construct object to represent ELF file.
 	 * On entry the ByteBuffer must be positioned at the start of the file.
 	 * Any byte order is permissible. On exit the position is unspecified,
@@ -176,6 +182,10 @@ public class ElfFile {
 		e_shentsize = buffer.getShort();
 		e_shnum = buffer.getShort();
 		e_shstrndx = buffer.getShort();
+
+		// Initialise section table.
+		sections = new ArrayList<ElfSection>(
+			Collections.nCopies(e_shnum, (ElfSection)null));
 	}
 
 	/** Get the ELF file class.
@@ -211,6 +221,37 @@ public class ElfFile {
 	 */
 	public final int getElfFlags() {
 		return e_flags;
+	}
+
+	/** Get the number of sections.
+	 * @return the number of sections
+	 */
+	public final int getElfSectionCount() {
+		return e_shnum;
+	}
+
+	/** Get one of the sections from this ELF file.
+	 * @param shndx the section index
+	 * @return the section
+	 */
+	public final ElfSection getElfSection(int shndx) throws IOException {
+		// Validate the section index.
+		if ((shndx < 0) || (shndx >= e_shnum) || (e_shoff == 0)) {
+			throw new IllegalArgumentException("section index out of range");
+		}
+
+		// Check whether the section has already been parsed.
+		ElfSection section = sections.get(shndx);
+
+		// If not then parse it from the ByteBuffer.
+		if (section == null) {
+			int offset = (int)(e_shoff + shndx * e_shentsize);
+			buffer.position(offset);
+			section = new ElfSection(buffer, this);
+			sections.set(shndx, section);
+		}
+
+		return section;
 	}
 
 	/** Dump the ELF header to a stream in human-readable form.
