@@ -24,5 +24,10 @@ class DumpElf {
 			out.printf("Section: %d\n", i);
 			elf.getElfSection(i).dump(out);
 		}
+		for (short i = 0; i != elf.getElfSegmentCount(); ++i) {
+			out.println();
+			out.printf("Segment: %d\n", i);
+			elf.getElfSegment(i).dump(out);
+		}
 	}
 }
