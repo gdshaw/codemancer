@@ -17,7 +17,9 @@ import org.junit.Test;
 
 import org.codemancer.loader.elf.ElfFile;
 import org.codemancer.loader.elf.ElfSection;
+import org.codemancer.loader.elf.ElfSymbolTableSection;
 import org.codemancer.loader.elf.ElfSegment;
+import org.codemancer.loader.elf.ElfSymbol;
 
 // Test file compiled using gcc 4.6.3 for x86_64-linux-gnu.
 // Test values obtained using readelf and/or objdump.
@@ -25,7 +27,7 @@ import org.codemancer.loader.elf.ElfSegment;
 public class TestElf64 {
 	private ElfFile elf;
 	private ElfSection text;
-	private ElfSection symtab;
+	private ElfSymbolTableSection symtab;
 	private ElfSegment loadseg0;
 	private ElfSegment dynseg;
 
@@ -37,7 +39,7 @@ public class TestElf64 {
 			FileChannel.MapMode.READ_ONLY, 0, file.length());
 		elf = new ElfFile(image);
 		text = elf.getElfSection(13);
-		symtab = elf.getElfSection(28);
+		symtab = (ElfSymbolTableSection)elf.getElfSection(28);
 		loadseg0 = elf.getElfSegment(2);
 		dynseg = elf.getElfSegment(4);
 	}
@@ -54,7 +56,7 @@ public class TestElf64 {
 
 	@Test
 	public void testElfTextSection() throws IOException {
-		assertEquals(".text", text.getElfSectionName());
+		assertEquals(".text", text.getName());
 		assertEquals(ElfSection.SHT_PROGBITS, text.getElfSectionType());
 		assertEquals(6, text.getElfSectionFlags());
 		assertEquals(0x00400410, text.getAddress());
@@ -64,12 +66,22 @@ public class TestElf64 {
 
 	@Test
 	public void testElfSymTabSection() throws IOException {
-		assertEquals(".symtab", symtab.getElfSectionName());
+		assertEquals(".symtab", symtab.getName());
 		assertEquals(ElfSection.SHT_SYMTAB, symtab.getElfSectionType());
 		assertEquals(0, symtab.getElfSectionFlags());
 		assertEquals(0, symtab.getAddress());
 		assertEquals(0x0600, symtab.getSize());
 		assertEquals(8, symtab.getAlignment());
+	}
+
+	@Test
+	public void testMainSymbol() throws IOException {
+		ElfSymbol sym = symtab.getElfSymbol(60);
+		assertEquals("main", sym.getName());
+		assertEquals(0x004004f4, sym.getValue());
+		assertEquals(21, sym.getSize());
+		assertEquals(ElfSymbol.STT_FUNC, sym.getElfType());
+		assertEquals(ElfSymbol.STB_GLOBAL, sym.getElfBinding());
 	}
 
 	@Test

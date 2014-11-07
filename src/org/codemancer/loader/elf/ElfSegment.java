@@ -72,9 +72,7 @@ public class ElfSegment {
 
 	/** Construct object to represent ELF segment.
 	 * On entry the ByteBuffer must be positioned at the start of the
-	 * relevant program header. The byte order must match that of the
-	 * ELF file. On exit the position is unspecified, but the byte order
-	 * is unchanged.
+	 * relevant program header. On exit the position is unspecified.
 	 * @param buffer a ByteBuffer giving access to the underlying ELF file
 	 * @param elf the ELF file to which the segment belongs
 	 */

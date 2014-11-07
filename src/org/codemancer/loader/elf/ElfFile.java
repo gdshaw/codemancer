@@ -18,6 +18,10 @@ import org.codemancer.loader.InvalidFileFormat;
 /** A class to represent the content of an ELF file.
  * Both 32- and 64-bit ELF files are supported, using either
  * little- or big-endian encoding.
+ *
+ * Note that this class is responsible for configuring the byte order of
+ * the ByteBuffer through which the ELF file is accessed. All other classes
+ * must leave the byte order unchanged.
  */
 public class ElfFile {
 	/** A constant equal to the size of the ident field, in bytes. */
@@ -277,7 +281,7 @@ public class ElfFile {
 		if (section == null) {
 			int offset = (int)(e_shoff + shndx * e_shentsize);
 			buffer.position(offset);
-			section = new ElfSection(buffer, this);
+			section = ElfSection.makeSection(buffer, this);
 			sections.set(shndx, section);
 		}
 

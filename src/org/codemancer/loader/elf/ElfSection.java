@@ -68,6 +68,34 @@ public class ElfSection {
 	/** A mask to identify flags with processor-specific semantics. */
 	public static final int SHF_MASKPROC = 0xf0000000;
 
+	/** Construct new section.
+	 * If the section type is recognised then the object returned will be
+	 * of an appropriate subclass, otherwise it will be of this class.
+	 * @param buffer a ByteBuffer giving access to the underlying ELF file
+	 * @param elf the ELF file to which the section belongs
+	 * @return the newly constructed section
+	 */
+	public static ElfSection makeSection(ByteBuffer buffer, ElfFile elf)
+		throws IOException {
+
+		// Parse the sh_type field, which is needed to determine what
+		// type of section to construct, but then rewind the ByteBuffer
+		// to its original position in order to let the constructor see
+		// the whole section header.
+		int position = buffer.position();
+		int sh_name = buffer.getInt();
+		int sh_type = buffer.getInt();
+		buffer.position(position);
+
+		switch (sh_type) {
+		case SHT_SYMTAB:
+		case SHT_DYNSYM:
+			return new ElfSymbolTableSection(buffer, elf);
+		default:
+			return new ElfSection(buffer, elf);
+		}
+	}
+
 	/** A ByteBuffer giving access to the underlying ELF file. */
 	private final ByteBuffer buffer;
 
@@ -119,9 +147,7 @@ public class ElfSection {
 
 	/** Construct object to represent ELF section.
 	 * On entry the ByteBuffer must be positioned at the start of the
-	 * relevant section header. The byte order must match that of the
-	 * ELF file. On exit the position is unspecified, but the byte order
-	 * is unchanged.
+	 * relevant section header. On exit the position is unspecified.
 	 * @param buffer a ByteBuffer giving access to the underlying ELF file
 	 * @param elf the ELF file to which the section belongs
 	 */
@@ -164,7 +190,7 @@ public class ElfSection {
 	/** Get ELF section name.
 	 * @return the section name
 	 */
-	public final String getElfSectionName() throws IOException {
+	public final String getName() throws IOException {
 		return elf.getElfSectionName(sh_name);
 	}
 
@@ -197,24 +223,57 @@ public class ElfSection {
 	}
 
 	/** Get size of this section.
-	 * @return the size, in bytes.
+	 * @return the size, in bytes
 	 */
 	public final long getSize() {
 		return sh_size;
 	}
 
 	/** Get alignment of this section.
-	 * @return the alignment, in bytes.
+	 * @return the alignment, in bytes
 	 */
 	public final long getAlignment() {
 		return sh_addralign;
+	}
+
+	/** Get entry size of this section.
+	 * @return the entry size, in bytes
+	 */
+	public final long getEntrySize() {
+		return sh_entsize;
+	}
+
+	/** Get linked section.
+	 * @return the linked section, or null if none
+	 */
+	public <T> T getLinkedSection() throws IOException {
+		ElfSection sect = elf.getElfSection(sh_link);
+		return (T)sect;
+	}
+
+	/** Get a string from a linked string table.
+	 * This function must only be used when the linked section
+	 * contains a string table.
+	 * @param index the index into the string table
+	 * @return the string
+	 */
+	public final String getLinkedString(long index) throws IOException {
+		StringBuilder sb = new StringBuilder();
+		ElfSection sect = elf.getElfSection(sh_link);
+		int absOffset = (int)(sect.getOffset() + index);
+		buffer.position(absOffset);
+		char c;
+		while ((c = (char)buffer.get()) != 0) {
+			sb.append(c);
+		}
+		return sb.toString();
 	}
 
 	/** Dump the section header to a stream in human-readable form.
 	 * @param out the stream to be written to
 	 */
 	public void dump(PrintWriter out) throws IOException {
-		out.printf("Name: %s\n", getElfSectionName());
+		out.printf("Name: %s\n", getName());
 		out.printf("Type: 0x%08x\n", sh_type);
 		out.printf("Flags: 0x%08x\n", sh_flags);
 		out.printf("Virtual address: 0x%08x\n", sh_addr);
