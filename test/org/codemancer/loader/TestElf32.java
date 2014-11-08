@@ -76,7 +76,7 @@ public class TestElf32 {
 
 	@Test
 	public void testMainSymbol() throws IOException {
-		ElfSymbol sym = symtab.getElfSymbol(61);
+		ElfSymbol sym = symtab.getElfSymbol(62);
 		assertEquals("main", sym.getName());
 		assertEquals(0x080483d4, sym.getValue());
 		assertEquals(28, sym.getSize());

@@ -41,7 +41,7 @@ public class ElfSymbolTableSection extends ElfSection {
 		long offset = getOffset();
 		long size = getSize();
 		long entsize = getEntrySize();
-		for (long i = entsize; i + entsize < size; i += entsize) {
+		for (long i = 0; i + entsize <= size; i += entsize) {
 			buffer.position((int)(offset + i));
 			ElfSymbol elfSymbol = new ElfSymbol(buffer, elf, this, strtab);
 			elfSymbols.add(elfSymbol);
