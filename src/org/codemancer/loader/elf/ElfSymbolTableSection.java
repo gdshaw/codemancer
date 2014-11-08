@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.codemancer.loader.InvalidFileFormat;
+
 /** A class to represent a section within an ELF file containing a symbol table.
  * This can be either an ordinary symbol table (SHT_SYMTAB) or a dynamic symbol
  * table (SHT_DYNSYM).
@@ -26,15 +28,22 @@ public class ElfSymbolTableSection extends ElfSection {
 	 * @param buffer a ByteBuffer giving access to the underlying ELF file
 	 * @param elf the ELF file to which the section belongs
 	 */
-	public ElfSymbolTableSection(ByteBuffer buffer, ElfFile elf) throws IOException {
+	public ElfSymbolTableSection(ByteBuffer buffer, ElfFile elf)
+		throws IOException {
+
 		super(buffer, elf);
+		if (!(getLinkedSection() instanceof ElfStringTableSection)) {
+			throw new InvalidFileFormat(
+				"symbol table linked section should be string table");
+		}
+		ElfStringTableSection strtab = (ElfStringTableSection)getLinkedSection();
 
 		long offset = getOffset();
 		long size = getSize();
 		long entsize = getEntrySize();
 		for (long i = entsize; i + entsize < size; i += entsize) {
 			buffer.position((int)(offset + i));
-			ElfSymbol elfSymbol = new ElfSymbol(buffer, elf, this);
+			ElfSymbol elfSymbol = new ElfSymbol(buffer, elf, this, strtab);
 			elfSymbols.add(elfSymbol);
 		}
 	}

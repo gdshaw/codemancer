@@ -88,6 +88,8 @@ public class ElfSection {
 		buffer.position(position);
 
 		switch (sh_type) {
+		case SHT_STRTAB:
+			return new ElfStringTableSection(buffer, elf);
 		case SHT_SYMTAB:
 		case SHT_DYNSYM:
 			return new ElfSymbolTableSection(buffer, elf);
@@ -97,7 +99,7 @@ public class ElfSection {
 	}
 
 	/** A ByteBuffer giving access to the underlying ELF file. */
-	private final ByteBuffer buffer;
+	protected final ByteBuffer buffer;
 
 	/** An object representing the decoded ELF file as a whole. */
 	private final ElfFile elf;
@@ -252,27 +254,8 @@ public class ElfSection {
 	/** Get linked section.
 	 * @return the linked section, or null if none
 	 */
-	public <T> T getLinkedSection() throws IOException {
-		ElfSection sect = elf.getElfSection(sh_link);
-		return (T)sect;
-	}
-
-	/** Get a string from a linked string table.
-	 * This function must only be used when the linked section
-	 * contains a string table.
-	 * @param index the index into the string table
-	 * @return the string
-	 */
-	public final String getLinkedString(long index) throws IOException {
-		StringBuilder sb = new StringBuilder();
-		ElfSection sect = elf.getElfSection(sh_link);
-		int absOffset = (int)(sect.getOffset() + index);
-		buffer.position(absOffset);
-		char c;
-		while ((c = (char)buffer.get()) != 0) {
-			sb.append(c);
-		}
-		return sb.toString();
+	public ElfSection getLinkedSection() throws IOException {
+		return elf.getElfSection(sh_link);
 	}
 
 	/** Dump the section header to a stream in human-readable form.

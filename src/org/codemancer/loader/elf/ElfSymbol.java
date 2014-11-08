@@ -61,8 +61,11 @@ public class ElfSymbol {
 	 * @param buffer a ByteBuffer giving access to the underlying ELF file
 	 * @param elf the ELF file to which the symbol belongs
 	 * @param sect the section to which the symbol belongs
+	 * @param strtab the string table section used by this symbol
 	 */
-	public ElfSymbol(ByteBuffer buffer, ElfFile elf, ElfSection sect) throws IOException {
+	public ElfSymbol(ByteBuffer buffer, ElfFile elf, ElfSection sect,
+		ElfStringTableSection strtab) throws IOException {
+
 		byte fileClass = elf.getElfFileClass();
 
 		byte st_info;
@@ -82,7 +85,7 @@ public class ElfSymbol {
 			st_shndx = buffer.getShort();
 		}
 
-		st_name = sect.getLinkedString(namendx);
+		st_name = strtab.getString(namendx);
 		st_type = (byte)(st_info & 0xf);
 		st_bind = (byte)(st_info >> 4);
 	}
