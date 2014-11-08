@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
+import java.util.ArrayList;
 
 import org.codemancer.loader.InvalidFileFormat;
 
@@ -53,6 +54,9 @@ public class CoffFile {
 	/** The flags word. */
 	private short f_flags;
 
+	/** A list of COFF sections in this file. */
+	private final ArrayList<CoffSection> sections;
+
 	/** Construct object to represent COFF file.
 	 * On entry the ByteBuffer must be positioned at the start of the file.
 	 * Any byte order is permissible. On exit the position is unspecified,
@@ -71,6 +75,13 @@ public class CoffFile {
 		f_nsyms = buffer.getInt();
 		f_opthdr = buffer.getShort();
 		f_flags = buffer.getShort();
+
+		// Parse section headers.
+		sections = new ArrayList<CoffSection>(f_nscns);
+		for (int i = 0; i != f_nscns; ++i) {
+			CoffSection section = new CoffSection(buffer, this);
+			sections.add(section);
+		}
 	}
 
 	/** Get the COFF file magic number.
@@ -92,6 +103,25 @@ public class CoffFile {
 	 */
 	public final short getFlags() {
 		return f_flags;
+	}
+
+	/** Get the number of sections.
+	 * @return the number of sections
+	 */
+	public final int getCoffSectionCount() {
+		return sections.size();
+	}
+
+	/** Get one of the sections from this Coff file.
+	 * @param index the section index
+	 * @return the section
+	 */
+	public final CoffSection getCoffSection(int index) throws IOException {
+		try {
+			return sections.get(index);
+		} catch (IndexOutOfBoundsException ex) {
+			throw new IllegalArgumentException("section index out of range");
+		}
 	}
 
 	/** Dump the COFF header to a stream in human-readable form.

@@ -19,5 +19,10 @@ class DumpCoff {
 		ByteBuffer image = file.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, file.length());
 		CoffFile coff = new CoffFile(image);
 		coff.dump(out);
+		for (short i = 0; i != coff.getCoffSectionCount(); ++i) {
+			out.println();
+			out.printf("Section: %d\n", i);
+			coff.getCoffSection(i).dump(out);
+                }
 	}
 }
