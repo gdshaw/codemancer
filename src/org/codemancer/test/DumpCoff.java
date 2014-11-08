@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 import org.codemancer.loader.coff.CoffFile;
+import org.codemancer.loader.coff.CoffSymbol;
 
 class DumpCoff {
 	public static final void main(String args[]) throws Exception {
@@ -26,7 +27,10 @@ class DumpCoff {
                 }
 		out.println();
 		for (short i = 0; i != coff.getCoffSymbolCount(); ++i) {
-			coff.getCoffSymbol(i).dump(out);
+			CoffSymbol sym = coff.getCoffSymbol(i);
+			if (sym != null) {
+				sym.dump(out);
+			}
                 }
 	}
 }

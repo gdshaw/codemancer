@@ -99,6 +99,9 @@ public class CoffFile {
 			CoffSymbol symbol = new CoffSymbol(buffer, this);
 			coffSymbols.add(symbol);
 			i += symbol.getAuxiliaryEntryCount();
+			for (int j = 0; j != symbol.getAuxiliaryEntryCount(); ++j) {
+				coffSymbols.add(null);
+			}
 		}
 
 		// Parse section headers.
