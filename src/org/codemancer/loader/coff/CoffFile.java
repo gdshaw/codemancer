@@ -28,6 +28,9 @@ public class CoffFile {
 	/** A flag to indicate that local symbols have been stripped from the file. */
 	public static final short F_LSYMS = 0x0008;
 
+	/** A magic number to indicate that this is a Z80 COFF file. */
+	public static final short Z80MAGIC = (short)0x805a;
+
 	/** A ByteBuffer giving access to the underlying COFF file. */
 	private final ByteBuffer buffer;
 

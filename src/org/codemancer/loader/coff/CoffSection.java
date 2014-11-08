@@ -95,11 +95,13 @@ public class CoffSection {
 		s_flags = buffer.getInt();
 
 		// Parse relocations.
-		coffRelocations = new ArrayList<CoffRelocation>(s_nreloc);
-		buffer.position(s_relptr);
-		for (int i = 0; i < s_nreloc; ++i) {
-			CoffRelocation rel = new CoffRelocationZ80(buffer, this);
-			coffRelocations.add(rel);
+		if (coff.getCoffMagic() == CoffFile.Z80MAGIC) {
+			coffRelocations = new ArrayList<CoffRelocation>(s_nreloc);
+			buffer.position(s_relptr);
+			for (int i = 0; i < s_nreloc; ++i) {
+				CoffRelocation rel = new CoffRelocationZ80(buffer, this);
+				coffRelocations.add(rel);
+			}
 		}
 	}
 
