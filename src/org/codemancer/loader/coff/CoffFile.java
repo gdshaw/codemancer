@@ -81,13 +81,7 @@ public class CoffFile {
 		f_nsyms = buffer.getInt();
 		f_opthdr = buffer.getShort();
 		f_flags = buffer.getShort();
-
-		// Parse section headers.
-		sections = new ArrayList<CoffSection>(f_nscns);
-		for (int i = 0; i != f_nscns; ++i) {
-			CoffSection section = new CoffSection(buffer, this);
-			sections.add(section);
-		}
+		int sectptr = buffer.position();
 
 		// Parse string table.
 		buffer.position(f_symptr + f_nsyms * CoffSymbol.SYMESZ);
@@ -105,6 +99,14 @@ public class CoffFile {
 			CoffSymbol symbol = new CoffSymbol(buffer, this);
 			coffSymbols.add(symbol);
 			i += symbol.getAuxiliaryEntryCount();
+		}
+
+		// Parse section headers.
+		sections = new ArrayList<CoffSection>(f_nscns);
+		for (int i = 0; i != f_nscns; ++i) {
+			buffer.position(sectptr + i * CoffSection.SCNHSZ);
+			CoffSection section = new CoffSection(buffer, this);
+			sections.add(section);
 		}
 	}
 
