@@ -54,8 +54,14 @@ public class CoffFile {
 	/** The flags word. */
 	private short f_flags;
 
-	/** A list of COFF sections in this file. */
+	/** A list of sections in this COFF file. */
 	private final ArrayList<CoffSection> sections;
+
+	/** A list of symbols defined within this COFF file. */
+	private ArrayList<CoffSymbol> coffSymbols;
+
+	/** The string table. */
+	private final byte[] strings;
 
 	/** Construct object to represent COFF file.
 	 * On entry the ByteBuffer must be positioned at the start of the file.
@@ -81,6 +87,24 @@ public class CoffFile {
 		for (int i = 0; i != f_nscns; ++i) {
 			CoffSection section = new CoffSection(buffer, this);
 			sections.add(section);
+		}
+
+		// Parse string table.
+		buffer.position(f_symptr + f_nsyms * CoffSymbol.SYMESZ);
+		int strsz = buffer.getInt();
+		if (strsz < 4) {
+			throw new InvalidFileFormat("invalid string table size");
+		}
+		strings = new byte[strsz];
+		buffer.get(strings, 4, strsz - 4);
+
+		// Parse symbol table.
+		coffSymbols = new ArrayList<CoffSymbol>(f_nsyms);
+		buffer.position(f_symptr);
+		for (int i = 0; i < f_nsyms; ++i) {
+			CoffSymbol symbol = new CoffSymbol(buffer, this);
+			coffSymbols.add(symbol);
+			i += symbol.getAuxiliaryEntryCount();
 		}
 	}
 
@@ -112,7 +136,7 @@ public class CoffFile {
 		return sections.size();
 	}
 
-	/** Get one of the sections from this Coff file.
+	/** Get one of the sections from this COFF file.
 	 * @param index the section index
 	 * @return the section
 	 */
@@ -122,6 +146,34 @@ public class CoffFile {
 		} catch (IndexOutOfBoundsException ex) {
 			throw new IllegalArgumentException("section index out of range");
 		}
+	}
+
+	/** Get the number of symbols.
+	 * @return the number of symbols
+	 */
+	public int getCoffSymbolCount() {
+		return coffSymbols.size();
+	}
+
+	/** Get symbol at given index.
+	 * @param index the index of the required symbol
+	 * @return the symbol, or null if not found
+	 */
+	public CoffSymbol getCoffSymbol(int index) {
+		return coffSymbols.get(index);
+	}
+
+	/** Get string from string table
+	 * @param offet the required offset into the string table
+	 * @return the corresponding string
+	 */
+	public final String getString(int offset) throws IOException {
+		int i = offset;
+		while (strings[i] != 0) {
+			i += 1;
+		}
+		int length = i - offset;
+		return new String(strings, offset, length, "ISO-8859-1");
 	}
 
 	/** Dump the COFF header to a stream in human-readable form.

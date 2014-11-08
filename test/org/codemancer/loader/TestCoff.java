@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import org.codemancer.loader.coff.CoffFile;
 import org.codemancer.loader.coff.CoffSection;
+import org.codemancer.loader.coff.CoffSymbol;
 
 // Test file compiled using GNU as 2.22 for z80-unknown-coff.
 // Test values obtained using objdump.
@@ -50,5 +51,12 @@ public class TestCoff {
 		CoffSection sect = coff.getCoffSection(1);
 		assertEquals(".data", sect.getName());
 		assertEquals(0x0000000f, sect.getSize());
+	}
+
+	@Test
+	public void testStartSymbol() throws IOException {
+		CoffSymbol sym = coff.getCoffSymbol(5);
+		assertEquals("_start", sym.getName());
+		assertEquals(0x100, sym.getValue());
 	}
 }

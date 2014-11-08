@@ -24,5 +24,9 @@ class DumpCoff {
 			out.printf("Section: %d\n", i);
 			coff.getCoffSection(i).dump(out);
                 }
+		out.println();
+		for (short i = 0; i != coff.getCoffSymbolCount(); ++i) {
+			coff.getCoffSymbol(i).dump(out);
+                }
 	}
 }
