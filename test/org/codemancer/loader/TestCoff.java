@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.codemancer.loader.coff.CoffFile;
 import org.codemancer.loader.coff.CoffSection;
 import org.codemancer.loader.coff.CoffSymbol;
+import org.codemancer.loader.coff.CoffRelocationZ80;
 
 // Test file compiled using GNU as 2.22 for z80-unknown-coff.
 // Test values obtained using objdump.
@@ -55,8 +56,18 @@ public class TestCoff {
 
 	@Test
 	public void testStartSymbol() throws IOException {
-		CoffSymbol sym = coff.getCoffSymbol(5);
+		// Index into symbol table now counts auxiliary entries.
+		CoffSymbol sym = coff.getCoffSymbol(9);
 		assertEquals("_start", sym.getName());
 		assertEquals(0x100, sym.getValue());
+	}
+
+	@Test
+	public void testMessageRelocation() throws IOException {
+		CoffSection sect = coff.getCoffSection(0);
+		CoffRelocationZ80 rel = (CoffRelocationZ80)sect.getCoffRelocation(0);
+		assertEquals(0x101, rel.getOffset());
+		assertEquals(".data", rel.getCoffSymbol().getName());
+		assertEquals(1, rel.getCoffRelocationType());
 	}
 }

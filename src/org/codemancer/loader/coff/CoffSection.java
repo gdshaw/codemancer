@@ -8,6 +8,7 @@ package org.codemancer.loader.coff;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 /** A class to represent a section within an COFF file. */
 public class CoffSection {
@@ -19,6 +20,9 @@ public class CoffSection {
 
 	/** A flag to indicate that a section defines a region of uninitialised data. */
 	public static final int STYP_BSS = 0x0080;
+
+	/** The size of a symbol table entry, in bytes. */
+	public static final int SCNHSZ = 40;
 
 	/** A ByteBuffer giving access to the underlying COFF file. */
 	protected final ByteBuffer buffer;
@@ -56,6 +60,9 @@ public class CoffSection {
 	/** The flags for this section. */
 	private final int s_flags;
 
+	/** A list of relocation directives for this COFF section. */
+	private ArrayList<CoffRelocation> coffRelocations;
+
 	/** Construct new section.
 	 * @param buffer a ByteBuffer giving access to the underlying COFF file
 	 * @param elf the COFF file to which the section belongs
@@ -86,14 +93,50 @@ public class CoffSection {
 		s_nreloc = buffer.getShort();
 		s_nlnno = buffer.getShort();
 		s_flags = buffer.getInt();
+
+		// Parse relocations.
+		coffRelocations = new ArrayList<CoffRelocation>(s_nreloc);
+		buffer.position(s_relptr);
+		for (int i = 0; i < s_nreloc; ++i) {
+			CoffRelocation rel = new CoffRelocationZ80(buffer, this);
+			coffRelocations.add(rel);
+		}
 	}
 
+	/** Get the COFF file to which this section belongs.
+	 * @return the COFF file
+	 */
+	public final CoffFile getCoffFile() {
+		return coff;
+	}
+
+	/** Get the name of this COFF section.
+	 * @return the name
+	 */
 	public final String getName() throws IOException {
 		return s_name;
 	}
 
+	/** Get the size of this COFF section.
+	 * @return the size
+	 */
 	public final long getSize() {
 		return s_size;
+	}
+
+	/** Get the number of relocations.
+	 * @return the number of relocations
+	 */
+	public int getCoffRelocationCount() {
+		return coffRelocations.size();
+	}
+
+	/** Get relocation at given index.
+	 * @param index the index of the required relocation
+	 * @return the relocation, or null if not found
+	 */
+	public CoffRelocation getCoffRelocation(int index) {
+		return coffRelocations.get(index);
 	}
 
 	/** Dump the section header to a stream in human-readable form.

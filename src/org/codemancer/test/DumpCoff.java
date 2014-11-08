@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 import org.codemancer.loader.coff.CoffFile;
+import org.codemancer.loader.coff.CoffSection;
 import org.codemancer.loader.coff.CoffSymbol;
 
 class DumpCoff {
@@ -21,9 +22,17 @@ class DumpCoff {
 		CoffFile coff = new CoffFile(image);
 		coff.dump(out);
 		for (short i = 0; i != coff.getCoffSectionCount(); ++i) {
+			CoffSection sect = coff.getCoffSection(i);
 			out.println();
 			out.printf("Section: %d\n", i);
-			coff.getCoffSection(i).dump(out);
+			sect.dump(out);
+			out.println();
+			for (int j = 0; j != sect.getCoffRelocationCount(); ++j) {
+				sect.getCoffRelocation(j).dump(out);
+			}
+			if (sect.getCoffRelocationCount() == 0) {
+				out.println("(no relocations)");
+			}
                 }
 		out.println();
 		for (short i = 0; i != coff.getCoffSymbolCount(); ++i) {
