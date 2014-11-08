@@ -12,12 +12,17 @@ import java.nio.ByteBuffer;
 public class ElfStringTableSection extends ElfSection {
 	/** Construct new string table section.
 	 * On entry the ByteBuffer must be positioned at the start of the
-	 * relevant section header. On exit the position is unspecified.
-	 * @param buffer a ByteBuffer giving access to the underlying ELF file
+	 * relevant section header. A defensive copy is made immediately,
+	 * and from that point onward the class instance neither modifies
+	 * nor depends on the original ByteBuffer.
+	 * @param parentBuffer a ByteBuffer giving access to the underlying
+	 *  ELF file
 	 * @param elf the ELF file to which the section belongs
 	 */
-	public ElfStringTableSection(ByteBuffer buffer, ElfFile elf) throws IOException {
-		super(buffer, elf);
+	public ElfStringTableSection(ByteBuffer parentBuffer, ElfFile elf)
+		throws IOException {
+
+		super(parentBuffer, elf);
 	}
 
 	/** Get the string starting at a given offset into this table.

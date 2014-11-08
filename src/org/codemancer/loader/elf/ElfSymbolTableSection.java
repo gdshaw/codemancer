@@ -24,14 +24,17 @@ public class ElfSymbolTableSection extends ElfSection {
 
 	/** Construct new symbol table section.
 	 * On entry the ByteBuffer must be positioned at the start of the
-	 * relevant section header. On exit the position is unspecified.
-	 * @param buffer a ByteBuffer giving access to the underlying ELF file
+	 * relevant section header. A defensive copy is made immediately,
+	 * and from that point onward the class instance neither modifies
+	 * nor depends on the original ByteBuffer.
+	 * @param parentBuffer a ByteBuffer giving access to the underlying
+	 *  ELF file
 	 * @param elf the ELF file to which the section belongs
 	 */
-	public ElfSymbolTableSection(ByteBuffer buffer, ElfFile elf)
+	public ElfSymbolTableSection(ByteBuffer parentBuffer, ElfFile elf)
 		throws IOException {
 
-		super(buffer, elf);
+		super(parentBuffer, elf);
 		if (!(getLinkedSection() instanceof ElfStringTableSection)) {
 			throw new InvalidFileFormat(
 				"symbol table linked section should be string table");
