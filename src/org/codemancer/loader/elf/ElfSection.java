@@ -93,6 +93,10 @@ public class ElfSection {
 		case SHT_SYMTAB:
 		case SHT_DYNSYM:
 			return new ElfSymbolTableSection(buffer, elf);
+		case SHT_RELA:
+			return new ElfRelocationSection(buffer, elf, true);
+		case SHT_REL:
+			return new ElfRelocationSection(buffer, elf, false);
 		default:
 			return new ElfSection(buffer, elf);
 		}

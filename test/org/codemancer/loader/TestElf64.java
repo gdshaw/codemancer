@@ -18,8 +18,10 @@ import org.junit.Test;
 import org.codemancer.loader.elf.ElfFile;
 import org.codemancer.loader.elf.ElfSection;
 import org.codemancer.loader.elf.ElfSymbolTableSection;
+import org.codemancer.loader.elf.ElfRelocationSection;
 import org.codemancer.loader.elf.ElfSegment;
 import org.codemancer.loader.elf.ElfSymbol;
+import org.codemancer.loader.elf.ElfRelocation;
 
 // Test file compiled using gcc 4.6.3 for x86_64-linux-gnu.
 // Test values obtained using readelf and/or objdump.
@@ -28,6 +30,7 @@ public class TestElf64 {
 	private ElfFile elf;
 	private ElfSection text;
 	private ElfSymbolTableSection symtab;
+	private ElfRelocationSection pltreltab;
 	private ElfSegment loadseg0;
 	private ElfSegment dynseg;
 
@@ -40,6 +43,7 @@ public class TestElf64 {
 		elf = new ElfFile(image);
 		text = elf.getElfSection(13);
 		symtab = (ElfSymbolTableSection)elf.getElfSection(28);
+		pltreltab = (ElfRelocationSection)elf.getElfSection(10);
 		loadseg0 = elf.getElfSegment(2);
 		dynseg = elf.getElfSegment(4);
 	}
@@ -82,6 +86,15 @@ public class TestElf64 {
 		assertEquals(21, sym.getSize());
 		assertEquals(ElfSymbol.STT_FUNC, sym.getElfType());
 		assertEquals(ElfSymbol.STB_GLOBAL, sym.getElfBinding());
+	}
+
+	@Test
+	public void testPutsRelocation() throws IOException {
+		ElfRelocation rel = pltreltab.getElfRelocation(0);
+		assertEquals(0x00601000, rel.getOffset());
+		assertEquals(7, rel.getElfRelocationType());
+		assertEquals("puts", rel.getElfSymbol().getName());
+		assertEquals(0, rel.getAddend());
 	}
 
 	@Test
