@@ -35,7 +35,9 @@ public class AofChunk {
 		buffer.position(position);
 
 		// Construct a chunk of the appropriate type according to the chunk ID.
-		if (chunkId.equals("OBJ_IDFN")) {
+		if (chunkId.equals("OBJ_HEAD")) {
+			return new AofHeaderChunk(buffer, aof);
+		} else if (chunkId.equals("OBJ_IDFN")) {
 			return new AofIdentificationChunk(buffer, aof);
 		} else {
 			return new AofChunk(buffer, aof);

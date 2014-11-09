@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import org.codemancer.loader.aof.AofFile;
 import org.codemancer.loader.aof.AofChunk;
+import org.codemancer.loader.aof.AofHeaderChunk;
 import org.codemancer.loader.aof.AofIdentificationChunk;
 
 // Test file compiled using GCCSDK 3.4.6 release 3.
@@ -42,10 +43,13 @@ public class TestAof {
 
 	@Test
 	public void testAofHeadChunk() throws IOException {
-		AofChunk chunk = aof.getUniqueChunk("OBJ_HEAD", true);
+		AofHeaderChunk chunk = (AofHeaderChunk)aof.getUniqueChunk("OBJ_HEAD", true);
 		assertEquals("OBJ_HEAD", chunk.getChunkId());
 		assertEquals(0x005c, chunk.getFileOffset());
 		assertEquals(0x0054, chunk.getSize());
+		assertEquals(310, chunk.getVersionId());
+		assertEquals(3, chunk.getAreaCount());
+		assertEquals(8, chunk.getSymbolCount());
 	}
 
 	@Test
