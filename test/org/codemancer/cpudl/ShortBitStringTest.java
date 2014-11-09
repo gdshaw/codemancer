@@ -53,4 +53,20 @@ public class ShortBitStringTest {
 		assertEquals(20, new ShortBitString(0, 20).length());
 		assertEquals(64, new ShortBitString(content, 64).length());
 	}
+
+	@Test
+	public void testEquals() {
+		assertEquals(new ShortBitString(), new ShortBitString());
+		assertEquals(new ShortBitString(1, 1), new ShortBitString(1, 1));
+		assertEquals(new ShortBitString(content, 64), new ShortBitString(content, 64));
+		assertFalse(new ShortBitString(content, 64).equals(new ShortBitString(content, 63)));
+		assertFalse(new ShortBitString(content, 64).equals(new ShortBitString(content + 1, 64)));
+	}
+
+	@Test
+	public void testHashCode() {
+		assertEquals(new ShortBitString().hashCode(), new ShortBitString().hashCode());
+		assertEquals(new ShortBitString(1, 1).hashCode(), new ShortBitString(1, 1).hashCode());
+		assertEquals(new ShortBitString(content, 64).hashCode(), new ShortBitString(content, 64).hashCode());
+	}
 }

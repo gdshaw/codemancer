@@ -6,7 +6,7 @@
 package org.codemancer.cpudl;
 
 /** A class to represent a bitstring of up to 64 bits. */
-public class ShortBitString {
+public class ShortBitString extends BitString {
 	/** The content of this bitstring, as a little-endian
 	 * long integer. */
 	private final long content;

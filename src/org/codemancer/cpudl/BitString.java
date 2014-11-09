@@ -10,16 +10,16 @@ package org.codemancer.cpudl;
  */
 public abstract class BitString {
 	/** Get a bit from this bitstring.
-	 * The behaviour of this function is undefined if index < 0
-	 * or index >= this.length().
+	 * The behaviour of this function is undefined if
+	 * index < 0 or index >= this.length().
 	 * @param index the index of the bit to be inspected
 	 * @return the bit at the given index
 	 */
 	public abstract int getBit(long index);
 
 	/** Get a number of bits from this bitstring.
-	 * The behaviour of this function is undefined if index < 0
-	 * or index + length > this.length().
+	 * The behaviour of this function is undefined if
+	 * index < 0 or index + length > this.length().
 	 * @param index the index of the first bit to be inspected
 	 * @param length the number of bits to be inspected
 	 * @return the bits, as a little-endian long integer
