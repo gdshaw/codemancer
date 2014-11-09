@@ -8,7 +8,10 @@ package org.codemancer.loader.aof;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.TreeMap;
 
+import org.codemancer.loader.Allocator;
 import org.codemancer.loader.InvalidFileFormat;
 
 /** A class to represent a header chunk within an AOF file. */
@@ -31,6 +34,12 @@ public class AofHeaderChunk extends AofChunk {
 	/** The offset to the entry point, if there is one. */
 	private final int entryAreaOffset;
 
+	/** The areas defined by this AOF file. */
+	private final ArrayList<AofArea> areas = new ArrayList<AofArea>();
+
+	/** An address map for this AOF file. */
+	private TreeMap<Long, AofArea> addressMap = new TreeMap<Long, AofArea>();
+
 	/** Construct new AOF header chunk.
 	 * On entry the supplied ByteBuffer should be positioned at the start
 	 * of the 16-byte entry in the chunk file header that corresponds to
@@ -38,11 +47,11 @@ public class AofHeaderChunk extends AofChunk {
 	 * that 16-byte entry.  A reference to the buffer is kept, but other
 	 * members of this class do not alter or depend on its position.
 	 *
-	 * @param buffer a ByteBuffer giving access to the underlying AOF file
+	 * @param parentBuffer a ByteBuffer giving access to the underlying AOF file
 	 * @param aof the AOF file to which the chunk belongs
 	 */
-	public AofHeaderChunk(ByteBuffer buffer, AofFile aof) throws IOException {
-		super(buffer, aof);
+	public AofHeaderChunk(ByteBuffer parentBuffer, AofFile aof) throws IOException {
+		super(parentBuffer, aof);
 		buffer.position(fileOffset);
 
 		// Read and validate object file type.
@@ -58,6 +67,15 @@ public class AofHeaderChunk extends AofChunk {
 		numSymbols = buffer.getInt();
 		entryAreaIndex = buffer.getInt();
 		entryAreaOffset = buffer.getInt();
+
+		// Read areas.
+		Allocator fileAlloc = new Allocator(aof.getAreaChunk().getFileOffset(), 1);
+		Allocator memAlloc = new Allocator(0x8000, 1);
+		for (int i = 0; i != numAreas; ++i) {
+			AofArea area = new AofArea(buffer, this, fileAlloc, memAlloc);
+			areas.add(area);
+			addressMap.put((long)area.getBaseAddress(), area);
+		}
 	}
 
 	/** Get the AOF version ID.
@@ -70,8 +88,16 @@ public class AofHeaderChunk extends AofChunk {
 	/** Get the number of areas in this AOF file.
 	 * @return the number of areas
 	 */
-	public final int getAreaCount() {
+	public final int getAofAreaCount() {
 		return numAreas;
+	}
+
+	/** Get AOF area by index.
+	 * @param index the index of the required area
+	 * @return the area
+	 */
+	public final AofArea getAofArea(int index) {
+		return areas.get(index);
 	}
 
 	/** Get the number of symbols in this AOF file.

@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 import org.codemancer.loader.aof.AofFile;
+import org.codemancer.loader.aof.AofHeaderChunk;
 import org.codemancer.loader.aof.AofSymbolTableChunk;
 
 class DumpAof {
@@ -19,10 +20,15 @@ class DumpAof {
 		RandomAccessFile file = new RandomAccessFile(args[0], "r");
 		ByteBuffer image = file.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, file.length());
 		AofFile aof = new AofFile(image);
+		AofHeaderChunk header = aof.getHeaderChunk();
 		aof.dump(out);
 		for (int i = 0; i != aof.getMaxChunks(); ++i) {
 			out.println();
 			aof.getChunk(i).dump(out);
+		}
+		out.println();
+		for (int i = 0; i != header.getAofAreaCount(); ++i) {
+			header.getAofArea(i).dump(out);
 		}
 		out.println();
 		AofSymbolTableChunk symtab = aof.getSymbolTableChunk();

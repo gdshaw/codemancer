@@ -21,13 +21,16 @@ import org.codemancer.loader.aof.AofHeaderChunk;
 import org.codemancer.loader.aof.AofIdentificationChunk;
 import org.codemancer.loader.aof.AofSymbolTableChunk;
 import org.codemancer.loader.aof.AofSymbol;
+import org.codemancer.loader.aof.AofArea;
 
 // Test file compiled using GCCSDK 3.4.6 release 3.
 // Type, location and size of chunks obtained by inspection of hex dump.
+// Area base addresses calculated assuming start address of 0x8000.
 // Other information obtained using decaof 2.00 (part of GCCSDK above).
 
 public class TestAof {
 	private AofFile aof;
+	private AofHeaderChunk head;
 	private AofSymbolTableChunk symtab;
 
 	public TestAof() throws IOException {
@@ -37,6 +40,7 @@ public class TestAof {
 		ByteBuffer image = file.getChannel().map(
 			FileChannel.MapMode.READ_ONLY, 0, file.length());
 		aof = new AofFile(image);
+		head = aof.getHeaderChunk();
 		symtab = aof.getSymbolTableChunk();
 	}
 
@@ -52,7 +56,7 @@ public class TestAof {
 		assertEquals(0x005c, chunk.getFileOffset());
 		assertEquals(0x0054, chunk.getSize());
 		assertEquals(310, chunk.getVersionId());
-		assertEquals(3, chunk.getAreaCount());
+		assertEquals(3, chunk.getAofAreaCount());
 		assertEquals(8, chunk.getSymbolCount());
 	}
 
@@ -95,5 +99,21 @@ public class TestAof {
 		AofSymbol symbol = symtab.getAofSymbol(2);
 		assertEquals("main", symbol.getName());
 		assertEquals(0, symbol.getValue());
+	}
+
+	@Test
+	public void testArea0() throws IOException {
+		AofArea area = head.getAofArea(0);
+		assertEquals("C$$code2", area.getName());
+		assertEquals(0x34, area.getSize());
+		assertEquals(0x8000, area.getBaseAddress());
+	}
+
+	@Test
+	public void testArea1() throws IOException {
+		AofArea area = head.getAofArea(1);
+		assertEquals("C$$rodata1", area.getName());
+		assertEquals(0x10, area.getSize());
+		assertEquals(0x8034, area.getBaseAddress());
 	}
 }

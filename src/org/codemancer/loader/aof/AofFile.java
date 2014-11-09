@@ -42,6 +42,9 @@ public class AofFile {
 	/** The header chunk. */
 	private AofHeaderChunk headerChunk = null;
 
+	/** The area chunk. */
+	private AofChunk areaChunk = null;
+
 	/** The string table chunk. */
 	private AofStringTableChunk stringTableChunk = null;
 
@@ -170,6 +173,16 @@ public class AofFile {
 			headerChunk = (AofHeaderChunk)getUniqueChunk("OBJ_HEAD", false);
 		}
 		return headerChunk;
+	}
+
+	/** Get the area chunk.
+	 * @return the area chunk, or null if not present
+	 */
+	public final AofChunk getAreaChunk() throws IOException {
+		if (areaChunk == null) {
+			areaChunk = (AofChunk)getUniqueChunk("OBJ_AREA", false);
+		}
+		return areaChunk;
 	}
 
 	/** Get the string table chunk.
