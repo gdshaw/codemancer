@@ -1,6 +1,7 @@
 // This file is part of Codemancer.
 // Copyright 2014 Graham Shaw.
-// All rights reserved.
+// Distribution and modification are permitted within the terms of the
+// GNU General Public License (version 3 or any later version).
 
 package org.codemancer.loader.aof;
 

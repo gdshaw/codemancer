@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 import org.codemancer.loader.aof.AofFile;
+import org.codemancer.loader.aof.AofSymbolTableChunk;
 
 class DumpAof {
 	public static final void main(String args[]) throws Exception {
@@ -22,6 +23,11 @@ class DumpAof {
 		for (int i = 0; i != aof.getMaxChunks(); ++i) {
 			out.println();
 			aof.getChunk(i).dump(out);
+		}
+		out.println();
+		AofSymbolTableChunk symtab = aof.getSymbolTableChunk();
+		for (int i = 0; i != symtab.getAofSymbolCount(); ++i) {
+			symtab.getAofSymbol(i).dump(out);
 		}
 	}
 }

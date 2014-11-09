@@ -19,6 +19,8 @@ import org.codemancer.loader.aof.AofFile;
 import org.codemancer.loader.aof.AofChunk;
 import org.codemancer.loader.aof.AofHeaderChunk;
 import org.codemancer.loader.aof.AofIdentificationChunk;
+import org.codemancer.loader.aof.AofSymbolTableChunk;
+import org.codemancer.loader.aof.AofSymbol;
 
 // Test file compiled using GCCSDK 3.4.6 release 3.
 // Type, location and size of chunks obtained by inspection of hex dump.
@@ -26,6 +28,7 @@ import org.codemancer.loader.aof.AofIdentificationChunk;
 
 public class TestAof {
 	private AofFile aof;
+	private AofSymbolTableChunk symtab;
 
 	public TestAof() throws IOException {
 		String pathname = "testdata" + File.separatorChar +
@@ -34,6 +37,7 @@ public class TestAof {
 		ByteBuffer image = file.getChannel().map(
 			FileChannel.MapMode.READ_ONLY, 0, file.length());
 		aof = new AofFile(image);
+		symtab = aof.getSymbolTableChunk();
 	}
 
 	@Test
@@ -84,5 +88,12 @@ public class TestAof {
 		assertEquals("OBJ_AREA", chunk.getChunkId());
 		assertEquals(0x01ec, chunk.getFileOffset());
 		assertEquals(0x006c, chunk.getSize());
+	}
+
+	@Test
+	public void testMainSymbol() throws IOException {
+		AofSymbol symbol = symtab.getAofSymbol(2);
+		assertEquals("main", symbol.getName());
+		assertEquals(0, symbol.getValue());
 	}
 }

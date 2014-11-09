@@ -39,6 +39,15 @@ public class AofFile {
 	 * indexed by position. */
 	private final ArrayList<AofChunk> chunks;
 
+	/** The header chunk. */
+	private AofHeaderChunk headerChunk = null;
+
+	/** The string table chunk. */
+	private AofStringTableChunk stringTableChunk = null;
+
+	/** The symbol table chunk. */
+	private AofSymbolTableChunk symbolTableChunk = null;
+
 	/** Construct object to represent AOF file.
 	 * On entry the ByteBuffer must be positioned at the start of the file.
 	 * Any byte order is permissible. On exit the position is unspecified,
@@ -151,6 +160,36 @@ public class AofFile {
 			throw new InvalidFileFormat("multiple " + chunkId + " chunks");
 		}
 		return getChunk(chunkList.get(0));
+	}
+
+	/** Get the header chunk.
+	 * @return the header chunk, or null if not present
+	 */
+	public final AofHeaderChunk getHeaderChunk() throws IOException {
+		if (headerChunk == null) {
+			headerChunk = (AofHeaderChunk)getUniqueChunk("OBJ_HEAD", false);
+		}
+		return headerChunk;
+	}
+
+	/** Get the string table chunk.
+	 * @return the string table chunk, or null if not present
+	 */
+	public final AofStringTableChunk getStringTableChunk() throws IOException {
+		if (stringTableChunk == null) {
+			stringTableChunk = (AofStringTableChunk)getUniqueChunk("OBJ_STRT", false);
+		}
+		return stringTableChunk;
+	}
+
+	/** Get the symbol table chunk.
+	 * @return the symbol table chunk, or null if not present
+	 */
+	public final AofSymbolTableChunk getSymbolTableChunk() throws IOException {
+		if (symbolTableChunk == null) {
+			symbolTableChunk = (AofSymbolTableChunk)getUniqueChunk("OBJ_SYMT", false);
+		}
+		return symbolTableChunk;
 	}
 
 	public void dump(PrintWriter out) throws IOException {

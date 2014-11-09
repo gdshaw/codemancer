@@ -39,6 +39,10 @@ public class AofChunk {
 			return new AofHeaderChunk(buffer, aof);
 		} else if (chunkId.equals("OBJ_IDFN")) {
 			return new AofIdentificationChunk(buffer, aof);
+		} else if (chunkId.equals("OBJ_SYMT")) {
+			return new AofSymbolTableChunk(buffer, aof);
+		} else if (chunkId.equals("OBJ_STRT")) {
+			return new AofStringTableChunk(buffer, aof);
 		} else {
 			return new AofChunk(buffer, aof);
 		}
