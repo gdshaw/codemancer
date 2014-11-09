@@ -35,6 +35,7 @@
    <arg value="org.codemancer.loader.TestElf32"/>
    <arg value="org.codemancer.loader.TestElf64"/>
    <arg value="org.codemancer.loader.TestCoff"/>
+   <arg value="org.codemancer.loader.TestAof"/>
   </java>
  </target>
 </project>
