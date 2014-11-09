@@ -9,16 +9,35 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
 
 import org.codemancer.loader.InvalidFileFormat;
 
 /** A class to represent the content of an AOF (ARM object format) file. */
 public class AofFile {
+	/** The offset of the first chunk header. */
+	private static final int chunkOffset = 12;
+
+	/** The size of each chunk header. */
+	private static final int chunkSize = 16;
+
 	/** A ByteBuffer giving access to the underlying AOF file. */
 	private final ByteBuffer buffer;
 
 	/** The maximum number of chunks allowed in this AOF file. */
 	private final int maxChunks;
+
+	/** A directory of chunks in this AOF file, indexed by ID. */
+	private final Map<String, List<Integer>> chunkDirectory =
+		new HashMap<String, List<Integer>>();
+
+	/** A table of chunks in this AOF file that have been parsed,
+	 * indexed by position. */
+	private final ArrayList<AofChunk> chunks;
 
 	/** Construct object to represent AOF file.
 	 * On entry the ByteBuffer must be positioned at the start of the file.
@@ -56,6 +75,25 @@ public class AofFile {
 		if ((numChunks < 0) || (numChunks > maxChunks)) {
 			throw new InvalidFileFormat("invalid numChunks field");
 		}
+
+		// Construct chunk directory.
+		for (int i = 0; i != maxChunks; ++i) {
+			buffer.position(chunkOffset + i * chunkSize);
+			AofChunk chunk = new AofChunk(buffer, this);
+			if (chunk.getFileOffset() != 0) {
+				String chunkId = chunk.getChunkId();
+				List<Integer> chunkList = chunkDirectory.get(chunkId);
+				if (chunkList == null) {
+					chunkList = new ArrayList<Integer>();
+					chunkDirectory.put(chunkId, chunkList);
+				}
+				chunkList.add(i);
+			}
+		}
+
+		// Initialise chunk table.
+		chunks = new ArrayList<AofChunk>(
+			Collections.nCopies(maxChunks, (AofChunk)null));
 	}
 
 	/** Get the maximum number of chunks allowed in this AOF file.
@@ -63,6 +101,56 @@ public class AofFile {
 	 */
 	public final int getMaxChunks() {
 		return maxChunks;
+	}
+
+	/** Get chunk by index.
+	 * @param index the chunk index
+	 * @return the corresponding chunk
+	 */
+	public final AofChunk getChunk(int index) throws IOException {
+		// Validate the chunk index.
+		if ((index < 0) || (index >= maxChunks)) {
+			throw new IllegalArgumentException(
+				"chunk index out of range");
+		}
+
+		// Attempt to fetch the chunk from the table.
+		AofChunk chunk = chunks.get(index);
+
+		// If the chunk was not in the table then parse it.
+		if (chunk == null) {
+			buffer.position(chunkOffset + index * chunkSize);
+			chunk = AofChunk.makeChunk(buffer, this);
+			chunks.set(index, chunk);
+		}
+
+		// Don't return unused chunks.
+		if (chunk.getFileOffset() == 0) {
+			chunk = null;
+		}
+
+		return chunk;
+	}
+
+	/** Find the unique chunk with a given chunk ID.
+	 * @param chunkId the required chunk ID
+	 * @param required true if this chunk is required to be present,
+	 *  otherwise false
+	 * @return the chunk, or null if not found and not required
+	 * @throws InvalidFileFormat if the chunk is missing but required,
+	 *  or if there is more than one chunk with the given ID
+	 */
+	public final AofChunk getUniqueChunk(String chunkId, boolean required)
+		throws IOException {
+
+		List<Integer> chunkList = chunkDirectory.get(chunkId);
+		if ((chunkList == null) || (chunkList.size() == 0)) {
+			throw new InvalidFileFormat("missing " + chunkId + " chunk");
+		}
+		if (chunkList.size() > 1) {
+			throw new InvalidFileFormat("multiple " + chunkId + " chunks");
+		}
+		return getChunk(chunkList.get(0));
 	}
 
 	public void dump(PrintWriter out) throws IOException {

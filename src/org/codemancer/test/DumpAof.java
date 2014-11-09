@@ -19,5 +19,9 @@ class DumpAof {
 		ByteBuffer image = file.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, file.length());
 		AofFile aof = new AofFile(image);
 		aof.dump(out);
+		for (int i = 0; i != aof.getMaxChunks(); ++i) {
+			out.println();
+			aof.getChunk(i).dump(out);
+		}
 	}
 }
