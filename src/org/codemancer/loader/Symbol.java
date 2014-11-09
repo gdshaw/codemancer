@@ -1,3 +1,8 @@
+// This file is part of Codemancer.
+// Copyright 2014 Graham Shaw.
+// Distribution and modification are permitted within the terms of the
+// GNU General Public License (version 3 or any later version).
+
 package org.codemancer.loader;
 
 import java.io.PrintWriter;

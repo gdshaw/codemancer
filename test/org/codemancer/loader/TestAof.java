@@ -122,7 +122,7 @@ public class TestAof {
 	public void testArea0Relocation0() throws IOException {
 		AofArea area = head.getAofArea(0);
 		AofRelocation rel = area.getAofRelocation(0);
-		assertEquals(0x30, rel.getOffset());
+		assertEquals(0x30, rel.getAddress());
 		assertEquals(4, rel.getSize());
 		assertEquals("__main", rel.getSymbol().getName());
 	}

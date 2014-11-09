@@ -91,7 +91,7 @@ public class TestElf32 {
 	@Test
 	public void testPutsRelocation() throws IOException {
 		ElfRelocation rel = pltreltab.getElfRelocation(0);
-		assertEquals(0x0804a000, rel.getOffset());
+		assertEquals(0x0804a000, rel.getAddress());
 		assertEquals(7, rel.getElfRelocationType());
 		assertEquals("puts", rel.getElfSymbol().getName());
 		assertEquals(0, rel.getAddend());

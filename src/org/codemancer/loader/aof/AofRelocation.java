@@ -9,13 +9,15 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.codemancer.loader.Symbol;
+import org.codemancer.loader.Relocation;
 import org.codemancer.loader.InvalidFileFormat;
 
 /** A class to represent a relocation directive. */
-public class AofRelocation {
+public class AofRelocation implements Relocation {
 	/** The location of the object to be relocated,
 	 * as a byte offset from the start of the relevant area. */
-	private long offset;
+	private int offset;
 
 	/** The size of the object to be relocated, in bytes. */
 	private int size;
@@ -88,24 +90,26 @@ public class AofRelocation {
 		}
 	}
 
-	/** Get the offset to which this relocation is applicable.
-	 * @return the offset
-	 */
-	public long getOffset() {
-		return offset;
+	public long getAddress() {
+		return offset & 0xFFFFFFFF;
 	}
 
-	/** Get the size of the object relocated.
-	 * @return the size, in bytes
-	 */
 	public long getSize() {
-		return size;
+		return size & 0xFFFFFFFF;
+	}
+
+	public Symbol getSymbol() {
+		return symbol;
+	}
+
+	public long getAddend() {
+		return 0;
 	}
 
 	/** Get the symbol to which this relocation refers.
 	 * @return the symbol
 	 */
-	public AofSymbol getSymbol() {
+	public AofSymbol getAofSymbol() {
 		return symbol;
 	}
 

@@ -1,13 +1,20 @@
+// This file is part of Codemancer.
+// Copyright 2014 Graham Shaw.
+// Distribution and modification are permitted within the terms of the
+// GNU General Public License (version 3 or any later version).
+
 package org.codemancer.loader.elf;
 
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.codemancer.loader.Symbol;
+import org.codemancer.loader.Relocation;
 import org.codemancer.loader.InvalidFileFormat;
 
 /** A class to represent a relocation directive (with or without an explicit addend). */
-public class ElfRelocation {
+public class ElfRelocation implements Relocation {
 	/** The location to which the relocation is applicable,
 	 * as an offset from the start of the relevant section. */
 	private long r_offset;
@@ -70,11 +77,20 @@ public class ElfRelocation {
 		}
 	}
 
-	/** Get the offset to which this relocation is applicable.
-	 * @return the offset
-	 */
-	public long getOffset() {
+	public long getAddress() {
 		return r_offset;
+	}
+
+	public long getSize() {
+		return 0;
+	}
+
+	public Symbol getSymbol() {
+		return symbol;
+	}
+
+	public long getAddend() {
+		return r_addend;
 	}
 
 	/** Get the type of this relocation.
@@ -89,13 +105,6 @@ public class ElfRelocation {
 	 */
 	public ElfSymbol getElfSymbol() {
 		return symbol;
-	}
-
-	/** Get the addend for this relocation, if there is one.
-	 * @return the addend, or 0 if none
-	 */
-	public long getAddend() {
-		return r_addend;
 	}
 
 	public void dump(PrintWriter out) throws IOException {

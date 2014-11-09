@@ -9,6 +9,8 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.codemancer.loader.Symbol;
+
 /** A class to represent a COFF relocation directive for the Z80. */
 public class CoffRelocationZ80 extends CoffRelocation {
 	/** The location to which the relocation is applicable. */
@@ -43,11 +45,20 @@ public class CoffRelocationZ80 extends CoffRelocation {
 		symbol = sect.getCoffFile().getCoffSymbol(symndx);
 	}
 
-	/** Get the address to which this relocation is applicable.
-	 * @return the offset
-	 */
-	public long getOffset() {
-		return r_vaddr;
+	public long getAddress() {
+		return r_vaddr & 0xFFFFFFFF;
+	}
+
+	public long getSize() {
+		return 0;
+	}
+
+	public Symbol getSymbol() {
+		return symbol;
+	}
+
+	public long getAddend() {
+		return r_offset & 0xFFFFFFFF;
 	}
 
 	/** Get the type of this relocation.
@@ -62,13 +73,6 @@ public class CoffRelocationZ80 extends CoffRelocation {
 	 */
 	public CoffSymbol getCoffSymbol() {
 		return symbol;
-	}
-
-	/** Get the addend.
-	 * @return the addend
-	 */
-	public int getAddend() {
-		return r_offset;
 	}
 
 	public void dump(PrintWriter out) throws IOException {

@@ -66,7 +66,7 @@ public class TestCoff {
 	public void testMessageRelocation() throws IOException {
 		CoffSection sect = coff.getCoffSection(0);
 		CoffRelocationZ80 rel = (CoffRelocationZ80)sect.getCoffRelocation(0);
-		assertEquals(0x101, rel.getOffset());
+		assertEquals(0x101, rel.getAddress());
 		assertEquals(".data", rel.getCoffSymbol().getName());
 		assertEquals(1, rel.getCoffRelocationType());
 	}
