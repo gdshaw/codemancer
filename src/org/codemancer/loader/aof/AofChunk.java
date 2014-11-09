@@ -1,6 +1,7 @@
 // This file is part of Codemancer.
 // Copyright 2014 Graham Shaw.
-// All rights reserved.
+// Distribution and modification are permitted within the terms of the
+// GNU General Public License (version 3 or any later version).
 
 package org.codemancer.loader.aof;
 
@@ -34,8 +35,11 @@ public class AofChunk {
 		buffer.position(position);
 
 		// Construct a chunk of the appropriate type according to the chunk ID.
-		// (currently no chunk IDs are recognised.)
-		return new AofChunk(buffer, aof);
+		if (chunkId.equals("OBJ_IDFN")) {
+			return new AofIdentificationChunk(buffer, aof);
+		} else {
+			return new AofChunk(buffer, aof);
+		}
 	}
 
 	/** A ByteBuffer giving access to the underlying AOF file. */

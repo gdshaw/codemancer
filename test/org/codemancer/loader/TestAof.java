@@ -17,9 +17,11 @@ import org.junit.Test;
 
 import org.codemancer.loader.aof.AofFile;
 import org.codemancer.loader.aof.AofChunk;
+import org.codemancer.loader.aof.AofIdentificationChunk;
 
 // Test file compiled using GCCSDK 3.4.6 release 3.
 // Type, location and size of chunks obtained by inspection of hex dump.
+// Other information obtained using decaof 2.00 (part of GCCSDK above).
 
 public class TestAof {
 	private AofFile aof;
@@ -48,10 +50,12 @@ public class TestAof {
 
 	@Test
 	public void testAofIdfnChunk() throws IOException {
-		AofChunk chunk = aof.getUniqueChunk("OBJ_IDFN", true);
+		AofIdentificationChunk chunk = (AofIdentificationChunk)aof.getUniqueChunk("OBJ_IDFN", true);
 		assertEquals("OBJ_IDFN", chunk.getChunkId());
 		assertEquals(0x00b0, chunk.getFileOffset());
 		assertEquals(0x0064, chunk.getSize());
+		assertEquals("GCCSDK AS AOF/ELF Assembler v1.46 (Jul 22 2007) [GCCSDK 3.4.6 (RISC OS GCCSDK 3.4.6 Release 3)]\n",
+			chunk.getIdentificationString());
 	}
 
 	@Test
