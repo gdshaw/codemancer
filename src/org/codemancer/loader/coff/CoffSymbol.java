@@ -9,8 +9,10 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.codemancer.loader.Symbol;
+
 /** A class to represent a symbol from an COFF symbol table. */
-public class CoffSymbol {
+public class CoffSymbol implements Symbol {
 	/** A constant to indicate that a symbol has no section number because it is external. */
 	public static final int N_UNDEF = 0;
 
@@ -178,7 +180,7 @@ public class CoffSymbol {
 	private String e_name;
 
 	/** The value of this symbol. */
-	private final long e_value;
+	private final int e_value;
 
 	/** The section to which this symbol refers. */
 	private final short e_scnum;
@@ -231,23 +233,14 @@ public class CoffSymbol {
 		buffer.position(buffer.position() + e_numaux * SYMESZ);
 	}
 
-	/** Get the name of this symbol.
-	 * @return the symbol name
-	 */
 	public String getName() {
 		return e_name;
 	}
 
-	/** Get the value of this symbol.
-	 * @return the symbol value
-	 */
 	public final long getValue() {
-		return e_value;
+		return e_value & 0xFFFFFFFF;
 	}
 
-	/** Get the size of the object referred to by this symbol.
-	 * @return the size, in bytes
-	 */
 	public final long getSize() {
 		return 0;
 	}

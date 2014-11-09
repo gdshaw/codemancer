@@ -9,8 +9,10 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.codemancer.loader.Symbol;
+
 /** A class to represent a symbol from an ELF symbol table. */
-public class ElfSymbol {
+public class ElfSymbol implements Symbol {
 	/** A constant to indicate that a symbol is local to the object file. */
 	public static final byte STB_LOCAL = 0;
 
@@ -90,23 +92,14 @@ public class ElfSymbol {
 		st_bind = (byte)(st_info >> 4);
 	}
 
-	/** Get the name of this symbol.
-	 * @return the name
-	 */
 	public final String getName() {
 		return st_name;
 	}
 
-	/** Get the value of this symbol.
-	 * @return the value
-	 */
 	public final long getValue() {
 		return st_value;
 	}
 
-	/** Get the size of this symbol.
-	 * @return the size, or 0 if not applicable
-	 */
 	public final long getSize() {
 		return st_size;
 	}

@@ -9,8 +9,10 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.codemancer.loader.Symbol;
+
 /** A class to represent a symbol from an AOF symbol table. */
-public class AofSymbol {
+public class AofSymbol implements Symbol {
 	/** The name of this symbol. */
 	private final String name;
 
@@ -35,18 +37,16 @@ public class AofSymbol {
 		area = buffer.getInt();
 	}
 
-	/** Get the name of this symbol.
-	 * @return the name
-	 */
         public String getName() {
 		return name;
 	}
 
-	/** Get the value of this symbol.
-	 * @return the value
-	 */
         public long getValue() {
-		return value;
+		return value & 0xFFFFFFFF;
+	}
+
+	public long getSize() {
+		return 0;
 	}
 
 	public void dump(PrintWriter out) throws IOException {
