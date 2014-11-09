@@ -63,6 +63,9 @@ public class AofArea {
 	/** The file offset for this area. */
 	private final int fileOffset;
 
+	/** The relocations for this area. */
+	private ArrayList<AofRelocation> aofRelocations;
+
 	/** Construct new area.
 	 * @param buffer a ByteBuffer giving access to the underlying AOF file
 	 * @param aofHeaderChunk the header chunk within which the area header is located
@@ -76,12 +79,14 @@ public class AofArea {
 		this.aofHeaderChunk = aofHeaderChunk;
 		AofFile aof = aofHeaderChunk.getAofFile();
 
+		// Parse area header.
 		this.name = aof.getStringTableChunk().get(buffer.getInt());
 		this.attributes = buffer.getInt();
 		this.size = buffer.getInt();
 		this.numRelocs = buffer.getInt();
-
 		int fileBaseAddress = buffer.getInt();
+
+		// Allocate address.
 		if ((this.attributes & ATTR_ABSOLUTE) == 0) {
 			if (fileBaseAddress != 0) {
 				throw new InvalidFileFormat("non-absolute area has non-zero base address");
@@ -91,15 +96,17 @@ public class AofArea {
 			this.baseAddress = fileBaseAddress;
 		}
 
+		// Validate size.
+		if ((size & 3) != 0) {
+			throw new InvalidFileFormat("area size is not a multiple of 4 bytes");
+		}
+
+		// Determine location of area content in AOF file.
 		this.fileOffset = (int)fileAlloc.allocate(0);
 		if (hasContent()) {
 			fileAlloc.allocate(this.size);
 		}
 		fileAlloc.allocate(this.numRelocs * 4);
-
-		if ((size & 3) != 0) {
-			throw new InvalidFileFormat("area size is not a multiple of 4 bytes");
-		}
 	}
 
 	/** Get the AOF file to which this area belongs. */
@@ -140,11 +147,34 @@ public class AofArea {
 		return attributes;
 	}
 
-	/** Get the number of relocations for this area.
+	/** Get a reference to the aofRelocations array, creating and populating it if necessary.
+	 * @return a reference to the aofRelocations array
+	 */
+	private ArrayList<AofRelocation> getAofRelocations() throws IOException {
+		if (aofRelocations == null) {
+			buffer.position(hasContent() ? (fileOffset + size) : fileOffset);
+			aofRelocations = new ArrayList<AofRelocation>(numRelocs);
+			for (int i = 0; i != numRelocs; ++i) {
+				AofRelocation rel = new AofRelocation(buffer, this);
+				aofRelocations.add(rel);
+			}
+		}
+		return aofRelocations;
+	}
+
+	/** Get the number of relocations.
 	 * @return the number of relocations
 	 */
-	public final int getAofRelocCount() {
-		return numRelocs;
+	public int getAofRelocationCount() throws IOException {
+		return getAofRelocations().size();
+	}
+
+	/** Get the relocation with a given index
+	 * @param index the required index
+	 * @return the relocation
+	 */
+	public AofRelocation getAofRelocation(int index) throws IOException {
+		return getAofRelocations().get(index);
 	}
 
 	/** Test whether initial content for this area is provided by the area chunk.

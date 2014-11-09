@@ -13,6 +13,7 @@ import java.nio.channels.FileChannel;
 import org.codemancer.loader.aof.AofFile;
 import org.codemancer.loader.aof.AofHeaderChunk;
 import org.codemancer.loader.aof.AofSymbolTableChunk;
+import org.codemancer.loader.aof.AofArea;
 
 class DumpAof {
 	public static final void main(String args[]) throws Exception {
@@ -26,9 +27,17 @@ class DumpAof {
 			out.println();
 			aof.getChunk(i).dump(out);
 		}
-		out.println();
 		for (int i = 0; i != header.getAofAreaCount(); ++i) {
-			header.getAofArea(i).dump(out);
+			out.println();
+			AofArea area = header.getAofArea(i);
+			area.dump(out);
+			out.println();
+			for (int j = 0; j != area.getAofRelocationCount(); ++j) {
+				area.getAofRelocation(j).dump(out);
+			}
+			if (area.getAofRelocationCount() == 0) {
+				out.println("(no relocations)");
+			}
 		}
 		out.println();
 		AofSymbolTableChunk symtab = aof.getSymbolTableChunk();

@@ -22,6 +22,7 @@ import org.codemancer.loader.aof.AofIdentificationChunk;
 import org.codemancer.loader.aof.AofSymbolTableChunk;
 import org.codemancer.loader.aof.AofSymbol;
 import org.codemancer.loader.aof.AofArea;
+import org.codemancer.loader.aof.AofRelocation;
 
 // Test file compiled using GCCSDK 3.4.6 release 3.
 // Type, location and size of chunks obtained by inspection of hex dump.
@@ -115,5 +116,14 @@ public class TestAof {
 		assertEquals("C$$rodata1", area.getName());
 		assertEquals(0x10, area.getSize());
 		assertEquals(0x8034, area.getBaseAddress());
+	}
+
+	@Test
+	public void testArea0Relocation0() throws IOException {
+		AofArea area = head.getAofArea(0);
+		AofRelocation rel = area.getAofRelocation(0);
+		assertEquals(0x30, rel.getOffset());
+		assertEquals(4, rel.getSize());
+		assertEquals("__main", rel.getSymbol().getName());
 	}
 }
