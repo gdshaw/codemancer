@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.codemancer.loader.ObjectFile;
 import org.codemancer.loader.Symbol;
 import org.codemancer.loader.InvalidFileFormat;
 
@@ -24,7 +25,7 @@ import org.codemancer.loader.InvalidFileFormat;
  * the ByteBuffer through which the ELF file is accessed. All other classes
  * must leave the byte order unchanged.
  */
-public class ElfFile {
+public class ElfFile implements ObjectFile {
 	/** A constant equal to the size of the ident field, in bytes. */
 	private static final int EI_NIDENT = 16;
 

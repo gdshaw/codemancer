@@ -15,11 +15,12 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
 
+import org.codemancer.loader.ObjectFile;
 import org.codemancer.loader.Symbol;
 import org.codemancer.loader.InvalidFileFormat;
 
 /** A class to represent the content of an AOF (ARM object format) file. */
-public class AofFile {
+public class AofFile implements ObjectFile {
 	/** The offset of the first chunk header. */
 	private static final int chunkOffset = 12;
 

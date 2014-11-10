@@ -14,11 +14,12 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.codemancer.loader.ObjectFile;
 import org.codemancer.loader.Symbol;
 import org.codemancer.loader.InvalidFileFormat;
 
 /** A class to represent the content of a COFF file. */
-public class CoffFile {
+public class CoffFile implements ObjectFile {
 	/** A flag to indicate that relocation information has been stripped from the file. */
 	public static final short F_RELFLG = 0x0001;
 
