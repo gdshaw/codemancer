@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
 
+import org.codemancer.loader.Symbol;
 import org.codemancer.loader.InvalidFileFormat;
 
 /** A class to represent the content of an AOF (ARM object format) file. */
@@ -159,14 +160,22 @@ public class AofFile {
 		// Initialise and populate the chunk table.
 		chunks = new ArrayList<AofChunk>(Collections.nCopies(maxChunks, (AofChunk)null));
 		stringTableChunk = (AofStringTableChunk)getUniqueChunk("OBJ_STRT", false);
-		symbolTableChunk = (AofSymbolTableChunk)getUniqueChunk("OBJ_SYMT", false);
 		headerChunk = (AofHeaderChunk)getUniqueChunk("OBJ_HEAD", false);
+		symbolTableChunk = (AofSymbolTableChunk)getUniqueChunk("OBJ_SYMT", false);
 		identificationChunk = (AofIdentificationChunk)getUniqueChunk("OBJ_IDFN", false);
 		areaChunk = (AofChunk)getUniqueChunk("OBJ_AREA", false);
 		for (int i = 0; i != maxChunks; ++i) {
 			if (chunks.get(i) == null) {
 				getChunk(i);
 			}
+		}
+	}
+
+	public final List<Symbol> getSymbols() {
+		if (symbolTableChunk != null) {
+			return symbolTableChunk.getSymbols();
+		} else {
+			return new ArrayList<Symbol>();
 		}
 	}
 

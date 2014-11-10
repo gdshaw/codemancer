@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.codemancer.loader.Symbol;
 import org.codemancer.loader.InvalidFileFormat;
 
 /** A class to represent the content of an ELF file.
@@ -131,6 +132,9 @@ public class ElfFile {
 	 * Entries for unparsed segments are set to null.
 	 */
 	private ArrayList<ElfSegment> elfSegments;
+
+	/** A list of symbols defined by this ELF file. */
+	private ArrayList<Symbol> symbols = new ArrayList<Symbol>();
 
 	/** Parse one of the sections from this ELF file.
 	 * @param shndx the section index
@@ -256,11 +260,20 @@ public class ElfFile {
 
 		// Populate the section and segment tables.
 		for (int i = 0; i != e_shnum; ++i) {
-			getElfSection(i);
+			ElfSection section = getElfSection(i);
+			if (section instanceof ElfSymbolTableSection) {
+				ElfSymbolTableSection symtab =
+					(ElfSymbolTableSection)section;
+				symbols.addAll(symtab.getElfSymbols());
+			}
 		}
 		for (int i = 0; i != e_phnum; ++i) {
 			getElfSegment(i);
 		}
+	}
+
+	public final List<Symbol> getSymbols() {
+		return Collections.unmodifiableList(symbols);
 	}
 
 	/** Get the ELF file class.

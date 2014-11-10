@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.codemancer.loader.Symbol;
 import org.codemancer.loader.InvalidFileFormat;
 
 /** A class to represent the content of a COFF file. */
@@ -59,11 +60,19 @@ public class CoffFile {
 	/** The flags word. */
 	private short f_flags;
 
-	/** A list of sections in this COFF file. */
+	/** A table of sections in this COFF file. */
 	private final ArrayList<CoffSection> coffSections;
 
-	/** A list of symbols defined within this COFF file. */
+	/** A table of COFF symbols defined within this COFF file.
+	 * This table includes null values for auxiliary symbol table
+	 * entries, in order to facilitate indexing.
+	 */
 	private ArrayList<CoffSymbol> coffSymbols;
+
+	/** A list of generic symbols defined within this COFF file.
+	 * This list does not include null entries.
+	 */
+	private ArrayList<Symbol> symbols;
 
 	/** The string table. */
 	private final byte[] strings;
@@ -99,10 +108,12 @@ public class CoffFile {
 
 		// Parse symbol table.
 		coffSymbols = new ArrayList<CoffSymbol>(f_nsyms);
+		symbols = new ArrayList<Symbol>(f_nsyms);
 		buffer.position(f_symptr);
 		for (int i = 0; i < f_nsyms; ++i) {
 			CoffSymbol symbol = new CoffSymbol(buffer, this);
 			coffSymbols.add(symbol);
+			symbols.add(symbol);
 			i += symbol.getAuxiliaryEntryCount();
 			for (int j = 0; j != symbol.getAuxiliaryEntryCount(); ++j) {
 				coffSymbols.add(null);
@@ -116,6 +127,10 @@ public class CoffFile {
 			CoffSection section = new CoffSection(buffer, this);
 			coffSections.add(section);
 		}
+	}
+
+	public final List<Symbol> getSymbols() {
+		return Collections.unmodifiableList(symbols);
 	}
 
 	/** Get the COFF file magic number.
