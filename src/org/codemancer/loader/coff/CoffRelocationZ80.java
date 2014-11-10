@@ -42,7 +42,7 @@ public class CoffRelocationZ80 extends CoffRelocation {
 		r_type = buffer.getShort();
 
 		// Get the relevant symbol.
-		symbol = sect.getCoffFile().getCoffSymbol(symndx);
+		symbol = sect.getCoffFile().getCoffSymbols().get(symndx);
 	}
 
 	public long getAddress() {

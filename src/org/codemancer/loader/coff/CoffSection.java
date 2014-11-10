@@ -8,7 +8,9 @@ package org.codemancer.loader.coff;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /** A class to represent a section within an COFF file. */
 public class CoffSection {
@@ -126,19 +128,11 @@ public class CoffSection {
 		return s_size;
 	}
 
-	/** Get the number of relocations.
-	 * @return the number of relocations
+	/** Get a list of relocations in this section.
+	 * @return a list of relocations
 	 */
-	public int getCoffRelocationCount() {
-		return coffRelocations.size();
-	}
-
-	/** Get relocation at given index.
-	 * @param index the index of the required relocation
-	 * @return the relocation, or null if not found
-	 */
-	public CoffRelocation getCoffRelocation(int index) {
-		return coffRelocations.get(index);
+	public List<CoffRelocation> getCoffRelocations() {
+		return Collections.unmodifiableList(coffRelocations);
 	}
 
 	/** Dump the section header to a stream in human-readable form.

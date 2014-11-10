@@ -9,10 +9,12 @@ import java.io.RandomAccessFile;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.List;
 
 import org.codemancer.loader.coff.CoffFile;
 import org.codemancer.loader.coff.CoffSection;
 import org.codemancer.loader.coff.CoffSymbol;
+import org.codemancer.loader.coff.CoffRelocation;
 
 class DumpCoff {
 	public static final void main(String args[]) throws Exception {
@@ -21,22 +23,25 @@ class DumpCoff {
 		ByteBuffer image = file.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, file.length());
 		CoffFile coff = new CoffFile(image);
 		coff.dump(out);
-		for (short i = 0; i != coff.getCoffSectionCount(); ++i) {
-			CoffSection sect = coff.getCoffSection(i);
+		List<CoffSection> sections = coff.getCoffSections();
+		for (short i = 0; i != sections.size(); ++i) {
+			CoffSection section = sections.get(i);
 			out.println();
 			out.printf("Section: %d\n", i);
-			sect.dump(out);
+			section.dump(out);
 			out.println();
-			for (int j = 0; j != sect.getCoffRelocationCount(); ++j) {
-				sect.getCoffRelocation(j).dump(out);
+			List<CoffRelocation> relocations = section.getCoffRelocations();
+			for (int j = 0; j != relocations.size(); ++j) {
+				relocations.get(j).dump(out);
 			}
-			if (sect.getCoffRelocationCount() == 0) {
+			if (relocations.size() == 0) {
 				out.println("(no relocations)");
 			}
                 }
 		out.println();
-		for (short i = 0; i != coff.getCoffSymbolCount(); ++i) {
-			CoffSymbol sym = coff.getCoffSymbol(i);
+		List<CoffSymbol> symbols = coff.getCoffSymbols();
+		for (short i = 0; i != symbols.size(); ++i) {
+			CoffSymbol sym = symbols.get(i);
 			if (sym != null) {
 				sym.dump(out);
 			}

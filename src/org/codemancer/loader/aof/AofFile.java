@@ -42,6 +42,9 @@ public class AofFile {
 	/** The header chunk. */
 	private AofHeaderChunk headerChunk = null;
 
+	/** The identification chunk. */
+	private AofIdentificationChunk identificationChunk = null;
+
 	/** The area chunk. */
 	private AofChunk areaChunk = null;
 
@@ -50,6 +53,56 @@ public class AofFile {
 
 	/** The symbol table chunk. */
 	private AofSymbolTableChunk symbolTableChunk = null;
+
+	/** Get the chunk with a given index.
+	 * @param index the required chunk index
+	 * @return the corresponding chunk
+	 */
+	private final AofChunk getChunk(int index) throws IOException {
+		// Validate the chunk index.
+		if ((index < 0) || (index >= maxChunks)) {
+			throw new IllegalArgumentException(
+				"chunk index out of range");
+		}
+
+		// Attempt to fetch the chunk from the table.
+		AofChunk chunk = chunks.get(index);
+
+		// If the chunk was not in the table then parse it.
+		if (chunk == null) {
+			buffer.position(chunkOffset + index * chunkSize);
+			chunk = AofChunk.makeChunk(buffer, this);
+			chunks.set(index, chunk);
+		}
+
+		// Don't return unused chunks.
+		if (chunk.getFileOffset() == 0) {
+			chunk = null;
+		}
+
+		return chunk;
+	}
+
+	/** Find the unique chunk with a given chunk ID.
+	 * @param chunkId the required chunk ID
+	 * @param required true if this chunk is required to be present,
+	 *  otherwise false
+	 * @return the chunk, or null if not found and not required
+	 * @throws InvalidFileFormat if the chunk is missing but required,
+	 *  or if there is more than one chunk with the given ID
+	 */
+	private final AofChunk getUniqueChunk(String chunkId, boolean required)
+		throws IOException {
+
+		List<Integer> chunkList = chunkDirectory.get(chunkId);
+		if ((chunkList == null) || (chunkList.size() == 0)) {
+			throw new InvalidFileFormat("missing " + chunkId + " chunk");
+		}
+		if (chunkList.size() > 1) {
+			throw new InvalidFileFormat("multiple " + chunkId + " chunks");
+		}
+		return getChunk(chunkList.get(0));
+	}
 
 	/** Construct object to represent AOF file.
 	 * On entry the ByteBuffer must be positioned at the start of the file.
@@ -103,9 +156,18 @@ public class AofFile {
 			}
 		}
 
-		// Initialise chunk table.
-		chunks = new ArrayList<AofChunk>(
-			Collections.nCopies(maxChunks, (AofChunk)null));
+		// Initialise and populate the chunk table.
+		chunks = new ArrayList<AofChunk>(Collections.nCopies(maxChunks, (AofChunk)null));
+		stringTableChunk = (AofStringTableChunk)getUniqueChunk("OBJ_STRT", false);
+		symbolTableChunk = (AofSymbolTableChunk)getUniqueChunk("OBJ_SYMT", false);
+		headerChunk = (AofHeaderChunk)getUniqueChunk("OBJ_HEAD", false);
+		identificationChunk = (AofIdentificationChunk)getUniqueChunk("OBJ_IDFN", false);
+		areaChunk = (AofChunk)getUniqueChunk("OBJ_AREA", false);
+		for (int i = 0; i != maxChunks; ++i) {
+			if (chunks.get(i) == null) {
+				getChunk(i);
+			}
+		}
 	}
 
 	/** Get the maximum number of chunks allowed in this AOF file.
@@ -115,93 +177,46 @@ public class AofFile {
 		return maxChunks;
 	}
 
-	/** Get chunk by index.
-	 * @param index the chunk index
-	 * @return the corresponding chunk
+	/** Get a list of chunks in this AOF file.
+	 * The list may contain null entries.
+	 * @return a list of chunks
 	 */
-	public final AofChunk getChunk(int index) throws IOException {
-		// Validate the chunk index.
-		if ((index < 0) || (index >= maxChunks)) {
-			throw new IllegalArgumentException(
-				"chunk index out of range");
-		}
-
-		// Attempt to fetch the chunk from the table.
-		AofChunk chunk = chunks.get(index);
-
-		// If the chunk was not in the table then parse it.
-		if (chunk == null) {
-			buffer.position(chunkOffset + index * chunkSize);
-			chunk = AofChunk.makeChunk(buffer, this);
-			chunks.set(index, chunk);
-		}
-
-		// Don't return unused chunks.
-		if (chunk.getFileOffset() == 0) {
-			chunk = null;
-		}
-
-		return chunk;
-	}
-
-	/** Find the unique chunk with a given chunk ID.
-	 * @param chunkId the required chunk ID
-	 * @param required true if this chunk is required to be present,
-	 *  otherwise false
-	 * @return the chunk, or null if not found and not required
-	 * @throws InvalidFileFormat if the chunk is missing but required,
-	 *  or if there is more than one chunk with the given ID
-	 */
-	public final AofChunk getUniqueChunk(String chunkId, boolean required)
-		throws IOException {
-
-		List<Integer> chunkList = chunkDirectory.get(chunkId);
-		if ((chunkList == null) || (chunkList.size() == 0)) {
-			throw new InvalidFileFormat("missing " + chunkId + " chunk");
-		}
-		if (chunkList.size() > 1) {
-			throw new InvalidFileFormat("multiple " + chunkId + " chunks");
-		}
-		return getChunk(chunkList.get(0));
+	public final List<AofChunk> getChunks() {
+		return Collections.unmodifiableList(chunks);
 	}
 
 	/** Get the header chunk.
 	 * @return the header chunk, or null if not present
 	 */
-	public final AofHeaderChunk getHeaderChunk() throws IOException {
-		if (headerChunk == null) {
-			headerChunk = (AofHeaderChunk)getUniqueChunk("OBJ_HEAD", false);
-		}
+	public final AofHeaderChunk getHeaderChunk() {
 		return headerChunk;
+	}
+
+	/** Get the identification chunk.
+	 * @return the identification chunk, or null if not present
+	 */
+	public final AofIdentificationChunk getIdentificationChunk() {
+		return identificationChunk;
 	}
 
 	/** Get the area chunk.
 	 * @return the area chunk, or null if not present
 	 */
-	public final AofChunk getAreaChunk() throws IOException {
-		if (areaChunk == null) {
-			areaChunk = (AofChunk)getUniqueChunk("OBJ_AREA", false);
-		}
+	public final AofChunk getAreaChunk() {
 		return areaChunk;
 	}
 
 	/** Get the string table chunk.
 	 * @return the string table chunk, or null if not present
 	 */
-	public final AofStringTableChunk getStringTableChunk() throws IOException {
-		if (stringTableChunk == null) {
-			stringTableChunk = (AofStringTableChunk)getUniqueChunk("OBJ_STRT", false);
-		}
+	public final AofStringTableChunk getStringTableChunk() {
 		return stringTableChunk;
 	}
 
 	/** Get the symbol table chunk.
 	 * @return the symbol table chunk, or null if not present
 	 */
-	public final AofSymbolTableChunk getSymbolTableChunk() throws IOException {
-		if (symbolTableChunk == null) {
-			symbolTableChunk = (AofSymbolTableChunk)getUniqueChunk("OBJ_SYMT", false);
-		}
+	public final AofSymbolTableChunk getSymbolTableChunk() {
 		return symbolTableChunk;
 	}
 

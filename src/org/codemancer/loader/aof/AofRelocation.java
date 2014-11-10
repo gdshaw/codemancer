@@ -8,6 +8,7 @@ package org.codemancer.loader.aof;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import org.codemancer.loader.Symbol;
 import org.codemancer.loader.Relocation;
@@ -37,6 +38,8 @@ public class AofRelocation implements Relocation {
 	 */
 	public AofRelocation(ByteBuffer buffer, AofArea area) throws IOException {
 		AofFile aof = area.getAofFile();
+		AofSymbolTableChunk symtab = aof.getSymbolTableChunk();
+		List<AofSymbol> symbols = symtab.getAofSymbols();
 
 		// Record offset.
 		offset = buffer.getInt();
@@ -62,7 +65,7 @@ public class AofRelocation implements Relocation {
 			// Identify symbol, if applicable.
 			if (symbolic) {
 				int sid = word1 & 0xffff;
-				symbol = aof.getSymbolTableChunk().getAofSymbol(sid);
+				symbol = symbols.get(sid);
 			} else {
 				symbol = null;
 			}
@@ -81,7 +84,7 @@ public class AofRelocation implements Relocation {
 			// Identify symbol, if applicable.
 			if (symbolic) {
 				int sid = word1 & 0xffffff;
-				symbol = aof.getSymbolTableChunk().getAofSymbol(sid);
+				symbol = symbols.get(sid);
 			} else {
 				symbol = null;
 			}

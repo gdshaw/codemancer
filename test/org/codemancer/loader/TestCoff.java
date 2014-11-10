@@ -42,14 +42,14 @@ public class TestCoff {
 
 	@Test
 	public void testTextSection() throws IOException {
-		CoffSection sect = coff.getCoffSection(0);
+		CoffSection sect = coff.getCoffSections().get(0);
 		assertEquals(".text", sect.getName());
 		assertEquals(0x0000010b, sect.getSize());
 	}
 
 	@Test
 	public void testDataSection() throws IOException {
-		CoffSection sect = coff.getCoffSection(1);
+		CoffSection sect = coff.getCoffSections().get(1);
 		assertEquals(".data", sect.getName());
 		assertEquals(0x0000000f, sect.getSize());
 	}
@@ -57,15 +57,15 @@ public class TestCoff {
 	@Test
 	public void testStartSymbol() throws IOException {
 		// Index into symbol table now counts auxiliary entries.
-		CoffSymbol sym = coff.getCoffSymbol(9);
+		CoffSymbol sym = coff.getCoffSymbols().get(9);
 		assertEquals("_start", sym.getName());
 		assertEquals(0x100, sym.getValue());
 	}
 
 	@Test
 	public void testMessageRelocation() throws IOException {
-		CoffSection sect = coff.getCoffSection(0);
-		CoffRelocationZ80 rel = (CoffRelocationZ80)sect.getCoffRelocation(0);
+		CoffSection sect = coff.getCoffSections().get(0);
+		CoffRelocationZ80 rel = (CoffRelocationZ80)sect.getCoffRelocations().get(0);
 		assertEquals(0x101, rel.getAddress());
 		assertEquals(".data", rel.getCoffSymbol().getName());
 		assertEquals(1, rel.getCoffRelocationType());

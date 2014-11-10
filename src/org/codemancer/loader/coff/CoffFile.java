@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
+import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.codemancer.loader.InvalidFileFormat;
 
@@ -58,7 +60,7 @@ public class CoffFile {
 	private short f_flags;
 
 	/** A list of sections in this COFF file. */
-	private final ArrayList<CoffSection> sections;
+	private final ArrayList<CoffSection> coffSections;
 
 	/** A list of symbols defined within this COFF file. */
 	private ArrayList<CoffSymbol> coffSymbols;
@@ -108,11 +110,11 @@ public class CoffFile {
 		}
 
 		// Parse section headers.
-		sections = new ArrayList<CoffSection>(f_nscns);
+		coffSections = new ArrayList<CoffSection>(f_nscns);
 		for (int i = 0; i != f_nscns; ++i) {
 			buffer.position(sectptr + i * CoffSection.SCNHSZ);
 			CoffSection section = new CoffSection(buffer, this);
-			sections.add(section);
+			coffSections.add(section);
 		}
 	}
 
@@ -137,38 +139,18 @@ public class CoffFile {
 		return f_flags;
 	}
 
-	/** Get the number of sections.
-	 * @return the number of sections
+	/** Get a list of sections in this COFF file.
+	 * @return a list of sections
 	 */
-	public final int getCoffSectionCount() {
-		return sections.size();
+	public final List<CoffSection> getCoffSections() {
+		return Collections.unmodifiableList(coffSections);
 	}
 
-	/** Get one of the sections from this COFF file.
-	 * @param index the section index
-	 * @return the section
+	/** Get a list of symbols in this COFF file.
+	 * @return a list of symbols
 	 */
-	public final CoffSection getCoffSection(int index) throws IOException {
-		try {
-			return sections.get(index);
-		} catch (IndexOutOfBoundsException ex) {
-			throw new IllegalArgumentException("section index out of range");
-		}
-	}
-
-	/** Get the number of symbols.
-	 * @return the number of symbols
-	 */
-	public int getCoffSymbolCount() {
-		return coffSymbols.size();
-	}
-
-	/** Get symbol at given index.
-	 * @param index the index of the required symbol
-	 * @return the symbol, or null if not found
-	 */
-	public CoffSymbol getCoffSymbol(int index) {
-		return coffSymbols.get(index);
+	public final List<CoffSymbol> getCoffSymbols() {
+		return Collections.unmodifiableList(coffSymbols);
 	}
 
 	/** Get string from string table

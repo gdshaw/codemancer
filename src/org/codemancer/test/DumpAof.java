@@ -11,9 +11,12 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 import org.codemancer.loader.aof.AofFile;
+import org.codemancer.loader.aof.AofChunk;
 import org.codemancer.loader.aof.AofHeaderChunk;
 import org.codemancer.loader.aof.AofSymbolTableChunk;
 import org.codemancer.loader.aof.AofArea;
+import org.codemancer.loader.aof.AofSymbol;
+import org.codemancer.loader.aof.AofRelocation;
 
 class DumpAof {
 	public static final void main(String args[]) throws Exception {
@@ -23,26 +26,24 @@ class DumpAof {
 		AofFile aof = new AofFile(image);
 		AofHeaderChunk header = aof.getHeaderChunk();
 		aof.dump(out);
-		for (int i = 0; i != aof.getMaxChunks(); ++i) {
+		for (AofChunk chunk: aof.getChunks()) {
 			out.println();
-			aof.getChunk(i).dump(out);
+			chunk.dump(out);
 		}
-		for (int i = 0; i != header.getAofAreaCount(); ++i) {
+		for (AofArea area: aof.getHeaderChunk().getAofAreas()) {
 			out.println();
-			AofArea area = header.getAofArea(i);
 			area.dump(out);
 			out.println();
-			for (int j = 0; j != area.getAofRelocationCount(); ++j) {
-				area.getAofRelocation(j).dump(out);
+			for (AofRelocation rel: area.getAofRelocations()) {
+				rel.dump(out);
 			}
-			if (area.getAofRelocationCount() == 0) {
+			if (area.getAofRelocations().size() == 0) {
 				out.println("(no relocations)");
 			}
 		}
 		out.println();
-		AofSymbolTableChunk symtab = aof.getSymbolTableChunk();
-		for (int i = 0; i != symtab.getAofSymbolCount(); ++i) {
-			symtab.getAofSymbol(i).dump(out);
+		for (AofSymbol symbol: aof.getSymbolTableChunk().getAofSymbols()) {
+			symbol.dump(out);
 		}
 	}
 }

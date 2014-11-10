@@ -5,11 +5,12 @@
 
 package org.codemancer.loader.aof;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import org.codemancer.loader.Allocator;
 import org.codemancer.loader.InvalidFileFormat;
@@ -147,10 +148,10 @@ public class AofArea {
 		return attributes;
 	}
 
-	/** Get a reference to the aofRelocations array, creating and populating it if necessary.
-	 * @return a reference to the aofRelocations array
+	/** Get a list of relocations in this AOF area.
+	 * @return a list of relocations
 	 */
-	private ArrayList<AofRelocation> getAofRelocations() throws IOException {
+	public List<AofRelocation> getAofRelocations() throws IOException {
 		if (aofRelocations == null) {
 			buffer.position(hasContent() ? (fileOffset + size) : fileOffset);
 			aofRelocations = new ArrayList<AofRelocation>(numRelocs);
@@ -159,25 +160,10 @@ public class AofArea {
 				aofRelocations.add(rel);
 			}
 		}
-		return aofRelocations;
+		return Collections.unmodifiableList(aofRelocations);
 	}
 
-	/** Get the number of relocations.
-	 * @return the number of relocations
-	 */
-	public int getAofRelocationCount() throws IOException {
-		return getAofRelocations().size();
-	}
-
-	/** Get the relocation with a given index
-	 * @param index the required index
-	 * @return the relocation
-	 */
-	public AofRelocation getAofRelocation(int index) throws IOException {
-		return getAofRelocations().get(index);
-	}
-
-	/** Test whether initial content for this area is provided by the area chunk.
+	/** Test whether the initial content for this area is provided by the area chunk.
 	 * @return true if content provided, otherwise false.
 	 */
 	public final boolean hasContent() {

@@ -5,12 +5,13 @@
 
 package org.codemancer.loader.elf;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import org.codemancer.loader.InvalidFileFormat;
 
@@ -51,19 +52,11 @@ public class ElfSymbolTableSection extends ElfSection {
 		}
 	}
 
-	/** Get the number of symbols.
-	 * @return the number of symbols
+	/** Get a list of symbols in this section.
+	 * @return a list of symbols
 	 */
-	public int getElfSymbolCount() {
-		return elfSymbols.size();
-	}
-
-	/** Get symbol at given index.
-	 * @param symndx the index of the required symbol
-	 * @return the symbol, or null if not found
-	 */
-	public ElfSymbol getElfSymbol(int symndx) {
-		return elfSymbols.get(symndx);
+	public List<ElfSymbol> getElfSymbols() {
+		return Collections.unmodifiableList(elfSymbols);
 	}
 
 	public void dump(PrintWriter out) throws IOException {

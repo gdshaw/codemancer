@@ -8,8 +8,10 @@ package org.codemancer.loader.aof;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.TreeMap;
+import java.util.Collections;
 
 import org.codemancer.loader.Allocator;
 import org.codemancer.loader.InvalidFileFormat;
@@ -35,7 +37,7 @@ public class AofHeaderChunk extends AofChunk {
 	private final int entryAreaOffset;
 
 	/** The areas defined by this AOF file. */
-	private final ArrayList<AofArea> areas = new ArrayList<AofArea>();
+	private ArrayList<AofArea> aofAreas = null;
 
 	/** An address map for this AOF file. */
 	private TreeMap<Long, AofArea> addressMap = new TreeMap<Long, AofArea>();
@@ -67,15 +69,6 @@ public class AofHeaderChunk extends AofChunk {
 		numSymbols = buffer.getInt();
 		entryAreaIndex = buffer.getInt();
 		entryAreaOffset = buffer.getInt();
-
-		// Read areas.
-		Allocator fileAlloc = new Allocator(aof.getAreaChunk().getFileOffset(), 1);
-		Allocator memAlloc = new Allocator(0x8000, 1);
-		for (int i = 0; i != numAreas; ++i) {
-			AofArea area = new AofArea(buffer, this, fileAlloc, memAlloc);
-			areas.add(area);
-			addressMap.put((long)area.getBaseAddress(), area);
-		}
 	}
 
 	/** Get the AOF version ID.
@@ -88,23 +81,32 @@ public class AofHeaderChunk extends AofChunk {
 	/** Get the number of areas in this AOF file.
 	 * @return the number of areas
 	 */
-	public final int getAofAreaCount() {
+	public final int getNumAreas() {
 		return numAreas;
-	}
-
-	/** Get AOF area by index.
-	 * @param index the index of the required area
-	 * @return the area
-	 */
-	public final AofArea getAofArea(int index) {
-		return areas.get(index);
 	}
 
 	/** Get the number of symbols in this AOF file.
 	 * @return the number of symbols
 	 */
-	public final int getSymbolCount() {
+	public final int getNumSymbols() {
 		return numSymbols;
+	}
+
+	/** Get a list of areas in this AOF file.
+	 * @return a list of areas
+	 */
+	public final List<AofArea> getAofAreas() throws IOException {
+		if (aofAreas == null) {
+			aofAreas = new ArrayList<AofArea>();
+			Allocator fileAlloc = new Allocator(aof.getAreaChunk().getFileOffset(), 1);
+			Allocator memAlloc = new Allocator(0x8000, 1);
+			for (int i = 0; i != numAreas; ++i) {
+				AofArea area = new AofArea(buffer, this, fileAlloc, memAlloc);
+				aofAreas.add(area);
+				addressMap.put((long)area.getBaseAddress(), area);
+			}
+		}
+		return Collections.unmodifiableList(aofAreas);
 	}
 
 	/** Dump the chunk header to a stream in human-readable form.

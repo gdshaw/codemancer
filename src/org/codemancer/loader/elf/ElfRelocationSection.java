@@ -1,10 +1,11 @@
 package org.codemancer.loader.elf;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import org.codemancer.loader.InvalidFileFormat;
 
@@ -45,20 +46,12 @@ public class ElfRelocationSection extends ElfSection {
 		}
 	}
 
-	/** Get the number of relocations.
-	 * @return the number of relocations
+	/** Get a list of relocations in this section.
+	 * @return a list of relocations
 	 */
-	public int getElfRelocationCount() {
-		return elfRelocations.size();
+	public List<ElfRelocation> getElfRelocations() {
+		return Collections.unmodifiableList(elfRelocations);
 	}
-
-        /** Get relocation at given index.
-         * @param relndx the index of the required relocation
-         * @return the relocation, or null if not found
-         */
-        public ElfRelocation getElfRelocation(int symndx) {
-                return elfRelocations.get(symndx);
-        }
 
 	public void dump(PrintWriter out) throws IOException {
 		super.dump(out);

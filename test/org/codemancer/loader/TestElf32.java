@@ -41,11 +41,11 @@ public class TestElf32 {
 		ByteBuffer image = file.getChannel().map(
 			FileChannel.MapMode.READ_ONLY, 0, file.length());
 		elf = new ElfFile(image);
-		text = elf.getElfSection(13);
-		symtab = (ElfSymbolTableSection)elf.getElfSection(28);
-		pltreltab = (ElfRelocationSection)elf.getElfSection(10);
-		loadseg0 = elf.getElfSegment(2);
-		dynseg = elf.getElfSegment(4);
+		text = elf.getElfSections().get(13);
+		symtab = (ElfSymbolTableSection)elf.getElfSections().get(28);
+		pltreltab = (ElfRelocationSection)elf.getElfSections().get(10);
+		loadseg0 = elf.getElfSegments().get(2);
+		dynseg = elf.getElfSegments().get(4);
 	}
 
 	@Test
@@ -55,7 +55,7 @@ public class TestElf32 {
 		assertEquals(3, elf.getElfArchitecture());
 		assertEquals(0x08048320, elf.getEntryPoint());
 		assertEquals(0, elf.getElfFlags());
-		assertEquals(30, elf.getElfSectionCount());
+		assertEquals(30, elf.getElfSections().size());
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class TestElf32 {
 
 	@Test
 	public void testMainSymbol() throws IOException {
-		ElfSymbol sym = symtab.getElfSymbol(62);
+		ElfSymbol sym = symtab.getElfSymbols().get(62);
 		assertEquals("main", sym.getName());
 		assertEquals(0x080483d4, sym.getValue());
 		assertEquals(28, sym.getSize());
@@ -90,7 +90,7 @@ public class TestElf32 {
 
 	@Test
 	public void testPutsRelocation() throws IOException {
-		ElfRelocation rel = pltreltab.getElfRelocation(0);
+		ElfRelocation rel = pltreltab.getElfRelocations().get(0);
 		assertEquals(0x0804a000, rel.getAddress());
 		assertEquals(7, rel.getElfRelocationType());
 		assertEquals("puts", rel.getElfSymbol().getName());

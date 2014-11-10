@@ -9,8 +9,11 @@ import java.io.RandomAccessFile;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.List;
 
 import org.codemancer.loader.elf.ElfFile;
+import org.codemancer.loader.elf.ElfSection;
+import org.codemancer.loader.elf.ElfSegment;
 
 class DumpElf {
 	public static final void main(String args[]) throws Exception {
@@ -19,15 +22,17 @@ class DumpElf {
 		ByteBuffer image = file.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, file.length());
 		ElfFile elf = new ElfFile(image);
 		elf.dump(out);
-		for (short i = 0; i != elf.getElfSectionCount(); ++i) {
+		List<ElfSection> sections = elf.getElfSections();
+		for (short i = 0; i != sections.size(); ++i) {
 			out.println();
 			out.printf("Section: %d\n", i);
-			elf.getElfSection(i).dump(out);
+			sections.get(i).dump(out);
 		}
-		for (short i = 0; i != elf.getElfSegmentCount(); ++i) {
+		List<ElfSegment> segments = elf.getElfSegments();
+		for (short i = 0; i != segments.size(); ++i) {
 			out.println();
 			out.printf("Segment: %d\n", i);
-			elf.getElfSegment(i).dump(out);
+			segments.get(i).dump(out);
 		}
 	}
 }

@@ -31,8 +31,6 @@ import org.codemancer.loader.aof.AofRelocation;
 
 public class TestAof {
 	private AofFile aof;
-	private AofHeaderChunk head;
-	private AofSymbolTableChunk symtab;
 
 	public TestAof() throws IOException {
 		String pathname = "testdata" + File.separatorChar +
@@ -41,8 +39,6 @@ public class TestAof {
 		ByteBuffer image = file.getChannel().map(
 			FileChannel.MapMode.READ_ONLY, 0, file.length());
 		aof = new AofFile(image);
-		head = aof.getHeaderChunk();
-		symtab = aof.getSymbolTableChunk();
 	}
 
 	@Test
@@ -52,18 +48,18 @@ public class TestAof {
 
 	@Test
 	public void testAofHeadChunk() throws IOException {
-		AofHeaderChunk chunk = (AofHeaderChunk)aof.getUniqueChunk("OBJ_HEAD", true);
+		AofHeaderChunk chunk = aof.getHeaderChunk();
 		assertEquals("OBJ_HEAD", chunk.getChunkId());
 		assertEquals(0x005c, chunk.getFileOffset());
 		assertEquals(0x0054, chunk.getSize());
 		assertEquals(310, chunk.getVersionId());
-		assertEquals(3, chunk.getAofAreaCount());
-		assertEquals(8, chunk.getSymbolCount());
+		assertEquals(3, chunk.getNumAreas());
+		assertEquals(8, chunk.getNumSymbols());
 	}
 
 	@Test
 	public void testAofIdfnChunk() throws IOException {
-		AofIdentificationChunk chunk = (AofIdentificationChunk)aof.getUniqueChunk("OBJ_IDFN", true);
+		AofIdentificationChunk chunk = aof.getIdentificationChunk();
 		assertEquals("OBJ_IDFN", chunk.getChunkId());
 		assertEquals(0x00b0, chunk.getFileOffset());
 		assertEquals(0x0064, chunk.getSize());
@@ -73,7 +69,7 @@ public class TestAof {
 
 	@Test
 	public void testAofStrtChunk() throws IOException {
-		AofChunk chunk = aof.getUniqueChunk("OBJ_STRT", true);
+		AofChunk chunk = aof.getStringTableChunk();
 		assertEquals("OBJ_STRT", chunk.getChunkId());
 		assertEquals(0x0114, chunk.getFileOffset());
 		assertEquals(0x0058, chunk.getSize());
@@ -81,7 +77,7 @@ public class TestAof {
 
 	@Test
 	public void testAofSymtChunk() throws IOException {
-		AofChunk chunk = aof.getUniqueChunk("OBJ_SYMT", true);
+		AofChunk chunk = aof.getSymbolTableChunk();
 		assertEquals("OBJ_SYMT", chunk.getChunkId());
 		assertEquals(0x016c, chunk.getFileOffset());
 		assertEquals(0x0080, chunk.getSize());
@@ -89,7 +85,7 @@ public class TestAof {
 
 	@Test
 	public void testAofAreaChunk() throws IOException {
-		AofChunk chunk = aof.getUniqueChunk("OBJ_AREA", true);
+		AofChunk chunk = aof.getAreaChunk();
 		assertEquals("OBJ_AREA", chunk.getChunkId());
 		assertEquals(0x01ec, chunk.getFileOffset());
 		assertEquals(0x006c, chunk.getSize());
@@ -97,14 +93,14 @@ public class TestAof {
 
 	@Test
 	public void testMainSymbol() throws IOException {
-		AofSymbol symbol = symtab.getAofSymbol(2);
+		AofSymbol symbol = aof.getSymbolTableChunk().getAofSymbols().get(2);
 		assertEquals("main", symbol.getName());
 		assertEquals(0, symbol.getValue());
 	}
 
 	@Test
 	public void testArea0() throws IOException {
-		AofArea area = head.getAofArea(0);
+		AofArea area = aof.getHeaderChunk().getAofAreas().get(0);
 		assertEquals("C$$code2", area.getName());
 		assertEquals(0x34, area.getSize());
 		assertEquals(0x8000, area.getBaseAddress());
@@ -112,7 +108,7 @@ public class TestAof {
 
 	@Test
 	public void testArea1() throws IOException {
-		AofArea area = head.getAofArea(1);
+		AofArea area = aof.getHeaderChunk().getAofAreas().get(1);
 		assertEquals("C$$rodata1", area.getName());
 		assertEquals(0x10, area.getSize());
 		assertEquals(0x8034, area.getBaseAddress());
@@ -120,8 +116,8 @@ public class TestAof {
 
 	@Test
 	public void testArea0Relocation0() throws IOException {
-		AofArea area = head.getAofArea(0);
-		AofRelocation rel = area.getAofRelocation(0);
+		AofArea area = aof.getHeaderChunk().getAofAreas().get(0);
+		AofRelocation rel = area.getAofRelocations().get(0);
 		assertEquals(0x30, rel.getAddress());
 		assertEquals(4, rel.getSize());
 		assertEquals("__main", rel.getSymbol().getName());

@@ -5,10 +5,12 @@
 
 package org.codemancer.loader.aof;
 
-import java.util.ArrayList;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /** A class to represent a symbol table chunk within an AOF file. */
 public class AofSymbolTableChunk extends AofChunk {
@@ -25,34 +27,19 @@ public class AofSymbolTableChunk extends AofChunk {
 		super(buffer, aof);
 	}
 
-	/** Get a reference to the aofSymbols array, creating and populating it if necessary.
-	 * @return a reference to the aofSymbols array
+	/** Get a list of symbols in this AOF file.
+	 * @return a list of symbols
 	 */
-	private ArrayList<AofSymbol> getAofSymbols() throws IOException {
+	public List<AofSymbol> getAofSymbols() throws IOException {
 		if (aofSymbols == null) {
 			buffer.position(getFileOffset());
-			int numSymbols = aof.getHeaderChunk().getSymbolCount();
+			int numSymbols = aof.getHeaderChunk().getNumSymbols();
 			aofSymbols = new ArrayList<AofSymbol>(numSymbols);
 			for (int i = 0; i != numSymbols; ++i) {
 				AofSymbol symbol = new AofSymbol(buffer, aof, this);
 				aofSymbols.add(symbol);
 			}
 		}
-		return aofSymbols;
-	}
-
-	/** Get the number of symbols.
-	 * @return the number of symbols
-	 */
-	public int getAofSymbolCount() throws IOException {
-		return getAofSymbols().size();
-	}
-
-	/** Get the symbol with a given SID.
-	 * @param sid the required SID
-	 * @return the symbol
-	 */
-	public AofSymbol getAofSymbol(int sid) throws IOException {
-		return getAofSymbols().get(sid);
+		return Collections.unmodifiableList(aofSymbols);
 	}
 }

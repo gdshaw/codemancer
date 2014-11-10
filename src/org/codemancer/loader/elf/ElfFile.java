@@ -124,13 +124,61 @@ public class ElfFile {
 	 * The size of this table is equal to e_shnum.
 	 * Entries for unparsed sections are set to null.
 	 */
-	private final ArrayList<ElfSection> sections;
+	private ArrayList<ElfSection> elfSections;
 
 	/** A table of ELF segments that have been parsed.
 	 * The size of this table is equal to e_phnum.
 	 * Entries for unparsed segments are set to null.
 	 */
-	private final ArrayList<ElfSegment> segments;
+	private ArrayList<ElfSegment> elfSegments;
+
+	/** Parse one of the sections from this ELF file.
+	 * @param shndx the section index
+	 * @return the section
+	 */
+	protected final ElfSection getElfSection(int shndx) throws IOException {
+		// Validate the section index.
+		if ((shndx < 0) || (shndx >= e_shnum) || (e_shoff == 0)) {
+			throw new IllegalArgumentException("section index out of range");
+		}
+
+		// Check whether the section has already been parsed.
+		ElfSection section = elfSections.get(shndx);
+
+		// If not then parse it from the ByteBuffer.
+		if (section == null) {
+			int offset = (int)(e_shoff + shndx * e_shentsize);
+			buffer.position(offset);
+			section = ElfSection.makeSection(buffer, this);
+			elfSections.set(shndx, section);
+		}
+
+		return section;
+	}
+
+	/** Parse one of the segments from this ELF file.
+	 * @param phndx the segment index
+	 * @return the segment
+	 */
+	protected final ElfSegment getElfSegment(int phndx) throws IOException {
+		// Validate the segment index.
+		if ((phndx < 0) || (phndx >= e_phnum) || (e_phoff == 0)) {
+			throw new IllegalArgumentException("segment index out of range");
+		}
+
+		// Check whether the segment has already been parsed.
+		ElfSegment segment = elfSegments.get(phndx);
+
+		// If not then parse it from the ByteBuffer.
+		if (segment == null) {
+			int offset = (int)(e_phoff + phndx * e_phentsize);
+			buffer.position(offset);
+			segment = new ElfSegment(buffer, this);
+			elfSegments.set(phndx, segment);
+		}
+
+		return segment;
+	}
 
 	/** Construct object to represent ELF file.
 	 * On entry the ByteBuffer must be positioned at the start of the file.
@@ -198,13 +246,21 @@ public class ElfFile {
 		e_shstrndx = buffer.getShort();
 
 		// Initialise section and segment tables.
-		sections = new ArrayList<ElfSection>(
+		elfSections = new ArrayList<ElfSection>(
 			Collections.nCopies(e_shnum, (ElfSection)null));
-		segments = new ArrayList<ElfSegment>(
+		elfSegments = new ArrayList<ElfSegment>(
 			Collections.nCopies(e_phnum, (ElfSegment)null));
 
 		// Record the offset to the section name table.
 		shstroff = getElfSection(e_shstrndx).getOffset();
+
+		// Populate the section and segment tables.
+		for (int i = 0; i != e_shnum; ++i) {
+			getElfSection(i);
+		}
+		for (int i = 0; i != e_phnum; ++i) {
+			getElfSegment(i);
+		}
 	}
 
 	/** Get the ELF file class.
@@ -242,6 +298,20 @@ public class ElfFile {
 		return e_flags;
 	}
 
+	/** Get a list of the sections in this ELF file.
+	 * @return a list of sections
+	 */
+	public final List<ElfSection> getElfSections() {
+		return Collections.unmodifiableList(elfSections);
+	}
+
+	/** Get a list of the segments in this ELF file.
+	 * @return a list of segments
+	 */
+	public final List<ElfSegment> getElfSegments() {
+		return Collections.unmodifiableList(elfSegments);
+	}
+
 	/** Get the name of a section, given the offset into the relevant string table.
 	 * @param offset the offset into the string table
 	 * @return the section name
@@ -255,68 +325,6 @@ public class ElfFile {
 			sb.append(c);
 		}
 		return sb.toString();
-	}
-
-	/** Get the number of sections.
-	 * @return the number of sections
-	 */
-	public final int getElfSectionCount() {
-		return e_shnum;
-	}
-
-	/** Get one of the sections from this ELF file.
-	 * @param shndx the section index
-	 * @return the section
-	 */
-	public final ElfSection getElfSection(int shndx) throws IOException {
-		// Validate the section index.
-		if ((shndx < 0) || (shndx >= e_shnum) || (e_shoff == 0)) {
-			throw new IllegalArgumentException("section index out of range");
-		}
-
-		// Check whether the section has already been parsed.
-		ElfSection section = sections.get(shndx);
-
-		// If not then parse it from the ByteBuffer.
-		if (section == null) {
-			int offset = (int)(e_shoff + shndx * e_shentsize);
-			buffer.position(offset);
-			section = ElfSection.makeSection(buffer, this);
-			sections.set(shndx, section);
-		}
-
-		return section;
-	}
-
-	/** Get the number of segments.
-	 * @return the number of segments
-	 */
-	public final int getElfSegmentCount() {
-		return e_phnum;
-	}
-
-	/** Get one of the segments from this ELF file.
-	 * @param phndx the segment index
-	 * @return the segment
-	 */
-	public final ElfSegment getElfSegment(int phndx) throws IOException {
-		// Validate the segment index.
-		if ((phndx < 0) || (phndx >= e_phnum) || (e_phoff == 0)) {
-			throw new IllegalArgumentException("segment index out of range");
-		}
-
-		// Check whether the segment has already been parsed.
-		ElfSegment segment = segments.get(phndx);
-
-		// If not then parse it from the ByteBuffer.
-		if (segment == null) {
-			int offset = (int)(e_phoff + phndx * e_phentsize);
-			buffer.position(offset);
-			segment = new ElfSegment(buffer, this);
-			segments.set(phndx, segment);
-		}
-
-		return segment;
 	}
 
 	/** Dump the ELF header to a stream in human-readable form.

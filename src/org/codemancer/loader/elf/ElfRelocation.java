@@ -8,6 +8,7 @@ package org.codemancer.loader.elf;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import org.codemancer.loader.Symbol;
 import org.codemancer.loader.Relocation;
@@ -42,6 +43,8 @@ public class ElfRelocation implements Relocation {
 		ElfFile elf = sect.getElfFile();
 		ElfSymbolTableSection symtab =
 			(ElfSymbolTableSection)sect.getLinkedSection();
+		List<ElfSymbol> symbols = symtab.getElfSymbols();
+
 		byte elfClass = elf.getElfFileClass();
 
 		int symndx;
@@ -58,11 +61,11 @@ public class ElfRelocation implements Relocation {
 		}
 
 		try {
-			symbol = symtab.getElfSymbol(symndx);
+			symbol = symbols.get(symndx);
 		} catch (IndexOutOfBoundsException ex) {
 			String message = String.format(
 				"Symbol index out of bounds in relocation (%d > %d)",
-				symndx, symtab.getElfSymbolCount());
+				symndx, symbols.size());
 			throw new InvalidFileFormat(message);
 		}
 
