@@ -9,8 +9,10 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.codemancer.loader.Segment;
+
 /** A class to represent a section within an ELF file. */
-public class ElfSection {
+public class ElfSection implements Segment {
 	/** A constant to indicate that a section header is not used. */
 	public static final int SHT_NULL = 0;
 
@@ -199,9 +201,6 @@ public class ElfSection {
 		return elf;
 	}
 
-	/** Get ELF section name.
-	 * @return the section name
-	 */
 	public final String getName() throws IOException {
 		return elf.getElfSectionName(sh_name);
 	}
@@ -246,6 +245,10 @@ public class ElfSection {
 	 */
 	public final long getAlignment() {
 		return sh_addralign;
+	}
+
+	public final boolean isMapped() {
+		return ((sh_flags & SHF_ALLOC) != 0);
 	}
 
 	/** Get entry size of this section.

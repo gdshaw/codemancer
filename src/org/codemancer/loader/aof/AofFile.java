@@ -12,11 +12,14 @@ import java.nio.ByteOrder;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Collections;
 
-import org.codemancer.loader.ObjectFile;
 import org.codemancer.loader.Symbol;
+import org.codemancer.loader.Segment;
+import org.codemancer.loader.ObjectFile;
 import org.codemancer.loader.InvalidFileFormat;
 
 /** A class to represent the content of an AOF (ARM object format) file. */
@@ -177,6 +180,14 @@ public class AofFile implements ObjectFile {
 			return symbolTableChunk.getSymbols();
 		} else {
 			return new ArrayList<Symbol>();
+		}
+	}
+
+	public final NavigableMap<Long, Segment> getAddressMap() throws IOException {
+		if (headerChunk != null) {
+			return headerChunk.getAddressMap();
+		} else {
+			return new TreeMap<Long, Segment>();
 		}
 	}
 

@@ -7,6 +7,7 @@ package org.codemancer.loader;
 
 import java.lang.IllegalArgumentException;
 import java.lang.reflect.Constructor;
+import java.io.PrintStream;
 import java.nio.ByteBuffer;
 
 /** A factory class for recognising the type of object files using signatures. */
@@ -53,6 +54,7 @@ public class ObjectFileFactory {
 			try {
 				return (ObjectFile)constructor.newInstance(buffer);
 			} catch (Exception ex) {
+				ex.printStackTrace(new PrintStream(System.err));
 				return null;
 			}
 		}

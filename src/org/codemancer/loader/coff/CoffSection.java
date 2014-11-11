@@ -12,8 +12,11 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.codemancer.loader.Allocator;
+import org.codemancer.loader.Segment;
+
 /** A class to represent a section within an COFF file. */
-public class CoffSection {
+public class CoffSection implements Segment {
 	/** A flag to indicate that a section contains only executable code. */
 	public static final int STYP_TEXT = 0x0020;
 
@@ -62,15 +65,19 @@ public class CoffSection {
 	/** The flags for this section. */
 	private final int s_flags;
 
+	/** The address to which this section has been mapped. */
+	private final long mappedAddress;
+
 	/** A list of relocation directives for this COFF section. */
 	private ArrayList<CoffRelocation> coffRelocations;
 
 	/** Construct new section.
 	 * @param buffer a ByteBuffer giving access to the underlying COFF file
 	 * @param elf the COFF file to which the section belongs
+	 * @param memAlloc an allocator for addresses in memory
 	 * @return the newly constructed section
 	 */
-	public CoffSection(ByteBuffer buffer, CoffFile coff)
+	public CoffSection(ByteBuffer buffer, CoffFile coff, Allocator memAlloc)
 		throws IOException {
 
 		this.buffer = buffer;
@@ -96,6 +103,13 @@ public class CoffSection {
 		s_nlnno = buffer.getShort();
 		s_flags = buffer.getInt();
 
+		// Allocate an address in memory.
+		if (memAlloc != null) {
+			mappedAddress = memAlloc.allocate(s_size);
+		} else {
+			mappedAddress = s_vaddr & 0xFFFFFFFFL;
+		}
+
 		// Parse relocations.
 		if (coff.getCoffMagic() == CoffFile.Z80MAGIC) {
 			coffRelocations = new ArrayList<CoffRelocation>(s_nreloc);
@@ -114,18 +128,20 @@ public class CoffSection {
 		return coff;
 	}
 
-	/** Get the name of this COFF section.
-	 * @return the name
-	 */
-	public final String getName() throws IOException {
+	public final String getName() {
 		return s_name;
 	}
 
-	/** Get the size of this COFF section.
-	 * @return the size
-	 */
+	public final long getAddress() {
+		return mappedAddress;
+	}
+
 	public final long getSize() {
-		return s_size;
+		return s_size & 0xFFFFFFFFL;
+	}
+
+	public final boolean isMapped() {
+		return true;
 	}
 
 	/** Get a list of relocations in this section.

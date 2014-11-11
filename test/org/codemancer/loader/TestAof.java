@@ -103,7 +103,7 @@ public class TestAof {
 		AofArea area = aof.getHeaderChunk().getAofAreas().get(0);
 		assertEquals("C$$code2", area.getName());
 		assertEquals(0x34, area.getSize());
-		assertEquals(0x8000, area.getBaseAddress());
+		assertEquals(0x8000, area.getAddress());
 	}
 
 	@Test
@@ -111,7 +111,7 @@ public class TestAof {
 		AofArea area = aof.getHeaderChunk().getAofAreas().get(1);
 		assertEquals("C$$rodata1", area.getName());
 		assertEquals(0x10, area.getSize());
-		assertEquals(0x8034, area.getBaseAddress());
+		assertEquals(0x8034, area.getAddress());
 	}
 
 	@Test

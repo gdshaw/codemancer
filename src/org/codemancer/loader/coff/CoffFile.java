@@ -12,10 +12,15 @@ import java.nio.ByteOrder;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 import java.util.Collections;
 
-import org.codemancer.loader.ObjectFile;
+import org.codemancer.loader.Allocator;
 import org.codemancer.loader.Symbol;
+import org.codemancer.loader.Segment;
+import org.codemancer.loader.ObjectFile;
 import org.codemancer.loader.InvalidFileFormat;
 
 /** A class to represent the content of a COFF file. */
@@ -78,10 +83,13 @@ public class CoffFile implements ObjectFile {
 	/** The string table. */
 	private final byte[] strings;
 
+	/** An address map for this COFF file. */
+	private TreeMap<Long, Segment> addressMap = new TreeMap<Long, Segment>();
+
 	/** Construct object to represent COFF file.
 	 * On entry the ByteBuffer must be positioned at the start of the file.
 	 * Any byte order is permissible. On exit the position is unspecified,
-	 * but the byte order will have been set to match the ELF file.
+	 * but the byte order will have been set to little-endian.
 	 * @param buffer the content of the COFF file as a ByteBuffer
 	 */
 	public CoffFile(ByteBuffer buffer) throws IOException {
@@ -123,10 +131,23 @@ public class CoffFile implements ObjectFile {
 
 		// Parse section headers.
 		coffSections = new ArrayList<CoffSection>(f_nscns);
+		Allocator memAlloc = ((f_flags & F_EXEC) == 0) ? new Allocator(0, 1) : null;
 		for (int i = 0; i != f_nscns; ++i) {
 			buffer.position(sectptr + i * CoffSection.SCNHSZ);
-			CoffSection section = new CoffSection(buffer, this);
+			CoffSection section = new CoffSection(buffer, this, memAlloc);
 			coffSections.add(section);
+		}
+
+		// Populate address map.
+		for (CoffSection section: coffSections) {
+			long addr = section.getAddress();
+			long size = section.getSize();
+			Map.Entry<Long, Segment> nextEntry = addressMap.ceilingEntry(addr);
+			if ((nextEntry != null) && (nextEntry.getKey() < addr + size)) {
+				throw new InvalidFileFormat("Section " + section.getName() +
+					" overlaps with section " + nextEntry.getValue().getName());
+			}
+			addressMap.put(addr, section);
 		}
 	}
 
@@ -167,6 +188,15 @@ public class CoffFile implements ObjectFile {
 	 */
 	public final List<CoffSymbol> getCoffSymbols() {
 		return Collections.unmodifiableList(coffSymbols);
+	}
+
+	/** Get the address map for this COFF file.
+	 * @return the address map
+	 */
+	public final NavigableMap<Long, Segment> getAddressMap() {
+		// Inefficient, but currently targetting Java 6 which
+		// does not support Collections.unmodifiableNavigableMap.
+		return new TreeMap<Long, Segment>(addressMap);
 	}
 
 	/** Get string from string table

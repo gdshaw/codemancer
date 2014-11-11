@@ -13,10 +13,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import org.codemancer.loader.Allocator;
+import org.codemancer.loader.Segment;
 import org.codemancer.loader.InvalidFileFormat;
 
 /** A class to represent an AOF area header. */
-public class AofArea {
+public class AofArea implements Segment {
 	/** An attribute to indicate that the area has an absolute base address. */
 	public static final int ATTR_ABSOLUTE = 0x00000100;
 
@@ -120,25 +121,20 @@ public class AofArea {
 		return aofHeaderChunk;
 	}
 
-	/** Get the name of this area.
-	 * @return the name
-	 */
 	public final String getName() {
 		return name;
 	}
 
-	/** Get the size of this area.
-	 * @return the size, in bytes
-	 */
-	public final long getSize() {
-		return size;
+	public final long getAddress() {
+		return baseAddress & 0xFFFFFFFFL;
 	}
 
-	/** Get the base address for this area.
-	 * @return the base address, or zero if not applicable
-	 */
-	public final int getBaseAddress() {
-		return baseAddress;
+	public final long getSize() {
+		return size & 0xFFFFFFFFL;
+	}
+
+	public final boolean isMapped() {
+		return true;
 	}
 
 	/** Get the attributes for this area.

@@ -10,10 +10,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.Collections;
 
 import org.codemancer.loader.Allocator;
+import org.codemancer.loader.Segment;
 import org.codemancer.loader.InvalidFileFormat;
 
 /** A class to represent a header chunk within an AOF file. */
@@ -40,7 +42,7 @@ public class AofHeaderChunk extends AofChunk {
 	private ArrayList<AofArea> aofAreas = null;
 
 	/** An address map for this AOF file. */
-	private TreeMap<Long, AofArea> addressMap = new TreeMap<Long, AofArea>();
+	private TreeMap<Long, Segment> addressMap = new TreeMap<Long, Segment>();
 
 	/** Construct new AOF header chunk.
 	 * On entry the supplied ByteBuffer should be positioned at the start
@@ -103,10 +105,22 @@ public class AofHeaderChunk extends AofChunk {
 			for (int i = 0; i != numAreas; ++i) {
 				AofArea area = new AofArea(buffer, this, fileAlloc, memAlloc);
 				aofAreas.add(area);
-				addressMap.put((long)area.getBaseAddress(), area);
+				addressMap.put(area.getAddress(), area);
 			}
 		}
 		return Collections.unmodifiableList(aofAreas);
+	}
+
+	/** Get the address map for this AOF file.
+	 * @return the address map
+	 */
+	public final NavigableMap<Long, Segment> getAddressMap() throws IOException {
+		// Ensure that the address map has been populated.
+		getAofAreas();
+
+		// Inefficient, but currently targetting Java 6 which
+		// does not support Collections.unmodifiableNavigableMap.
+		return new TreeMap<Long, Segment>(addressMap);
 	}
 
 	/** Dump the chunk header to a stream in human-readable form.

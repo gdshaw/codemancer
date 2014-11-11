@@ -11,10 +11,14 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 import java.util.Collections;
 
-import org.codemancer.loader.ObjectFile;
 import org.codemancer.loader.Symbol;
+import org.codemancer.loader.Segment;
+import org.codemancer.loader.ObjectFile;
 import org.codemancer.loader.InvalidFileFormat;
 
 /** A class to represent the content of an ELF file.
@@ -136,6 +140,9 @@ public class ElfFile implements ObjectFile {
 
 	/** A list of symbols defined by this ELF file. */
 	private ArrayList<Symbol> symbols = new ArrayList<Symbol>();
+
+	/** An address map for this ELF file. */
+	private TreeMap<Long, Segment> addressMap = new TreeMap<Long, Segment>();
 
 	/** Parse one of the sections from this ELF file.
 	 * @param shndx the section index
@@ -259,7 +266,7 @@ public class ElfFile implements ObjectFile {
 		// Record the offset to the section name table.
 		shstroff = getElfSection(e_shstrndx).getOffset();
 
-		// Populate the section and segment tables.
+		// Process all sections.
 		for (int i = 0; i != e_shnum; ++i) {
 			ElfSection section = getElfSection(i);
 			if (section instanceof ElfSymbolTableSection) {
@@ -267,7 +274,19 @@ public class ElfFile implements ObjectFile {
 					(ElfSymbolTableSection)section;
 				symbols.addAll(symtab.getElfSymbols());
 			}
+			if (section.isMapped()) {
+				long addr = section.getAddress();
+				long size = section.getSize();
+				Map.Entry<Long, Segment> nextEntry = addressMap.ceilingEntry(addr);
+				if ((nextEntry != null) && (nextEntry.getKey() < addr + size)) {
+					throw new InvalidFileFormat("Section " + section.getName() +
+						" overlaps with section " + nextEntry.getValue().getName());
+				}
+				addressMap.put(addr, section);
+			}
 		}
+
+		// Process all segments.
 		for (int i = 0; i != e_phnum; ++i) {
 			getElfSegment(i);
 		}
@@ -324,6 +343,15 @@ public class ElfFile implements ObjectFile {
 	 */
 	public final List<ElfSegment> getElfSegments() {
 		return Collections.unmodifiableList(elfSegments);
+	}
+
+	/** Get the address map for this ELF file.
+	 * @return the address map
+	 */
+	public final NavigableMap<Long, Segment> getAddressMap() {
+		// Inefficient, but currently targetting Java 6 which
+		// does not support Collections.unmodifiableNavigableMap.
+		return new TreeMap<Long, Segment>(addressMap);
 	}
 
 	/** Get the name of a section, given the offset into the relevant string table.
