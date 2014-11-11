@@ -55,6 +55,17 @@ public class ShortBitStringTest {
 	}
 
 	@Test
+	public void testSubstring() {
+		assertEquals(new ShortBitString(), new ShortBitString(content, 64).substring(0, 0));
+		assertEquals(new ShortBitString(), new ShortBitString(content, 64).substring(64, 64));
+		assertEquals(new ShortBitString(1, 1), new ShortBitString(content, 64).substring(0, 1));
+		assertEquals(new ShortBitString(0xD3, 8), new ShortBitString(content, 64).substring(0, 8));
+		assertEquals(0x243F6A8885A308D3L, new ShortBitString(content, 64).substring(0, 64).getBits(0, 64));
+		assertEquals(0x8885AL, new ShortBitString(content, 64).substring(20, 40).getBits(0, 20));
+		assertEquals(0x243F6AL, new ShortBitString(content, 64).substring(40, 64).getBits(0, 24));
+	}
+
+	@Test
 	public void testEquals() {
 		assertEquals(new ShortBitString(), new ShortBitString());
 		assertEquals(new ShortBitString(1, 1), new ShortBitString(1, 1));

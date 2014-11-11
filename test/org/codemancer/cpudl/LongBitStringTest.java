@@ -55,6 +55,17 @@ public class LongBitStringTest {
 	}
 
 	@Test
+	public void testSubstring() {
+		assertEquals(new ShortBitString(), new LongBitString(content, 256).substring(0, 0));
+		assertEquals(new ShortBitString(), new LongBitString(content, 256).substring(256, 256));
+		assertEquals(new ShortBitString(1, 1), new LongBitString(content, 256).substring(0, 1));
+		assertEquals(new ShortBitString(0xD3, 8), new LongBitString(content, 256).substring(0, 8));
+		assertEquals(0x243F6A8885A308D3L, new LongBitString(content, 256).substring(0, 64).getBits(0, 64));
+		assertEquals(0x07344243F6A8885AL, new LongBitString(content, 256).substring(20, 84).getBits(0, 64));
+		assertEquals(0x082EFA98EC4E6C89L, new LongBitString(content, 256).substring(192, 256).getBits(0, 64));
+	}
+
+	@Test
 	public void testEquals() {
 		assertEquals(new LongBitString(content, 0), new LongBitString(content, 0));
 		assertEquals(new LongBitString(content, 1), new LongBitString(content, 1));

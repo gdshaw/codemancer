@@ -31,6 +31,16 @@ public abstract class BitString {
 	 */
 	public abstract long length();
 
+	/** Extract a substring of this bitstring.
+	 * It is an error if beginIndex < 0, beginIndex > endIndex, or
+	 * endIndex > this.length().
+	 * @param beginIndex the index at which the substring is to begin (inclusive)
+	 * @param endIndex the index at which the substring is to end (exclusive)
+	 */
+	public BitString substring(long beginIndex, long endIndex) {
+		return new SubBitString(this, beginIndex, endIndex - beginIndex);
+	}
+
 	public boolean equals(Object that) {
 		if (this == that) return true;
 		if (!(that instanceof BitString)) return false;
