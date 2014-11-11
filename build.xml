@@ -32,6 +32,7 @@
    <classpath location="build/jar/codemancer.jar"/>
    <classpath path="build/test/"/>
    <arg value="org.codemancer.cpudl.ShortBitStringTest"/>
+   <arg value="org.codemancer.cpudl.LongBitStringTest"/>
    <arg value="org.codemancer.loader.TestElf32"/>
    <arg value="org.codemancer.loader.TestElf64"/>
    <arg value="org.codemancer.loader.TestCoff"/>
