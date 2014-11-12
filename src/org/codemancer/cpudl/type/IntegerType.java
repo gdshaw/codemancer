@@ -71,6 +71,23 @@ public class IntegerType extends Type {
 		return 1;
 	}
 
+	public final Expression decode(List<BitReader> readers) {
+		if (readers.size() != 1) {
+			throw new IllegalArgumentException("incorrect number of chunks");
+		}
+		BitString bits = readers.get(0).read(size);
+		long value = bits.getBits(0, size);
+		switch (encoding) {
+		case UNSIGNED:
+			break;
+		case TWOS_COMPLEMENT:
+			if ((size < 64) && (((value >> (size - 1)) & 1) != 0)) {
+				value -= (1L << size);
+			}
+		}
+		return new Constant(this, value);
+	}
+
 	public final int getPieceCount() {
 		return 1;
 	}

@@ -5,6 +5,9 @@
 
 package org.codemancer.cpudl.type;
 
+import java.util.List;
+
+import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.expr.Expression;
 
 /** A class to represent a generic CPUDL data type. */
@@ -15,6 +18,16 @@ public abstract class Type {
 	 */
 	public int getChunkCount() {
 		return 0;
+	}
+
+	/** Attempt to decode a collection of bit sequences as an instance of this type.
+	 * If decoding is successful then the bit readers are left positioned at the end
+	 * of the respective chunks. If decoding fails then their positions are unspecified.
+	 * @param readers sources of bits, one for each chunk
+	 * @return an expression corresponding to the bit sequences, or null if they did not match
+	 */
+	public Expression decode(List<BitReader> readers) {
+		return null;
 	}
 
 	/** Get the number of pieces of assembly language matched by this type.
