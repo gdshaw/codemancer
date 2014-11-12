@@ -10,6 +10,7 @@ import org.w3c.dom.Element;
 
 import org.codemancer.cpudl.BitString;
 import org.codemancer.cpudl.BitReader;
+import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Constant;
 
@@ -39,19 +40,19 @@ public class IntegerType extends Type {
 	/** Construct integer type from XML.
 	 * @param element this type as an XML element
 	 */
-	public IntegerType(Element element) {
+	public IntegerType(Element element) throws CpudlParseException {
 		// Parse size attribute.
 		String sizeString = element.getAttribute("size");
 		if (sizeString.length() == 0) {
-			throw new IllegalArgumentException("missing integer size attribute");
+			throw new CpudlParseException(element, "missing integer size attribute");
 		}
 		try {
 			this.size = Integer.decode(element.getAttribute("size"));
 		} catch (NumberFormatException ex) {
-			throw new IllegalArgumentException("invalid integer size attribute");
+			throw new CpudlParseException(element, "invalid integer size attribute");
 		}
 		if ((this.size < 0) || (this.size > 64)) {
-			throw new IllegalArgumentException("integer size attribute out of range");
+			throw new CpudlParseException(element, "integer size attribute out of range");
 		}
 
 		// Parse encoding attribute.
@@ -63,7 +64,7 @@ public class IntegerType extends Type {
 		} else if (encodingString.equals("2c")) {
 			this.encoding = TWOS_COMPLEMENT;
 		} else {
-			throw new IllegalArgumentException("invalid integer encoding attribute");
+			throw new CpudlParseException(element, "invalid integer encoding attribute");
 		}
 	}
 
