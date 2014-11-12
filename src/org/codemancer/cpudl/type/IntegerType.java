@@ -74,4 +74,11 @@ public class IntegerType extends Type {
 	public final int getPieceCount() {
 		return 1;
 	}
+
+	public String unparse(int piece, Expression expr) {
+		if (piece != 0) {
+			throw new IllegalArgumentException("invalid piece number");
+		}
+		return expr.unparse();
+	}
 }

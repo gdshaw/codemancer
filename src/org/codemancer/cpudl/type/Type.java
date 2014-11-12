@@ -5,6 +5,8 @@
 
 package org.codemancer.cpudl.type;
 
+import org.codemancer.cpudl.expr.Expression;
+
 /** A class to represent a generic CPUDL data type. */
 public abstract class Type {
 	/** Get the number of chunks of machine code matched by this type.
@@ -21,5 +23,15 @@ public abstract class Type {
 	 */
 	public int getPieceCount() {
 		return 0;
+	}
+
+	/** Construct a piece of assembly language to match this fragment.
+	 * It is an error if piece < 0 or piece >= getPieceCount().
+	 * @param piece the piece number
+	 * @param expr the expression to be unparsed
+	 * @return the corresponding string
+	 */
+	public String unparse(int piece, Expression expr) {
+		throw new IllegalArgumentException("invalid piece number");
 	}
 }
