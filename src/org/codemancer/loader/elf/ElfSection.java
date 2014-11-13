@@ -251,6 +251,15 @@ public class ElfSection implements Segment {
 		return ((sh_flags & SHF_ALLOC) != 0);
 	}
 
+	public final ByteBuffer getContent() {
+		ByteBuffer content = this.buffer.duplicate();
+		content.position((int)sh_offset);
+		content.limit((int)(sh_offset + sh_size));
+		content = content.slice();
+		content.order(this.buffer.order());
+		return content;
+	}
+
 	/** Get entry size of this section.
 	 * @return the entry size, in bytes
 	 */

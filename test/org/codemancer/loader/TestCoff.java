@@ -70,4 +70,14 @@ public class TestCoff {
 		assertEquals(".data", rel.getCoffSymbol().getName());
 		assertEquals(1, rel.getCoffRelocationType());
 	}
+
+	@Test
+	public void testTextContent() {
+		CoffSection sect = coff.getCoffSections().get(0);
+		ByteBuffer content = sect.getContent();
+		content.position(0x100);
+		assertEquals(0x0E000011, content.getInt() & 0xFFFFFFFF);
+		assertEquals(0x0005CD09, content.getInt() & 0xFFFFFFFF);
+		assertEquals(0x010B, content.limit());
+	}
 }

@@ -144,6 +144,15 @@ public class CoffSection implements Segment {
 		return true;
 	}
 
+	public final ByteBuffer getContent() {
+		ByteBuffer content = this.buffer.duplicate();
+		content.position(s_scnptr);
+		content.limit(s_scnptr + s_size);
+		content = content.slice();
+		content.order(this.buffer.order());
+		return content;
+	}
+
 	/** Get a list of relocations in this section.
 	 * @return a list of relocations
 	 */

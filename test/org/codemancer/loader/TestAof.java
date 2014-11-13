@@ -122,4 +122,13 @@ public class TestAof {
 		assertEquals(4, rel.getSize());
 		assertEquals("__main", rel.getSymbol().getName());
 	}
+
+	@Test
+	public void testArea0Content() throws IOException {
+		AofArea area = aof.getHeaderChunk().getAofAreas().get(0);
+		ByteBuffer content = area.getContent();
+		assertEquals(0xE1A0C00D, content.getInt() & 0xFFFFFFFF);
+		assertEquals(0xE92DDA00, content.getInt() & 0xFFFFFFFF);
+		assertEquals(52, content.limit());
+	}
 }

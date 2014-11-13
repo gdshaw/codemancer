@@ -7,6 +7,7 @@ package org.codemancer.loader;
 
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /** An interface for inspecting a segment from an object file. */
 public interface Segment {
@@ -41,6 +42,11 @@ public interface Segment {
 	 * @return true if this section is mapped, otherwise false
 	 */
 	public boolean isMapped();
+
+	/** Get the content of this section as a ByteBuffer.
+	 * @return the content
+	 */
+	public ByteBuffer getContent();
 
 	/** Dump the metadata for this symbol to a stream in human-readable form.
 	 * @param out the stream to be written to

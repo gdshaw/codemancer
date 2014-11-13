@@ -137,6 +137,15 @@ public class AofArea implements Segment {
 		return true;
 	}
 
+	public final ByteBuffer getContent() {
+		ByteBuffer content = this.buffer.duplicate();
+		content.position(fileOffset);
+		content.limit(fileOffset + size);
+		content = content.slice();
+		content.order(this.buffer.order());
+		return content;
+	}
+
 	/** Get the attributes for this area.
 	 * @return the attributes word
 	 */

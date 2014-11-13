@@ -118,4 +118,12 @@ public class TestElf64 {
 		assertEquals(6, dynseg.getElfSegmentFlags());
 		assertEquals(8, dynseg.getAlignment());
 	}
+
+	@Test
+	public void testTextContent() {
+		ByteBuffer content = text.getContent();
+		assertEquals(0x8949ED31, content.getInt() & 0xFFFFFFFF);
+		assertEquals(0x89485ED1, content.getInt() & 0xFFFFFFFF);
+		assertEquals(0x01D8, content.limit());
+	}
 }
