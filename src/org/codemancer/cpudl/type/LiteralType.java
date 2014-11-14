@@ -27,9 +27,6 @@ public class LiteralType extends Type {
 	}
 
 	public String unparse(int piece, Expression expr) {
-
-		System.err.println(piece);
-
 		if (piece != 0) {
 			throw new IllegalArgumentException("invalid piece number");
 		}
