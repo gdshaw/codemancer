@@ -25,7 +25,9 @@ public abstract class Type {
 			if (child instanceof Element) {
 				Element childElement = (Element)child;
 				String tagName = childElement.getTagName();
-				if (tagName.equals("integer")) {
+				if (tagName.equals("literal")) {
+					return new LiteralType(childElement);
+				} else if (tagName.equals("integer")) {
 					return new IntegerType(childElement);
 				} else if (tagName.equals("fragment")) {
 					return new FragmentType(childElement);
