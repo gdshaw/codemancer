@@ -48,6 +48,34 @@ public abstract class Type {
 		return 0;
 	}
 
+	/** Return the width of the initial fixed-width region for a given chunk.
+	 * It is an error if chunk < 0 or chunk >= getChunkCount().
+	 * @param chunk the chunk number
+	 * @return the width, in bits
+	 */
+	public long getFixedWidth(int chunk) {
+		throw new IllegalArgumentException("invalid chunk number");
+	}
+
+	/** Get possible values for the bit at a given index of a given chunk.
+	 * It is an error if chunk < 0, chunk >= getChunkCount() or index >= getFixedWidth(chunk).
+	 * @param chunk the chunk number
+	 * @param index the bit index
+	 * @return the value the bit must have, or -1 if either is possible
+	 */
+	public int getFixedBit(int chunk, long index) {
+		throw new IllegalArgumentException("invalid chunk number");
+	}
+
+	/** Determine whether a given chunk has a variable-width region
+	 * It is an error if chunk < 0 or chunk >= getChunkCount().
+	 * @param chunk the chunk number
+	 * @return true if the chunk has a variable-width region, otherwise false
+	 */
+	public boolean isVariableWidth(int chunk) {
+		throw new IllegalArgumentException("invalid chunk number");
+	}
+
 	/** Attempt to decode a collection of bit sequences as an instance of this type.
 	 * If decoding is successful then the bit readers are left positioned at the end
 	 * of the respective chunks. If decoding fails then their positions are unspecified.

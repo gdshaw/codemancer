@@ -72,6 +72,30 @@ public class IntegerType extends Type {
 		return 1;
 	}
 
+	public final long getFixedWidth(int chunk) {
+		if (chunk != 0) {
+			throw new IllegalArgumentException("invalid chunk number");
+		}
+		return size;
+	}
+
+	public final int getFixedBit(int chunk, long index) {
+		if (chunk != 0) {
+			throw new IllegalArgumentException("invalid chunk number");
+		}
+		if ((index < 0) || (index >= size)) {
+			throw new IllegalArgumentException("invalid bit index");
+		}
+		return -1;
+	}
+
+	public final boolean isVariableWidth(int chunk) {
+		if (chunk != 0) {
+			throw new IllegalArgumentException("invalid chunk number");
+		}
+		return false;
+	}
+
 	public final Expression decode(List<BitReader> readers) {
 		if (readers.size() != 1) {
 			throw new IllegalArgumentException("incorrect number of chunks");
