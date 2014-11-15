@@ -5,13 +5,16 @@ Distribution and modification are permitted within the terms of the
 GNU General Public License (version 3 or any later version).
 -->
 
+<!--
+Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
+-->
+
 <cpudl>
  <define name="reg8">
   <fragment>
    <pattern>
     <const>000</const>
    </pattern>
-
    <phrase>
     <literal>B</literal>
    </phrase>
@@ -21,7 +24,6 @@ GNU General Public License (version 3 or any later version).
    <pattern>
     <const>100</const>
    </pattern>
-
    <phrase>
     <literal>C</literal>
    </phrase>
@@ -31,7 +33,6 @@ GNU General Public License (version 3 or any later version).
    <pattern>
     <const>010</const>
    </pattern>
-
    <phrase>
     <literal>D</literal>
    </phrase>
@@ -41,7 +42,6 @@ GNU General Public License (version 3 or any later version).
    <pattern>
     <const>110</const>
    </pattern>
-
    <phrase>
     <literal>E</literal>
    </phrase>
@@ -51,7 +51,6 @@ GNU General Public License (version 3 or any later version).
    <pattern>
     <const>001</const>
    </pattern>
-
    <phrase>
     <literal>H</literal>
    </phrase>
@@ -61,7 +60,6 @@ GNU General Public License (version 3 or any later version).
    <pattern>
     <const>101</const>
    </pattern>
-
    <phrase>
     <literal>L</literal>
    </phrase>
@@ -71,7 +69,6 @@ GNU General Public License (version 3 or any later version).
    <pattern>
     <const>011</const>
    </pattern>
-
    <phrase>
     <literal>(HL)</literal>
    </phrase>
@@ -81,9 +78,96 @@ GNU General Public License (version 3 or any later version).
    <pattern>
     <const>111</const>
    </pattern>
-
    <phrase>
     <literal>A</literal>
+   </phrase>
+  </fragment>
+ </define>
+
+ <define name="add">
+  <fragment>
+   <pattern>
+    <const>000</const>
+   </pattern>
+   <phrase>
+    <literal>ADD</literal>
+   </phrase>
+  </fragment>
+ </define>
+
+ <define name="adc">
+  <fragment>
+   <pattern>
+    <const>100</const>
+   </pattern>
+   <phrase>
+    <literal>ADC</literal>
+   </phrase>
+  </fragment>
+ </define>
+
+ <define name="sub">
+  <fragment>
+   <pattern>
+    <const>010</const>
+   </pattern>
+   <phrase>
+    <literal>SUB</literal>
+   </phrase>
+  </fragment>
+ </define>
+
+ <define name="sbc">
+  <fragment>
+   <pattern>
+    <const>110</const>
+   </pattern>
+   <phrase>
+    <literal>SBC</literal>
+   </phrase>
+  </fragment>
+ </define>
+
+ <define name="and">
+  <fragment>
+   <pattern>
+    <const>001</const>
+   </pattern>
+   <phrase>
+    <literal>AND</literal>
+   </phrase>
+  </fragment>
+ </define>
+
+ <define name="xor">
+  <fragment>
+   <pattern>
+    <const>101</const>
+   </pattern>
+   <phrase>
+    <literal>XOR</literal>
+   </phrase>
+  </fragment>
+ </define>
+
+ <define name="or">
+  <fragment>
+   <pattern>
+    <const>011</const>
+   </pattern>
+   <phrase>
+    <literal>OR</literal>
+   </phrase>
+  </fragment>
+ </define>
+
+ <define name="cp">
+  <fragment>
+   <pattern>
+    <const>111</const>
+   </pattern>
+   <phrase>
+    <literal>CP</literal>
    </phrase>
   </fragment>
  </define>
@@ -93,25 +177,68 @@ GNU General Public License (version 3 or any later version).
    <var name="rs">
     <ref name="reg8"/>
    </var>
-
    <var name="rd">
     <ref name="reg8"/>
    </var>
-
    <pattern>
     <ref name="rs"/>
     <ref name="rd"/>
     <const>10</const>
    </pattern>
-
    <phrase>
     <literal>LD</literal>
    </phrase>
-
    <phrase>
     <ref name="rd"/>
     <literal>,</literal>
     <ref name="rs"/>
+   </phrase>
+  </fragment>
+
+  <fragment>
+   <var name="r">
+    <ref name="reg8"/>
+   </var>
+   <var name="opcode">
+    <ref name="add"/>
+    <ref name="adc"/>
+    <ref name="sbc"/>
+   </var>
+   <pattern>
+    <ref name="r"/>
+    <ref name="opcode"/>
+    <const>01</const>
+   </pattern>
+   <phrase>
+    <ref name="opcode"/>
+   </phrase>
+   <phrase>
+    <literal>A,</literal>
+    <ref name="r"/>
+   </phrase>
+  </fragment>
+
+  <fragment>
+   <var name="r">
+    <ref name="reg8"/>
+   </var>
+   <var name="opcode">
+    <ref name="sub"/>
+    <ref name="and"/>
+    <ref name="xor"/>
+    <ref name="or"/>
+    <ref name="cp"/>
+   </var>
+   <pattern>
+    <ref name="r"/>
+    <ref name="opcode"/>
+    <const>01</const>
+   </pattern>
+   <phrase>
+    <ref name="opcode"/>
+   </phrase>
+   <phrase>
+    <ref name="r"/>
    </phrase>
   </fragment>
  </start>
