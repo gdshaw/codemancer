@@ -54,7 +54,7 @@ public class Phrase {
 				String tagName = childElement.getTagName();
 				if (tagName.equals("literal")) {
 					Type type = new LiteralType(childElement);
-					MemberInfo member = new MemberInfo(type);
+					MemberInfo member = new MemberInfo(type, 0);
 					add(childElement, null, member);
 				} else if (tagName.equals("ref")) {
 
