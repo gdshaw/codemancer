@@ -5,9 +5,18 @@
 
 package org.codemancer.cpudl;
 
+import java.io.FileReader;
 import java.util.HashMap;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.dom.DOMResult;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 import org.codemancer.cpudl.type.Type;
 import org.codemancer.cpudl.type.Choice;
@@ -62,5 +71,34 @@ public class Architecture {
 	 */
 	public final Type getType(String typeName) {
 		return types.get(typeName);
+	}
+
+	/** Make architecture from CPUDL file.
+	 * @param architectureName the name of the required architecture
+	 * @return the architecture
+	 */
+	public static Architecture makeArchitecture(String architectureName) throws Exception {
+
+		// Create InputSource to read from CPUDL file.
+		String architectureSystemId = "cpus/" + architectureName + ".cpu";
+		InputSource in = new InputSource(new FileReader(architectureSystemId));
+		in.setSystemId(architectureSystemId);
+
+		// Create SAXSource with attached LocationFilter, to annotate
+		// elements with source filename/row/column.
+		XMLReader reader = XMLReaderFactory.createXMLReader();
+		LocationFilter filter = new LocationFilter(reader);
+		SAXSource sax = new SAXSource(filter, in);
+
+		// Transform resulting SAXSource into a DOM tree.
+		TransformerFactory factory = TransformerFactory.newInstance();
+		Transformer transformer = factory.newTransformer();
+		DOMResult result = new DOMResult();
+		transformer.transform(sax, result);
+
+		// Build architecture from DOM tree.
+		Document document = (Document)result.getNode();
+		Element root = document.getDocumentElement();
+		return new Architecture(root);
 	}
 }
