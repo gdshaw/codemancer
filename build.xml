@@ -25,15 +25,17 @@
   <mkdir dir="build/test"/>
   <javac srcdir="test" destdir="build/test" debug="true" debuglevel="lines,vars,source">
    <classpath location="/usr/share/java/junit4.jar"/>
+   <classpath location="/usr/share/java/jaxp-1.3.jar"/>
    <classpath location="build/jar/codemancer.jar"/>
   </javac>
-  <java classname="org.junit.runner.JUnitCore">
+  <java classname="org.junit.runner.JUnitCore" fork="true">
    <classpath location="/usr/share/java/junit4.jar"/>
    <classpath location="build/jar/codemancer.jar"/>
    <classpath path="build/test/"/>
    <arg value="org.codemancer.cpudl.ShortBitStringTest"/>
    <arg value="org.codemancer.cpudl.LongBitStringTest"/>
    <arg value="org.codemancer.cpudl.BitStringReaderTest"/>
+   <arg value="org.codemancer.cpudl.CpuTest"/>
    <arg value="org.codemancer.loader.TestElf32"/>
    <arg value="org.codemancer.loader.TestElf64"/>
    <arg value="org.codemancer.loader.TestCoff"/>
