@@ -1,0 +1,118 @@
+<!--
+This file is part of Codemancer.
+Copyright 2014 Graham Shaw.
+Distribution and modification are permitted within the terms of the
+GNU General Public License (version 3 or any later version).
+-->
+
+<cpudl>
+ <define name="reg8">
+  <fragment>
+   <pattern>
+    <const>000</const>
+   </pattern>
+
+   <phrase>
+    <literal>B</literal>
+   </phrase>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>100</const>
+   </pattern>
+
+   <phrase>
+    <literal>C</literal>
+   </phrase>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>010</const>
+   </pattern>
+
+   <phrase>
+    <literal>D</literal>
+   </phrase>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>110</const>
+   </pattern>
+
+   <phrase>
+    <literal>E</literal>
+   </phrase>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>001</const>
+   </pattern>
+
+   <phrase>
+    <literal>H</literal>
+   </phrase>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>101</const>
+   </pattern>
+
+   <phrase>
+    <literal>L</literal>
+   </phrase>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>011</const>
+   </pattern>
+
+   <phrase>
+    <literal>(HL)</literal>
+   </phrase>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>111</const>
+   </pattern>
+
+   <phrase>
+    <literal>A</literal>
+   </phrase>
+  </fragment>
+ </define>
+
+ <start>
+  <fragment>
+   <var name="rs">
+    <ref name="reg8"/>
+   </var>
+
+   <var name="rd">
+    <ref name="reg8"/>
+   </var>
+
+   <pattern>
+    <ref name="rs"/>
+    <ref name="rd"/>
+    <const>10</const>
+   </pattern>
+
+   <phrase>
+    <literal>LD</literal>
+   </phrase>
+
+   <phrase>
+    <ref name="rd"/>
+    <literal>,</literal>
+    <ref name="rs"/>
+   </phrase>
+  </fragment>
+ </start>
+</cpudl>
