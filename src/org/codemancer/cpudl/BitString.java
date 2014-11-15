@@ -9,6 +9,11 @@ package org.codemancer.cpudl;
  * Instances of this class are required to be immutable.
  */
 public abstract class BitString {
+	/** Get the length of this bitstring.
+	 * @return the length, in bits
+	 */
+	public abstract long length();
+
 	/** Get a bit from this bitstring.
 	 * The behaviour of this function is undefined if
 	 * index < 0 or index >= this.length().
@@ -26,10 +31,47 @@ public abstract class BitString {
 	 */
 	public abstract long getBits(long index, long length);
 
-	/** Get the length of this bitstring.
-	 * @return the length, in bits
+	/** Set a bit within this bitstring.
+	 * @param index the index of the bit to be set
+	 * @param value the value to which the bit should be set
+	 * @return a bitstring in which the given bit has been set to the given value
+	 * The length of the bitstring, and the values of any other bits, are unchanged.
 	 */
-	public abstract long length();
+	public BitString setBit(long index, int value) {
+		// For efficiency, if the bit already has the required value then return this.
+		if (getBit(index) == value) return this;
+
+		long newLength = length();
+		if (newLength <= 64) {
+			long mask = 1L << index;
+			long oldContent = getBits(0, newLength);
+			long newContent = ((value & 1) != 0) ?
+				(oldContent | mask) :
+				(oldContent & ~mask);
+			return new ShortBitString(newContent, newLength);
+		} else {
+			long newContent[] = new long[(int)((newLength + 63) / 64)];
+			int newIndex = 0;
+			long oldOffset = 0;
+			long oldRemaining = newLength;
+			while (oldRemaining >= 64) {
+				newContent[newIndex] = getBits(oldOffset, 64);
+				newIndex += 1;
+				oldOffset += 64;
+				oldRemaining -= 64;
+			}
+			if (oldRemaining > 0) {
+				newContent[newIndex] = getBits(oldOffset, oldRemaining);
+			}
+
+			long mask = 1L << (index & 63);
+			newIndex = (int)(index >> 6);
+			newContent[newIndex] = ((value & 1) != 0) ?
+				(newContent[newIndex] | mask) :
+				(newContent[newIndex] & ~mask);
+			return new LongBitString(newContent, newLength);
+		}
+	}
 
 	/** Extract a substring of this bitstring.
 	 * It is an error if beginIndex < 0, beginIndex > endIndex, or

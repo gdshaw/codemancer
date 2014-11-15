@@ -15,6 +15,13 @@ public class ShortBitStringTest {
 	private final long content = 0x243F6A8885A308D3L;
 
 	@Test
+	public void testLength() {
+		assertEquals(0, new ShortBitString(0, 0).length());
+		assertEquals(20, new ShortBitString(0, 20).length());
+		assertEquals(64, new ShortBitString(content, 64).length());
+	}
+
+	@Test
 	public void testGetBit() {
 		assertEquals(1, new ShortBitString(content, 64).getBit(0));
 		assertEquals(1, new ShortBitString(content, 64).getBit(1));
@@ -48,10 +55,26 @@ public class ShortBitStringTest {
 	}
 
 	@Test
-	public void testLength() {
-		assertEquals(0, new ShortBitString(0, 0).length());
-		assertEquals(20, new ShortBitString(0, 20).length());
-		assertEquals(64, new ShortBitString(content, 64).length());
+	public void testSetBit() {
+		for (int i = 1; i <= 64; ++i) {
+			int xLength = i;
+			long xMask = (1L << xLength) - 1;
+			long xContent = content & xMask;
+			BitString xBits = new ShortBitString(xContent, xLength);
+			for (int j = 0; j < i; ++j) {
+				BitString yBits = xBits.setBit(j, 0);
+				BitString zBits = xBits.setBit(j, 1);
+				for (int k = 0; k < i; ++k) {
+					if (k == j) {
+						assertEquals(0, yBits.getBit(k));
+						assertEquals(1, zBits.getBit(k));
+					} else {
+						assertEquals(xBits.getBit(k), yBits.getBit(k));
+						assertEquals(xBits.getBit(k), zBits.getBit(k));
+					}
+				}
+			}
+		}
 	}
 
 	@Test
