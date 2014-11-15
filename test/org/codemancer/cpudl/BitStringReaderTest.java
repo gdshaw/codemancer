@@ -66,4 +66,72 @@ public class BitStringReaderTest {
 		bits.read(96);
 		assertEquals(new ShortBitString(0x31D013198A2EL, 48), bits.read(48));
 	}
+
+	@Test
+	public void testPeek() {
+		BitReader bits = new BitStringReader(new LongBitString(longContent, 256));
+		assertEquals(1, bits.peek(7));
+		assertEquals(1, bits.peek(6));
+		assertEquals(0, bits.peek(5));
+		assertEquals(1, bits.peek(4));
+		assertEquals(0, bits.peek(3));
+		assertEquals(0, bits.peek(2));
+		assertEquals(1, bits.peek(1));
+		assertEquals(1, bits.peek(0));
+		bits.read(1);
+		assertEquals(0, bits.peek(7));
+		assertEquals(1, bits.peek(6));
+		assertEquals(1, bits.peek(5));
+		assertEquals(0, bits.peek(4));
+		assertEquals(1, bits.peek(3));
+		assertEquals(0, bits.peek(2));
+		assertEquals(0, bits.peek(1));
+		assertEquals(1, bits.peek(0));
+		bits.read(3);
+		assertEquals(1, bits.peek(7));
+		assertEquals(0, bits.peek(6));
+		assertEquals(0, bits.peek(5));
+		assertEquals(0, bits.peek(4));
+		assertEquals(1, bits.peek(3));
+		assertEquals(1, bits.peek(2));
+		assertEquals(0, bits.peek(1));
+		assertEquals(1, bits.peek(0));
+		bits.read(56);
+		assertEquals(0, bits.peek(7));
+		assertEquals(1, bits.peek(6));
+		assertEquals(0, bits.peek(5));
+		assertEquals(0, bits.peek(4));
+		assertEquals(0, bits.peek(3));
+		assertEquals(0, bits.peek(2));
+		assertEquals(1, bits.peek(1));
+		assertEquals(0, bits.peek(0));
+	}
+
+	@Test
+	public void testSeek() {
+		BitReader bits = new BitStringReader(new LongBitString(longContent, 256));
+		bits.seek(1);
+		assertEquals(new ShortBitString(0x69, 8), bits.read(8));
+		bits.seek(56);
+		assertEquals(new ShortBitString(0x24, 8), bits.read(8));
+		bits.seek(63);
+		assertEquals(new ShortBitString(0x88, 8), bits.read(8));
+		bits.seek(64);
+		assertEquals(new ShortBitString(0x44, 8), bits.read(8));
+		bits.seek(120);
+		assertEquals(new ShortBitString(0x13, 8), bits.read(8));
+		bits.seek(190);
+		assertEquals(new ShortBitString(0x26, 8), bits.read(8));
+	}
+
+	@Test
+	public void testTell() {
+		for (int i = 1; i != 256; ++i) {
+			BitReader bits = new BitStringReader(new LongBitString(longContent, 256));
+			for (int j = 0; j < 256; j += i) {
+				assertEquals(j, bits.tell());
+				bits.read(i);
+			}
+		}
+	}
 }

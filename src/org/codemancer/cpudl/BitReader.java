@@ -16,4 +16,20 @@ public interface BitReader {
 	 * @return the bits as a bitstring
 	 */
 	public BitString read(long count);
+
+	/** Inspect a single bit from this source without consuming it.
+	 * @param offset the offset with respect to the current position in the stream
+	 * @return the value of the bit at the given offset
+	 */
+	public abstract int peek(long offset);
+
+	/** Get the current absolute position.
+	 * @return the current absolute position
+	 */
+	public abstract long tell();
+
+	/** Seek to a given absolute position.
+	 * @param position the required absolute position
+	 */
+	public abstract void seek(long position);
 }

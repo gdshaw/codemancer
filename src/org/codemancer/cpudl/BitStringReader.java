@@ -28,4 +28,16 @@ public class BitStringReader implements BitReader {
 		position += count;
 		return result;
 	}
+
+	public final int peek(long offset) {
+		return bits.getBit(position + offset);
+	}
+
+	public final void seek(long position) {
+		this.position = position;
+	}
+
+	public final long tell() {
+		return this.position;
+	}
 }
