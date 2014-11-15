@@ -45,7 +45,17 @@ public class Context {
 		}
 		Element element = (Element)node;
 		String tagName = element.getTagName();
-		if (tagName.equals("const")) {
+		if (tagName.equals("ref")) {
+			String typeName = element.getAttribute("name");
+			if (typeName == null) {
+				throw new CpudlParseException(element, "missing name attribute in <ref> element");
+			}
+			Type type = arch.getType(typeName);
+			if (type == null) {
+				throw new CpudlParseException(element, "type name '" + typeName + "' not found");
+			}
+			return type;
+		} else if (tagName.equals("const")) {
 			return new ConstantType(this, element);
 		} else if (tagName.equals("literal")) {
 			return new LiteralType(this, element);

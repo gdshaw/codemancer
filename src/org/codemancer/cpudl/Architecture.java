@@ -5,6 +5,7 @@
 
 package org.codemancer.cpudl;
 
+import java.util.HashMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
@@ -15,6 +16,9 @@ import org.codemancer.cpudl.type.Choice;
 public class Architecture {
 	/** A type which describes any instruction of this architecture. */
 	private Type start = null;
+
+	/** The types defined by this architecture, indexed by name. */
+	private final HashMap<String, Type> types = new HashMap<String, Type>();
 
 	/** Construct architecture from XML.
 	 * @param element the required content as an XML element
@@ -31,6 +35,13 @@ public class Architecture {
 						throw new CpudlParseException(childElement, "multiple <start> elements");
 					}
 					start = ctx.makeChoice(childElement);
+				} else if (tagName.equals("define")) {
+					String typeName = childElement.getAttribute("name");
+					if (typeName == null) {
+						throw new CpudlParseException(childElement, "missing name attribute in <define> element");
+					}
+					Type type = ctx.makeChoice(childElement);
+					types.put(typeName, type);
 				}
 			}
 			child = child.getNextSibling();
@@ -43,5 +54,13 @@ public class Architecture {
 	/** Get the start type for this architecture. */
 	public final Type getStart() {
 		return start;
+	}
+
+	/** Get named type.
+	 * @param typeName the required type name
+	 * @return the corresponding type, or null if not found
+	 */
+	public final Type getType(String typeName) {
+		return types.get(typeName);
 	}
 }
