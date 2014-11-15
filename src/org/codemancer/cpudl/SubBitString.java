@@ -22,6 +22,10 @@ public class SubBitString extends BitString {
 	 * @param length the required length, in bits
 	 */
 	public SubBitString(BitString parent, long offset, long length) {
+		if (length < 0) {
+			throw new IllegalArgumentException(
+				"substring length cannot be negative");
+		}
 		if ((offset < 0) || (offset + length > parent.length())) {
 			throw new IllegalArgumentException(
 				"substring does not fully overlap parent bitstring");

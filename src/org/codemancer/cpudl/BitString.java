@@ -41,6 +41,79 @@ public abstract class BitString {
 		return new SubBitString(this, beginIndex, endIndex - beginIndex);
 	}
 
+	/** Concatenate a given bit to the end of this bitstring.
+	 * This bitstring, being immutable, is not altered by the concatenation.
+	 * @param bit the bit to be concatenated
+	 * @return the concatenated bitstring
+	 */
+	public BitString concat(int bit) {
+		long oldLength = length();
+		long newLength = oldLength + 1;
+		if (newLength <= 64) {
+			long oldContent = getBits(0, oldLength);
+			long newContent = oldContent | ((bit & 1L) << oldLength);
+			return new ShortBitString(newContent, newLength);
+		} else {
+			return concat(new ShortBitString(bit, 1));
+		}
+	}
+
+	/** Concatenate a given bitstring to the end of this bitstring.
+	 * This bitstring, being immutable, is not altered by the concatenation.
+	 * @param bits the bitstring to be concatenated
+	 * @return the concatenated bitstring
+	 */
+	public BitString concat(BitString bits) {
+		long oldLength = length();
+		long addLength = bits.length();
+		long newLength = oldLength + addLength;
+		if (addLength == 0) {
+			// This test is required because it is assumed below that addLength != 0.
+			return this;
+		} else if (newLength <= 64) {
+			long oldContent = getBits(0, oldLength);
+			long newContent = oldContent | (bits.getBits(0, addLength) << oldLength);
+			return new ShortBitString(newContent, newLength);
+		} else {
+			long newContent[] = new long[(int)((newLength + 63) / 64)];
+			int index = 0;
+
+			// Copy any complete words from the left hand side to the result.
+			long oldOffset = 0;
+			long oldRemaining = oldLength;
+			while (oldRemaining >= 64) {
+				newContent[index] = getBits(oldOffset, 64);
+				index += 1;
+				oldOffset += 64;
+				oldRemaining -= 64;
+			}
+
+			// Copy any remaining bits from the left hand side, then append bits from the
+			// right hand side to make this (as nearly as possible) into a complete word.
+			long addRemaining = addLength;
+			long addOffset = Math.min(addRemaining, (64 - oldRemaining));
+			newContent[index] = getBits(oldOffset, oldRemaining) |
+				(bits.getBits(0, addOffset) << oldRemaining);
+			index += 1;
+			addRemaining -= addOffset;
+
+			// Append any remaining complete words from the right hand side.
+			while (addRemaining >= 64) {
+				newContent[index] = bits.getBits(addOffset, 64);
+				index += 1;
+				addOffset += 64;
+				addRemaining -= 64;
+			}
+
+			// Append any remaining bits from the right hand side.
+			if (addRemaining > 0) {
+				newContent[index] = bits.getBits(addOffset, addRemaining);
+			}
+
+			return new LongBitString(newContent, newLength);
+		}
+	}
+
 	public boolean equals(Object that) {
 		if (this == that) return true;
 		if (!(that instanceof BitString)) return false;

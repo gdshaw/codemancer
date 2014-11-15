@@ -66,6 +66,51 @@ public class LongBitStringTest {
 	}
 
 	@Test
+	public void testConcatBit() {
+		BitString bits1 = new LongBitString(content, 60);
+		bits1 = bits1.concat(0);
+		bits1 = bits1.concat(1);
+		bits1 = bits1.concat(0);
+		bits1 = bits1.concat(0);
+		bits1 = bits1.concat(0);
+		bits1 = bits1.concat(0);
+		bits1 = bits1.concat(1);
+		bits1 = bits1.concat(0);
+		assertEquals(bits1, new LongBitString(content, 68));
+		BitString bits2 = new LongBitString(content, 124);
+		bits2 = bits2.concat(1);
+		bits2 = bits2.concat(0);
+		bits2 = bits2.concat(0);
+		bits2 = bits2.concat(0);
+		bits2 = bits2.concat(0);
+		bits2 = bits2.concat(0);
+		bits2 = bits2.concat(0);
+		bits2 = bits2.concat(0);
+		bits2 = bits2.concat(1);
+		bits2 = bits2.concat(0);
+		bits2 = bits2.concat(1);
+		bits2 = bits2.concat(1);
+		assertEquals(bits2, new LongBitString(content, 136));
+	}
+
+	@Test
+	public void testConcat() {
+		BitString bits = new LongBitString(content, 256);
+		for (int i = 0; i <= 256; ++i) {
+			int zLength = i;
+			for (int j = 0; j <= i; ++j) {
+				int xLength = j;
+				int yLength = i - j;
+				BitString xBits = bits.substring(0, xLength);
+				BitString yBits = bits.substring(xLength, xLength + yLength);
+				BitString zBits = xBits.concat(yBits);
+				assertEquals(zBits.length(), zLength);
+				assertEquals(zBits, bits.substring(0, zLength));
+			}
+		}
+	}
+
+	@Test
 	public void testEquals() {
 		assertEquals(new LongBitString(content, 0), new LongBitString(content, 0));
 		assertEquals(new LongBitString(content, 1), new LongBitString(content, 1));

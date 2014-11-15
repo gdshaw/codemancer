@@ -66,6 +66,42 @@ public class ShortBitStringTest {
 	}
 
 	@Test
+	public void testConcatBit() {
+		BitString bits = new ShortBitString(content, 56);
+		bits = bits.concat(0);
+		bits = bits.concat(0);
+		bits = bits.concat(1);
+		bits = bits.concat(0);
+		bits = bits.concat(0);
+		bits = bits.concat(1);
+		bits = bits.concat(0);
+		bits = bits.concat(0);
+		assertEquals(bits, new ShortBitString(content, 64));
+	}
+
+	@Test
+	public void testConcat() {
+		for (int i = 0; i <= 64; ++i) {
+			int zLength = i;
+			long zMask = (zLength < 64) ? ((1L << zLength) - 1) : -1;
+			long zContent = content & zMask;
+			for (int j = 0; j <= i; ++j) {
+				int xLength = j;
+				int yLength = i - j;
+				long xMask = (xLength < 64) ? ((1L << xLength) - 1) : -1;
+				long yMask = (yLength < 64) ? ((1L << yLength) - 1) : -1;
+				long xContent = content & xMask;
+				long yContent = (content >> xLength) & yMask;
+				BitString xBits = new ShortBitString(xContent, xLength);
+				BitString yBits = new ShortBitString(yContent, yLength);
+				BitString zBits = xBits.concat(yBits);
+				assertEquals(zBits.length(), zLength);
+				assertEquals(zBits.getBits(0, zLength), zContent);
+			}
+		}
+	}
+
+	@Test
 	public void testEquals() {
 		assertEquals(new ShortBitString(), new ShortBitString());
 		assertEquals(new ShortBitString(1, 1), new ShortBitString(1, 1));
