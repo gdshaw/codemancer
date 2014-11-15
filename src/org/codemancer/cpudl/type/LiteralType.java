@@ -5,6 +5,7 @@
 
 package org.codemancer.cpudl.type;
 
+import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.expr.Expression;
 
 import org.w3c.dom.Element;
@@ -16,9 +17,10 @@ public class LiteralType extends Type {
 	private String content;
 
 	/** Construct literal type from XML.
+	 * @param ctx the context of this type
 	 * @param element this type as an XML element
 	 */
-	public LiteralType(Element element) {
+	public LiteralType(Context ctx, Element element) {
 		content = element.getTextContent();
 	}
 

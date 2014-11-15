@@ -11,6 +11,7 @@ import org.w3c.dom.Element;
 import org.codemancer.cpudl.BitString;
 import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.ShortBitString;
+import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Constant;
@@ -21,9 +22,10 @@ public class ConstantType extends Type {
 	private final BitString content;
 
 	/** Construct constant type from XML.
+	 * @param ctx the context of this type
 	 * @param element this type as an XML element
 	 */
-	public ConstantType(Element element) throws CpudlParseException {
+	public ConstantType(Context ctx, Element element) throws CpudlParseException {
 		BitString content = new ShortBitString();
 		String contentString = element.getTextContent();
 		for (int i = 0; i != contentString.length(); ++i) {

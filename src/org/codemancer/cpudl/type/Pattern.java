@@ -16,6 +16,7 @@ import org.codemancer.cpudl.BitString;
 import org.codemancer.cpudl.ShortBitString;
 import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.BitStringReader;
+import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.type.FragmentType.MemberInfo;
 import org.codemancer.cpudl.expr.Expression;
@@ -77,16 +78,17 @@ public class Pattern {
 	boolean variableWidth;
 
 	/** Construct pattern from XML.
-	 * @param el this pattern as an XML element
+	 * @param ctx the context of this pattern
+	 * @param element this pattern as an XML element
 	 */
-	public Pattern(Element element, SortedMap<String, MemberInfo> members) throws CpudlParseException {
+	public Pattern(Context ctx, Element element, SortedMap<String, MemberInfo> members) throws CpudlParseException {
 		Node child = element.getFirstChild();
 		while (child != null) {
 			if (child instanceof Element) {
 				Element childElement = (Element)child;
 				String tagName = childElement.getTagName();
 				if (tagName.equals("const")) {
-					Type type = new ConstantType(childElement);
+					Type type = new ConstantType(ctx, childElement);
 					MemberInfo member = new MemberInfo(type, 0);
 					add(childElement, null, member);
 				} else if (tagName.equals("ref")) {

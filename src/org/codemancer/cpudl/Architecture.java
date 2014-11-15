@@ -20,6 +20,7 @@ public class Architecture {
 	 * @param element the required content as an XML element
 	 */
 	public Architecture(Element element) throws CpudlParseException {
+		Context ctx = new Context(this);
 		Node child = element.getFirstChild();
 		while (child != null) {
 			if (child instanceof Element) {
@@ -29,7 +30,7 @@ public class Architecture {
 					if (start != null) {
 						throw new CpudlParseException(childElement, "multiple <start> elements");
 					}
-					start = Type.makeChoice(childElement);
+					start = ctx.makeChoice(childElement);
 				}
 			}
 			child = child.getNextSibling();

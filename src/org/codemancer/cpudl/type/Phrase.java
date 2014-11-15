@@ -10,6 +10,7 @@ import java.util.SortedMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
+import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.type.FragmentType.MemberInfo;
 import org.codemancer.cpudl.expr.Expression;
@@ -43,22 +44,21 @@ public class Phrase {
 	private final ArrayList<PieceInfo> pieces = new ArrayList<PieceInfo>();
 
 	/** Construct phrase from XML.
+	 * @param ctx the context of this phrase
 	 * @param element this phrase as an XML element
 	 * @param members the members of the fragment type to which this phrase belongs
 	 */
-	public Phrase(Element element, SortedMap<String, MemberInfo> members) throws CpudlParseException {
+	public Phrase(Context ctx, Element element, SortedMap<String, MemberInfo> members) throws CpudlParseException {
 		Node child = element.getFirstChild();
 		while (child != null) {
 			if (child instanceof Element) {
 				Element childElement = (Element)child;
 				String tagName = childElement.getTagName();
 				if (tagName.equals("literal")) {
-					Type type = new LiteralType(childElement);
+					Type type = new LiteralType(ctx, childElement);
 					MemberInfo member = new MemberInfo(type, 0);
 					add(childElement, null, member);
 				} else if (tagName.equals("ref")) {
-
-
 					String name = childElement.getAttribute("name");
 					if (name == null) {
 						throw new CpudlParseException(childElement, "missing name attribute in ref element");

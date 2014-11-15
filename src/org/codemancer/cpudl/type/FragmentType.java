@@ -13,6 +13,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
 import org.codemancer.cpudl.BitReader;
+import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Fragment;
@@ -57,20 +58,21 @@ public class FragmentType extends Type {
 	private int bufferCount = 1;
 
 	/** Construct fragment type from XML.
+	 * @param ctx the context of this type
 	 * @param element this fragment type as an XML element
 	 */
-	public FragmentType(Element element) throws CpudlParseException {
+	public FragmentType(Context ctx, Element element) throws CpudlParseException {
 		Node child = element.getFirstChild();
 		while (child != null) {
 			if (child instanceof Element) {
 				Element childElement = (Element)child;
 				String tagName = childElement.getTagName();
 				if (tagName.equals("var")) {
-					parseMember(childElement);
+					parseMember(ctx, childElement);
 				} else if (tagName.equals("pattern")) {
-					patterns.add(new Pattern(childElement, members));
+					patterns.add(new Pattern(ctx, childElement, members));
 				} else if (tagName.equals("phrase")) {
-					phrases.add(new Phrase(childElement, members));
+					phrases.add(new Phrase(ctx, childElement, members));
 				}
 			}
 			child = child.getNextSibling();
@@ -78,14 +80,15 @@ public class FragmentType extends Type {
 	}
 
 	/** Parse member.
+	 * @param ctx the context of this type
 	 * @param element the member as an XML element
 	 */
-	private final void parseMember(Element element) throws CpudlParseException {
+	private final void parseMember(Context ctx, Element element) throws CpudlParseException {
 		String name = element.getAttribute("name");
 		if (name.equals("")) {
 			throw new CpudlParseException(element, "member name not specified");
 		}
-		Type type = Type.makeChoice(element);
+		Type type = ctx.makeChoice(element);
 		members.put(name, new MemberInfo(type, bufferCount));
 		bufferCount += 1;
 	}

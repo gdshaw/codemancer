@@ -10,6 +10,7 @@ import org.w3c.dom.Element;
 
 import org.codemancer.cpudl.BitString;
 import org.codemancer.cpudl.BitReader;
+import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Constant;
@@ -38,9 +39,10 @@ public class IntegerType extends Type {
 	}
 
 	/** Construct integer type from XML.
+	 * @param ctx the context of this type
 	 * @param element this type as an XML element
 	 */
-	public IntegerType(Element element) throws CpudlParseException {
+	public IntegerType(Context ctx, Element element) throws CpudlParseException {
 		// Parse size attribute.
 		String sizeString = element.getAttribute("size");
 		if (sizeString.length() == 0) {
