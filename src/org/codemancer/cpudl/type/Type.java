@@ -6,6 +6,7 @@
 package org.codemancer.cpudl.type;
 
 import java.util.List;
+import java.util.ArrayList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
@@ -15,31 +16,54 @@ import org.codemancer.cpudl.expr.Expression;
 
 /** A class to represent a generic CPUDL data type. */
 public abstract class Type {
-	/** Make type from content of XML element.
-	 * @param element the element to be interpreted as a type
-	 * @return the corresponding type, or null if element does not contain a type
+	/** Make type from XML node.
+	 * @param node the node to be interpreted as a type
+	 * @return the corresponding type, or null if node does not contain a type
 	 */
-	public static Type makeType(Element element) throws CpudlParseException {
+	public static Type makeType(Node node) throws CpudlParseException {
+		if (!(node instanceof Element)) {
+			return null;
+		}
+		Element element = (Element)node;
+		String tagName = element.getTagName();
+		if (tagName.equals("const")) {
+			return new ConstantType(element);
+		} else if (tagName.equals("literal")) {
+			return new LiteralType(element);
+		} else if (tagName.equals("integer")) {
+			return new IntegerType(element);
+		} else if (tagName.equals("fragment")) {
+			return new FragmentType(element);
+		} else if (tagName.equals("choice")) {
+			return makeChoice(element);
+		} else {
+			return null;
+		}
+	}
+
+	/** Make choice of types from children of XML element.
+	 * If only one type is specified then it may be returned directly
+	 * (as opposed to being wrapped within a Choice object).
+	 * @param element the parent of the elements to be interpreted as types
+	 * @return the type or choice of types
+	 */
+	public static Type makeChoice(Element element) throws CpudlParseException {
+		List<Type> types = new ArrayList<Type>();
 		Node child = element.getFirstChild();
 		while (child != null) {
-			if (child instanceof Element) {
-				Element childElement = (Element)child;
-				String tagName = childElement.getTagName();
-				if (tagName.equals("const")) {
-					return new ConstantType(childElement);
-				} else if (tagName.equals("literal")) {
-					return new LiteralType(childElement);
-				} else if (tagName.equals("integer")) {
-					return new IntegerType(childElement);
-				} else if (tagName.equals("fragment")) {
-					return new FragmentType(childElement);
-				} else {
-					return null;
-				}
+			Type type = makeType(child);
+			if (type != null) {
+				types.add(type);
 			}
 			child = child.getNextSibling();
 		}
-		return null;
+		if (types.size() == 0) {
+			throw new CpudlParseException(element, "type expected");
+		} else if (types.size() == 1) {
+			return types.get(0);
+		} else {
+			return new Choice(types);
+		}
 	}
 
 	/** Get the number of chunks of machine code matched by this type.
