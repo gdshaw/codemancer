@@ -48,10 +48,14 @@ public abstract class Expression {
 		}
 		Element el = (Element)node;
 		String tagName = el.getTagName();
-		if (tagName.equals("const")) {
+		if (tagName.equals("ref")) {
+			return Reference.make(el);
+		} else if (tagName.equals("const")) {
 			return Constant.make(el);
 		} else if (tagName.equals("register")) {
 			return Register.make(el);
+		} else if (tagName.equals("assign")) {
+			return Assignment.make(el);
 		} else if (tagName.equals("sequence")) {
 			return Sequence.make(el);
 		} else {
