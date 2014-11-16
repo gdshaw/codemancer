@@ -25,6 +25,10 @@ public class Sequence extends BinaryExpression {
 		super(type, lhs, rhs);
 	}
 
+	public Expression partialClone(Expression lhs, Expression rhs) {
+		return new Sequence(getType(), lhs, rhs);
+	}
+
 	public String getSymbol() {
 		return ",";
 	}

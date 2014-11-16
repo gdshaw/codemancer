@@ -8,12 +8,16 @@ package org.codemancer.cpudl.expr;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.codemancer.cpudl.CpudlReferenceException;
 import org.codemancer.cpudl.type.Type;
 
 /** An expression class to represent an instruction fragment. */
 public class Fragment extends Expression {
 	/** The members of this fragment, indexed by name. */
 	private final Map<String, Expression> members = new HashMap<String, Expression>();
+
+	/** The effect of this fragment. */
+	private Expression effect = null;
 
 	/** Construct empty fragment.
 	 * @param type the type of this fragment
@@ -36,6 +40,24 @@ public class Fragment extends Expression {
 	 */
 	public final void put(String name, Expression value) {
 		members.put(name, value);
+	}
+
+	/** Get effect.
+	 * @return the unresolved effect of this fragment
+	 */
+	public final Expression getEffect() {
+		return effect;
+	}
+
+	/** Set effect.
+	 * @param effect the required effect of this fragment
+	 */
+	public final void setEffect(Expression effect) {
+		this.effect = effect;
+	}
+
+	public Expression resolve(Fragment frag, boolean part) throws CpudlReferenceException {
+		return (effect != null) ? effect.resolve(this, part) : null;
 	}
 
 	public String unparse() {

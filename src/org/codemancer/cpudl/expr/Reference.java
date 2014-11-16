@@ -8,6 +8,7 @@ package org.codemancer.cpudl.expr;
 import org.w3c.dom.Element;
 
 import org.codemancer.cpudl.CpudlParseException;
+import org.codemancer.cpudl.CpudlReferenceException;
 import org.codemancer.cpudl.type.Type;
 
 /** An expression class to represent a reference to a fragment member. */
@@ -38,6 +39,28 @@ public class Reference extends Expression {
 		return sb.toString();
 	}
 
+	public Expression resolve(Fragment frag, boolean part) throws CpudlReferenceException {
+		// Attempt to resolve the name as a fragment member.
+		Expression result = frag.get(name);
+
+		// If the name was resolved then resolve the associated value.
+		if (result != null) {
+			result = result.resolve(frag, part);
+		}
+
+		// If resolution failed then either throw an exception or return
+		// this unresolved reference, as appropriate.
+		if (result == null) {
+			if (part) {
+				result = this;
+			} else {
+				throw new CpudlReferenceException(name);
+			}
+		}
+
+		return result;
+	}
+
 	/** Make reference from XML element.
 	 * @param element the reference as XML
 	 * @return the reference as an object
@@ -45,7 +68,7 @@ public class Reference extends Expression {
 	public static Reference make(Element element) throws CpudlParseException {
 		String name = element.getAttribute("name");
 		if (name == null) {
-			throw new CpudlParseException(element, "member name not specified");
+			throw new CpudlParseException(element, "missing name attribute in <ref> element");
 		}
 		return new Reference(null, name);
 	}

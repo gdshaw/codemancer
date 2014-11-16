@@ -147,6 +147,7 @@ public class FragmentType extends Type {
 				return null;
 			}
 		}
+		frag.setEffect(effect);
 		return frag;
 	}
 

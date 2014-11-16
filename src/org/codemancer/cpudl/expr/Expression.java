@@ -9,6 +9,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
 import org.codemancer.cpudl.CpudlParseException;
+import org.codemancer.cpudl.CpudlReferenceException;
 import org.codemancer.cpudl.type.Type;
 
 /** A class to represent a generic CPUDL expression.
@@ -37,6 +38,16 @@ public abstract class Expression {
 	 * @return this expression as a string
 	 */
 	public abstract String unparse();
+
+	/** Recursively resolve references within this expression.
+	 * @param frag the instruction fragment that is currently in scope, or null if none
+	 * @param part true if it is acceptable for references to be left unresolved
+	 *  where necessary, otherwise false
+	 * @return the resolved expression
+	 */
+	public Expression resolve(Fragment frag, boolean part) throws CpudlReferenceException {
+		return this;
+	}
 
 	/** Make expression from XML node.
 	 * @param node the expression as XML

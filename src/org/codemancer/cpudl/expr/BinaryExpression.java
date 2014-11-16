@@ -5,7 +5,9 @@
 
 package org.codemancer.cpudl.expr;
 
+import org.codemancer.cpudl.CpudlReferenceException;
 import org.codemancer.cpudl.type.Type;
+import org.codemancer.cpudl.type.FragmentType;
 
 /** An abstract expression class to represent an operation with two arguments. */
 public abstract class BinaryExpression extends Expression {
@@ -26,6 +28,13 @@ public abstract class BinaryExpression extends Expression {
 		this.rhs = rhs;
 	}
 
+	/** Return a binary expression identical to this one except for its arguments.
+	 * @param lhs the required left-hand argument
+	 * @param rhs the required right-hand argument
+	 * @return the partially cloned binary expression
+	 */
+	public abstract Expression partialClone(Expression lhs, Expression rhs);
+
 	/** Get the symbol representing this operation.
 	 * @return the symbol
 	 */
@@ -43,6 +52,12 @@ public abstract class BinaryExpression extends Expression {
 	 */
 	public final Expression getRhs() {
 		return rhs;
+	}
+
+	public Expression resolve(Fragment frag, boolean part) throws CpudlReferenceException {
+		Expression resolvedLhs = lhs.resolve(frag, part);
+		Expression resolvedRhs = rhs.resolve(frag, part);
+		return partialClone(resolvedLhs, resolvedRhs);
 	}
 
 	public String unparse() {

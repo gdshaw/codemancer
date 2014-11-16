@@ -22,6 +22,10 @@ public class Assignment extends BinaryExpression {
 		super(rhs.getType(), lhs, rhs);
 	}
 
+	public Expression partialClone(Expression lhs, Expression rhs) {
+		return new Assignment(lhs, rhs);
+	}
+
 	public String getSymbol() {
 		return "=";
 	}
