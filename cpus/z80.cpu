@@ -172,6 +172,28 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   </fragment>
  </define>
 
+ <define name="inc">
+  <fragment>
+   <pattern>
+    <const>0</const>
+   </pattern>
+   <phrase>
+    <literal>INC</literal>
+   </phrase>
+  </fragment>
+ </define>
+
+ <define name="dec">
+  <fragment>
+   <pattern>
+    <const>1</const>
+   </pattern>
+   <phrase>
+    <literal>DEC</literal>
+   </phrase>
+  </fragment>
+ </define>
+
  <start>
   <fragment>
    <var name="rs">
@@ -233,6 +255,28 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
     <ref name="r"/>
     <ref name="opcode"/>
     <const>01</const>
+   </pattern>
+   <phrase>
+    <ref name="opcode"/>
+   </phrase>
+   <phrase>
+    <ref name="r"/>
+   </phrase>
+  </fragment>
+
+  <fragment>
+   <var name="r">
+    <ref name="reg8"/>
+   </var>
+   <var name="opcode">
+    <ref name="inc"/>
+    <ref name="dec"/>
+   </var>
+   <pattern>
+    <ref name="opcode"/>
+    <const>01</const>
+    <ref name="r"/>
+    <const>00</const>
    </pattern>
    <phrase>
     <ref name="opcode"/>
