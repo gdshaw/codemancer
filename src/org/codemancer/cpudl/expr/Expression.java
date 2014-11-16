@@ -67,6 +67,16 @@ public abstract class Expression {
 			return Register.make(el);
 		} else if (tagName.equals("memory")) {
 			return Memory.make(el);
+		} else if (tagName.equals("add")) {
+			return Addition.make(el);
+		} else if (tagName.equals("sub")) {
+			return Subtraction.make(el);
+		} else if (tagName.equals("and")) {
+			return BitwiseAnd.make(el);
+		} else if (tagName.equals("or")) {
+			return BitwiseOr.make(el);
+		} else if (tagName.equals("xor")) {
+			return BitwiseXor.make(el);
 		} else if (tagName.equals("assign")) {
 			return Assignment.make(el);
 		} else if (tagName.equals("sequence")) {
