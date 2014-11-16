@@ -16,6 +16,7 @@ import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.expr.Expression;
+import org.codemancer.cpudl.expr.Sequence;
 import org.codemancer.cpudl.expr.Fragment;
 
 /** A class to represent a type of instruction fragment. */
@@ -54,6 +55,9 @@ public class FragmentType extends Type {
 	/** The phrases that are matched by this fragment, indexed by piece number. */
 	private final List<Phrase> phrases = new ArrayList<Phrase>();
 
+	/** The effect of this fragment. */
+	private Expression effect = null;
+
 	/** The number of bitstring assembly buffers needed to decode this compound fragment. */
 	private int bufferCount = 1;
 
@@ -73,6 +77,8 @@ public class FragmentType extends Type {
 					patterns.add(new Pattern(ctx, childElement, members));
 				} else if (tagName.equals("phrase")) {
 					phrases.add(new Phrase(ctx, childElement, members));
+				} else if (tagName.equals("effect")) {
+					parseEffect(ctx, childElement);
 				}
 			}
 			child = child.getNextSibling();
@@ -91,6 +97,17 @@ public class FragmentType extends Type {
 		Type type = ctx.makeChoice(element);
 		members.put(name, new MemberInfo(type, bufferCount));
 		bufferCount += 1;
+	}
+
+	/** Parse effect.
+	 * @param ctx the context of this fragment
+	 * @param element the effect element to be parsed
+	 */
+	private final void parseEffect(Context ctx, Element element) throws CpudlParseException {
+		if (effect != null) {
+			throw new CpudlParseException(element, "multiple <effect> elements in <fragment>");
+		}
+		effect = Sequence.make(element);
 	}
 
 	public final int getChunkCount() {
@@ -142,5 +159,9 @@ public class FragmentType extends Type {
 			throw new IllegalArgumentException("invalid piece number");
 		}
 		return phrases.get(piece).unparse(expr);
+	}
+
+	public Expression getEffect() {
+		return effect;
 	}
 }
