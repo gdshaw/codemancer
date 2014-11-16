@@ -65,6 +65,8 @@ public abstract class Expression {
 			return Constant.make(el);
 		} else if (tagName.equals("register")) {
 			return Register.make(el);
+		} else if (tagName.equals("memory")) {
+			return Memory.make(el);
 		} else if (tagName.equals("assign")) {
 			return Assignment.make(el);
 		} else if (tagName.equals("sequence")) {
