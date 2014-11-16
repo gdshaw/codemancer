@@ -18,6 +18,9 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>B</literal>
    </phrase>
+   <effect>
+    <register name="B"/>
+   </effect>
   </fragment>
 
   <fragment>
@@ -27,6 +30,9 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>C</literal>
    </phrase>
+   <effect>
+    <register name="C"/>
+   </effect>
   </fragment>
 
   <fragment>
@@ -36,6 +42,9 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>D</literal>
    </phrase>
+   <effect>
+    <register name="D"/>
+   </effect>
   </fragment>
 
   <fragment>
@@ -45,6 +54,9 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>E</literal>
    </phrase>
+   <effect>
+    <register name="E"/>
+   </effect>
   </fragment>
 
   <fragment>
@@ -54,6 +66,9 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>H</literal>
    </phrase>
+   <effect>
+    <register name="H"/>
+   </effect>
   </fragment>
 
   <fragment>
@@ -63,6 +78,9 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>L</literal>
    </phrase>
+   <effect>
+    <register name="L"/>
+   </effect>
   </fragment>
 
   <fragment>
@@ -72,6 +90,11 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>(HL)</literal>
    </phrase>
+   <effect>
+    <memory>
+     <register name="HL"/>
+    </memory>
+   </effect>
   </fragment>
 
   <fragment>
@@ -81,6 +104,9 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>A</literal>
    </phrase>
+   <effect>
+    <register name="A"/>
+   </effect>
   </fragment>
  </define>
 
@@ -215,6 +241,12 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
     <literal>,</literal>
     <ref name="rs"/>
    </phrase>
+   <effect>
+    <assign>
+     <ref name="rd"/>
+     <ref name="rs"/>
+    </assign>
+   </effect>
   </fragment>
 
   <fragment>
@@ -307,6 +339,12 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
     <literal>,</literal>
     <ref name="imm"/>
    </phrase>
+   <effect>
+    <assign>
+     <ref name="r"/>
+     <ref name="imm"/>
+    </assign>
+   </effect>
   </fragment>
  </start>
 </cpudl>
