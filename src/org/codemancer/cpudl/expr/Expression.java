@@ -5,6 +5,10 @@
 
 package org.codemancer.cpudl.expr;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
+
+import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.type.Type;
 
 /** A class to represent a generic CPUDL expression.
@@ -33,4 +37,21 @@ public abstract class Expression {
 	 * @return this expression as a string
 	 */
 	public abstract String unparse();
+
+	/** Make expression from XML node.
+	 * @param node the expression as XML
+	 * @return a corresponding expression, or null if node does not contain an expression
+	 */
+	public static Expression make(Node node) throws CpudlParseException {
+		if (!(node instanceof Element)) {
+			return null;
+		}
+		Element el = (Element)node;
+		String tagName = el.getTagName();
+		if (tagName.equals("const")) {
+			return Constant.make(el);
+		} else {
+			return null;
+		}
+	}
 }

@@ -5,6 +5,8 @@
 
 package org.codemancer.cpudl.expr;
 
+import org.w3c.dom.Element;
+
 import org.codemancer.cpudl.type.Type;
 
 /** An expression class to represent a known integer constant. */
@@ -30,5 +32,13 @@ public class Constant extends Expression {
 
 	public String unparse() {
 		return new Long(value).toString();
+	}
+
+	/** Make constant from XML element.
+	 * @param el the constant as XML
+	 * @return a corresponding expression
+	 */
+	public static Constant make(Element el) {
+		return new Constant(null, Long.decode(el.getTextContent()));
 	}
 }
