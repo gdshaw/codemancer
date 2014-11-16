@@ -50,6 +50,8 @@ public abstract class Expression {
 		String tagName = el.getTagName();
 		if (tagName.equals("const")) {
 			return Constant.make(el);
+		} else if (tagName.equals("seq")) {
+			return Sequence.make(el);
 		} else {
 			return null;
 		}
