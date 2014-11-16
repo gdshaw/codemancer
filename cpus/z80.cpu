@@ -285,5 +285,28 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
     <ref name="r"/>
    </phrase>
   </fragment>
+
+  <fragment>
+   <var name="r">
+    <ref name="reg8"/>
+   </var>
+   <var name="imm">
+    <integer size="8"/>
+   </var>
+   <pattern>
+    <const>011</const>
+    <ref name="r"/>
+    <const>00</const>
+    <ref name="imm"/>
+   </pattern>
+   <phrase>
+    <literal>LD</literal>
+   </phrase>
+   <phrase>
+    <ref name="r"/>
+    <literal>,</literal>
+    <ref name="imm"/>
+   </phrase>
+  </fragment>
  </start>
 </cpudl>

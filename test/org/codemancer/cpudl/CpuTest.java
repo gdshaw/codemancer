@@ -32,6 +32,18 @@ public class CpuTest {
 	BitString code;
 	String[] fields;
 
+	private static int hexValue(char c) {
+		if ((c >= '0') && (c <= '9')) {
+			return c - '0';
+		} else if ((c >= 'A') && (c <= 'F')) {
+			return c - 'A' + 10;
+		} else if ((c >= 'a') && (c <= 'f')) {
+			return c - 'a' + 10;
+		} else {
+			throw new IllegalArgumentException("hex digit expected");
+		}
+	}
+
 	public CpuTest(Architecture arch, String line) throws Exception {
 		this.arch = arch;
 		this.start = arch.getStart();
@@ -39,19 +51,10 @@ public class CpuTest {
 		this.code = new ShortBitString();
 
 		String codeField = fields[0];
-		for (int i = 0; i != codeField.length(); ++i) {
-			char c = codeField.charAt(i);
-			int v;
-			if ((c >= '0') && (c <= '9')) {
-				v = c - '0';
-			} else if ((c >= 'A') && (c <= 'F')) {
-				v = c - 'A' + 10;
-			} else if ((c >= 'a') && (c <= 'f')) {
-				v = c - 'a' + 10;
-			} else {
-				throw new Exception("non-hex digit in code field");
-			}
-			code = new ShortBitString(v, 4).concat(code);
+		for (int i = 0; i + 1 < codeField.length(); i += 2) {
+			int v = (hexValue(codeField.charAt(i)) << 4) |
+				hexValue(codeField.charAt(i + 1));
+			code = code.concat(new ShortBitString(v, 8));
 		}
 	}
 
