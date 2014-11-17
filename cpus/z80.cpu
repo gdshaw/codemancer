@@ -118,6 +118,15 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>ADD</literal>
    </phrase>
+   <effect>
+    <assign>
+     <register name="A"/>
+     <add>
+      <register name="A"/>
+      <ref name="operand"/>
+     </add>
+    </assign>
+   </effect>
   </fragment>
  </define>
 
@@ -129,6 +138,16 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>ADC</literal>
    </phrase>
+   <effect>
+    <assign>
+     <register name="A"/>
+     <add>
+      <register name="A"/>
+      <ref name="operand"/>
+      <register name="C"/>
+     </add>
+    </assign>
+   </effect>
   </fragment>
  </define>
 
@@ -140,6 +159,15 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>SUB</literal>
    </phrase>
+   <effect>
+    <assign>
+     <register name="A"/>
+     <sub>
+      <register name="A"/>
+      <ref name="operand"/>
+     </sub>
+    </assign>
+   </effect>
   </fragment>
  </define>
 
@@ -151,6 +179,16 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>SBC</literal>
    </phrase>
+   <effect>
+    <assign>
+     <register name="A"/>
+     <sub>
+      <register name="A"/>
+      <ref name="operand"/>
+      <register name="C"/>
+     </sub>
+    </assign>
+   </effect>
   </fragment>
  </define>
 
@@ -162,6 +200,15 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>AND</literal>
    </phrase>
+   <effect>
+    <assign>
+     <register name="A"/>
+     <and>
+      <register name="A"/>
+      <ref name="operand"/>
+     </and>
+    </assign>
+   </effect>
   </fragment>
  </define>
 
@@ -173,6 +220,15 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>XOR</literal>
    </phrase>
+   <effect>
+    <assign>
+     <register name="A"/>
+     <xor>
+      <register name="A"/>
+      <ref name="operand"/>
+     </xor>
+    </assign>
+   </effect>
   </fragment>
  </define>
 
@@ -184,6 +240,15 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>OR</literal>
    </phrase>
+   <effect>
+    <assign>
+     <register name="A"/>
+     <or>
+      <register name="A"/>
+      <ref name="operand"/>
+     </or>
+    </assign>
+   </effect>
   </fragment>
  </define>
 
@@ -195,6 +260,12 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>CP</literal>
    </phrase>
+   <effect>
+    <sub>
+     <register name="A"/>
+     <ref name="operand"/>
+    </sub>
+   </effect>
   </fragment>
  </define>
 
@@ -206,6 +277,15 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>INC</literal>
    </phrase>
+   <effect>
+    <assign>
+     <ref name="operand"/>
+     <add>
+      <ref name="operand"/>
+      <const>1</const>
+     </add>
+    </assign>
+   </effect>
   </fragment>
  </define>
 
@@ -217,6 +297,15 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <literal>DEC</literal>
    </phrase>
+   <effect>
+    <assign>
+     <ref name="operand"/>
+     <sub>
+      <ref name="operand"/>
+      <const>1</const>
+     </sub>
+    </assign>
+   </effect>
   </fragment>
  </define>
 
@@ -270,6 +359,11 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
     <literal>A,</literal>
     <ref name="r"/>
    </phrase>
+   <effect>
+    <ref name="opcode">
+     <bind name="operand" src="r"/>
+    </ref>
+   </effect>
   </fragment>
 
   <fragment>
@@ -294,6 +388,11 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <ref name="r"/>
    </phrase>
+   <effect>
+    <ref name="opcode">
+     <bind name="operand" src="r"/>
+    </ref>
+   </effect>
   </fragment>
 
   <fragment>
@@ -316,6 +415,11 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <phrase>
     <ref name="r"/>
    </phrase>
+   <effect>
+    <ref name="opcode">
+     <bind name="operand" src="r"/>
+    </ref>
+   </effect>
   </fragment>
 
   <fragment>
