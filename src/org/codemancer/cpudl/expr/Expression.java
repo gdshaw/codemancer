@@ -5,6 +5,7 @@
 
 package org.codemancer.cpudl.expr;
 
+import java.util.Map;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
@@ -41,11 +42,14 @@ public abstract class Expression {
 
 	/** Recursively resolve references within this expression.
 	 * @param frag the instruction fragment that is currently in scope, or null if none
+	 * @param args the arguments that are currently in scope, or null if none
 	 * @param part true if it is acceptable for references to be left unresolved
 	 *  where necessary, otherwise false
 	 * @return the resolved expression
 	 */
-	public Expression resolve(Fragment frag, boolean part) throws CpudlReferenceException {
+	public Expression resolve(Fragment frag, Map<String, Expression> args, boolean part)
+		throws CpudlReferenceException {
+
 		return this;
 	}
 

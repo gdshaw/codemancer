@@ -56,8 +56,10 @@ public class Fragment extends Expression {
 		this.effect = effect;
 	}
 
-	public Expression resolve(Fragment frag, boolean part) throws CpudlReferenceException {
-		return (effect != null) ? effect.resolve(this, part) : null;
+	public Expression resolve(Fragment frag, Map<String, Expression> args, boolean part)
+		throws CpudlReferenceException {
+
+		return (effect != null) ? effect.resolve(this, args, part) : null;
 	}
 
 	public String unparse() {

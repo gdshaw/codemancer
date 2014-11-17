@@ -5,6 +5,7 @@
 
 package org.codemancer.cpudl.expr;
 
+import java.util.Map;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
@@ -37,8 +38,10 @@ public class Memory extends Expression {
 		return "[" + address.unparse() + "]";
 	}
 
-	public Expression resolve(Fragment frag, boolean part) throws CpudlReferenceException {
-		return new Memory(getType(), address.resolve(frag, part));
+	public Expression resolve(Fragment frag, Map<String, Expression> args, boolean part)
+		throws CpudlReferenceException {
+
+		return new Memory(getType(), address.resolve(frag, args, part));
 	}
 
 	/** Make memory reference from XML element.
