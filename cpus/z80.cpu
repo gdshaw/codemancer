@@ -110,6 +110,56 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   </fragment>
  </define>
 
+ <define name="reg16">
+  <fragment>
+   <pattern>
+    <const>00</const>
+   </pattern>
+   <phrase>
+    <literal>BC</literal>
+   </phrase>
+   <effect>
+    <register name="BC"/>
+   </effect>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>10</const>
+   </pattern>
+   <phrase>
+    <literal>DE</literal>
+   </phrase>
+   <effect>
+    <register name="DE"/>
+   </effect>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>01</const>
+   </pattern>
+   <phrase>
+    <literal>HL</literal>
+   </phrase>
+   <effect>
+    <register name="HL"/>
+   </effect>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>11</const>
+   </pattern>
+   <phrase>
+    <literal>SP</literal>
+   </phrase>
+   <effect>
+    <register name="SP"/>
+   </effect>
+  </fragment>
+ </define>
+
  <define name="add">
   <fragment>
    <pattern>
@@ -448,6 +498,107 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
      <ref name="r"/>
      <ref name="imm"/>
     </assign>
+   </effect>
+  </fragment>
+
+  <fragment>
+   <var name="r">
+    <ref name="reg16"/>
+   </var>
+   <var name="imm">
+    <integer size="16"/>
+   </var>
+   <pattern>
+    <const>1000</const>
+    <ref name="r"/>
+    <const>00</const>
+    <ref name="imm"/>
+   </pattern>
+   <phrase>
+    <literal>LD</literal>
+   </phrase>
+   <phrase>
+    <ref name="r"/>
+    <literal>,</literal>
+    <ref name="imm"/>
+   </phrase>
+   <effect>
+    <assign>
+     <ref name="r"/>
+     <ref name="imm"/>
+    </assign>
+   </effect>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>10011111</const>
+   </pattern>
+   <phrase>
+    <literal>LD</literal>
+   </phrase>
+   <phrase>
+    <literal>SP,HL</literal>
+   </phrase>
+   <effect>
+    <assign>
+     <register name="SP"/>
+     <register name="HL"/>
+    </assign>
+   </effect>
+  </fragment>
+
+  <fragment>
+   <var name="r">
+    <ref name="reg16"/>
+   </var>
+   <pattern>
+    <const>1001</const>
+    <ref name="r"/>
+    <const>00</const>
+   </pattern>
+   <phrase>
+    <literal>ADD</literal>
+   </phrase>
+   <phrase>
+    <literal>HL,</literal>
+    <ref name="r"/>
+   </phrase>
+   <effect>
+    <assign>
+     <register name="HL"/>
+     <add>
+      <register name="HL"/>
+      <ref name="r"/>
+     </add>
+    </assign>
+   </effect>
+  </fragment>
+
+  <fragment>
+   <var name="r">
+    <ref name="reg16"/>
+   </var>
+   <var name="opcode">
+    <ref name="inc"/>
+    <ref name="dec"/>
+   </var>
+   <pattern>
+    <const>110</const>
+    <ref name="opcode"/>
+    <ref name="r"/>
+    <const>00</const>
+   </pattern>
+   <phrase>
+    <ref name="opcode"/>
+   </phrase>
+   <phrase>
+    <ref name="r"/>
+   </phrase>
+   <effect>
+    <ref name="opcode">
+     <bind name="operand" src="r"/>
+    </ref>
    </effect>
   </fragment>
  </start>
