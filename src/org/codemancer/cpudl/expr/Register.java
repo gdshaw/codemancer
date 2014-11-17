@@ -8,6 +8,7 @@ package org.codemancer.cpudl.expr;
 import java.util.HashMap;
 import org.w3c.dom.Element;
 
+import org.codemancer.cpudl.State;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.type.Type;
 
@@ -34,6 +35,16 @@ public class Register extends Expression {
 
 	public String unparse() {
 		return name;
+	}
+
+	public void assign(State state, Expression value) {
+		state.put(this, value);
+	}
+
+	public Expression evaluate(State state) {
+		Expression value = state.get(this);
+		if (value != null) return value;
+		return this;
 	}
 
 	/** An index of unique register objects, indexed by name. */

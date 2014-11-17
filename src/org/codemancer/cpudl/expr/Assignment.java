@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
+import org.codemancer.cpudl.State;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.type.Type;
 
@@ -28,6 +29,11 @@ public class Assignment extends BinaryExpression {
 
 	public String getSymbol() {
 		return "=";
+	}
+
+	public Expression evaluate(State state) {
+		getLhs().assign(state, getRhs());
+		return getRhs();
 	}
 
 	/** Make assignment operation from XML element.

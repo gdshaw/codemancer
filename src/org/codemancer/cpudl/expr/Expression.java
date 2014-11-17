@@ -9,6 +9,7 @@ import java.util.Map;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
+import org.codemancer.cpudl.State;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.CpudlReferenceException;
 import org.codemancer.cpudl.type.Type;
@@ -51,6 +52,23 @@ public abstract class Expression {
 		throws CpudlReferenceException {
 
 		return this;
+	}
+
+	/** Recursively evaluate this expression.
+	 * @param state the machine state on which to act
+	 * @return the evaluated expression
+	 */
+	public Expression evaluate(State state) {
+		return this;
+	}
+
+	/** Assign a value to this expression.
+	 * This will fail unless the expression is an l-value.
+	 * @param state the machine state on which to act
+	 * @param value the value to be assigned to this expression
+	 */
+	public void assign(State state, Expression value) {
+		throw new IllegalArgumentException("not an l-value");
 	}
 
 	/** Make expression from XML node.

@@ -9,6 +9,7 @@ import java.util.Map;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
+import org.codemancer.cpudl.State;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.CpudlReferenceException;
 import org.codemancer.cpudl.type.Type;
@@ -42,6 +43,16 @@ public class Memory extends Expression {
 		throws CpudlReferenceException {
 
 		return new Memory(getType(), address.resolve(frag, args, part));
+	}
+
+	public void assign(State state, Expression value) {
+		state.put(this, value);
+	}
+
+	public Expression evaluate(State state) {
+		Expression value = state.get(this);
+		if (value != null) return value;
+		return this;
 	}
 
 	/** Make memory reference from XML element.
