@@ -78,6 +78,21 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="imp-mode">
+ <fragment>
+  <pattern>
+   <const>010</const>
+  </pattern>
+  <pattern></pattern>
+  <phrase>
+   <literal>A</literal>
+  </phrase>
+  <effect>
+   <register name="A"/>
+  </effect>
+ </fragment>
+</define>
+
 <define name="abs-mode">
  <fragment>
   <var name="addr">
@@ -359,10 +374,90 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="asl-instr">
+ <fragment>
+  <pattern>
+   <const>000</const>
+  </pattern>
+  <phrase>
+   <literal>ASL</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="arithmetic" carry="C">
+     <ref name="operand"/>
+     <const>1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="rol-instr">
+ <fragment>
+  <pattern>
+   <const>100</const>
+  </pattern>
+  <phrase>
+   <literal>ROL</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="rotation">
+     <ref name="operand"/>
+     <const>1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="lsr-instr">
+ <fragment>
+  <pattern>
+   <const>010</const>
+  </pattern>
+  <phrase>
+   <literal>LSR</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="logical" carry="C">
+     <ref name="operand"/>
+     <const>-1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ror-instr">
+ <fragment>
+  <pattern>
+   <const>110</const>
+  </pattern>
+  <phrase>
+   <literal>ROR</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="rotation">
+     <ref name="operand"/>
+     <const>-1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <define name="dec-instr">
  <fragment>
   <pattern>
-   <const>0</const>
+   <const>011</const>
   </pattern>
   <phrase>
    <literal>DEC</literal>
@@ -382,7 +477,7 @@ GNU General Public License (version 3 or any later version).
 <define name="inc-instr">
  <fragment>
   <pattern>
-   <const>1</const>
+   <const>111</const>
   </pattern>
   <phrase>
    <literal>INC</literal>
@@ -463,6 +558,34 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="opcode">
+   <ref name="asl-instr"/>
+   <ref name="rol-instr"/>
+   <ref name="lsr-instr"/>
+   <ref name="ror-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="zp-mode"/>
+   <ref name="imp-mode"/>
+   <ref name="abs-mode"/>
+   <ref name="zpx-mode"/>
+   <ref name="absx-mode"/>
+  </var>
+  <pattern>
+   <const>01</const>
+   <ref name="operand"/>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
    <ref name="dec-instr"/>
    <ref name="inc-instr"/>
   </var>
@@ -476,7 +599,6 @@ GNU General Public License (version 3 or any later version).
    <const>01</const>
    <ref name="operand"/>
    <ref name="opcode"/>
-   <const>11</const>
    <ref name="operand"/>
   </pattern>
   <phrase>
