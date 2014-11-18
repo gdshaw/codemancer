@@ -170,6 +170,32 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="zpy-x-mode">
+ <fragment>
+  <var name="addr">
+   <integer size="8"/>
+  </var>
+  <pattern>
+   <const>101</const>
+  </pattern>
+  <pattern>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <ref name="addr"/>
+   <literal>,Y</literal>
+  </phrase>
+  <effect>
+   <memory>
+    <add>
+     <ref name="addr"/>
+     <register name="Y"/>
+    </add>
+   </memory>
+  </effect>
+ </fragment>
+</define>
+
 <define name="absy-mode">
  <fragment>
   <var name="addr">
@@ -218,6 +244,53 @@ GNU General Public License (version 3 or any later version).
      <register name="X"/>
     </add>
    </memory>
+  </effect>
+ </fragment>
+</define>
+
+<define name="absy-x-mode">
+ <fragment>
+  <var name="addr">
+   <integer size="16"/>
+  </var>
+  <pattern>
+   <const>111</const>
+  </pattern>
+  <pattern>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <ref name="addr"/>
+   <literal>,Y</literal>
+  </phrase>
+  <effect>
+   <memory>
+    <add>
+     <ref name="addr"/>
+     <register name="Y"/>
+    </add>
+   </memory>
+  </effect>
+ </fragment>
+</define>
+
+<define name="imm-xy-mode">
+ <fragment>
+  <var name="value">
+   <integer size="8"/>
+  </var>
+  <pattern>
+   <const>000</const>
+  </pattern>
+  <pattern>
+   <ref name="value"/>
+  </pattern>
+  <phrase>
+   <literal>#</literal>
+   <ref name="value"/>
+  </phrase>
+  <effect>
+   <ref name="value"/>
   </effect>
  </fragment>
 </define>
@@ -553,6 +626,108 @@ GNU General Public License (version 3 or any later version).
      <ref name="operand"/>
      <const>1</const>
     </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sty-instr">
+ <fragment>
+  <pattern>
+   <const>001</const>
+  </pattern>
+  <phrase>
+   <literal>STY</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <register name="Y"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ldy-instr">
+ <fragment>
+  <pattern>
+   <const>101</const>
+  </pattern>
+  <phrase>
+   <literal>LDY</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="Y"/>
+    <ref name="operand"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cpy-instr">
+ <fragment>
+  <pattern>
+   <const>011</const>
+  </pattern>
+  <phrase>
+   <literal>CPY</literal>
+  </phrase>
+  <effect>
+   <sub>
+    <register name="Y"/>
+    <ref name="operand"/>
+   </sub>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cpx-instr">
+ <fragment>
+  <pattern>
+   <const>111</const>
+  </pattern>
+  <phrase>
+   <literal>CPX</literal>
+  </phrase>
+  <effect>
+   <sub>
+    <register name="X"/>
+    <ref name="operand"/>
+   </sub>
+  </effect>
+ </fragment>
+</define>
+
+<define name="stx-instr">
+ <fragment>
+  <pattern>
+   <const>001</const>
+  </pattern>
+  <phrase>
+   <literal>STX</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <register name="X"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ldx-instr">
+ <fragment>
+  <pattern>
+   <const>101</const>
+  </pattern>
+  <phrase>
+   <literal>LDX</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="X"/>
+    <ref name="operand"/>
    </assign>
   </effect>
  </fragment>
@@ -1213,6 +1388,179 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <ref name="operand"/>
   </phrase>
+ </fragment>
+
+ <fragment>
+  <var name="operand">
+   <choice>
+    <ref name="imm-xy-mode"/>
+    <ref name="zp-mode"/>
+    <ref name="abs-mode"/>
+   </choice>
+  </var>
+  <var name="operation">
+   <choice>
+    <ref name="ldy-instr"/>
+    <ref name="cpy-instr"/>
+    <ref name="cpx-instr"/>
+   </choice>
+  </var>
+  <pattern>
+   <const>00</const>
+   <ref name="operand"/>
+   <ref name="operation"/>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="operation"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="operation">
+    <bind name="operand">
+     <ref name="operand"/>
+    </bind>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="operand">
+   <choice>
+    <ref name="zpx-mode"/>
+    <ref name="absx-mode"/>
+   </choice>
+  </var>
+  <var name="operation">
+   <choice>
+    <ref name="ldy-instr"/>
+   </choice>
+  </var>
+  <pattern>
+   <const>00</const>
+   <ref name="operand"/>
+   <ref name="operation"/>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="operation"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="operation">
+    <bind name="operand">
+     <ref name="operand"/>
+    </bind>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="operand">
+   <choice>
+    <ref name="zp-mode"/>
+    <ref name="abs-mode"/>
+    <ref name="zpx-mode"/>
+   </choice>
+  </var>
+  <var name="operation">
+   <choice>
+    <ref name="sty-instr"/>
+   </choice>
+  </var>
+  <pattern>
+   <const>00</const>
+   <ref name="operand"/>
+   <ref name="operation"/>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="operation"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="operation">
+    <bind name="operand">
+     <ref name="operand"/>
+    </bind>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="operand">
+   <choice>
+    <ref name="zp-mode"/>
+    <ref name="abs-mode"/>
+    <ref name="zpy-x-mode"/>
+   </choice>
+  </var>
+  <var name="operation">
+   <choice>
+    <ref name="stx-instr"/>
+   </choice>
+  </var>
+  <pattern>
+   <const>01</const>
+   <ref name="operand"/>
+   <ref name="operation"/>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="operation"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="operation">
+    <bind name="operand">
+     <ref name="operand"/>
+    </bind>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="operand">
+   <choice>
+    <ref name="imm-xy-mode"/>
+    <ref name="zp-mode"/>
+    <ref name="abs-mode"/>
+    <ref name="zpy-x-mode"/>
+    <ref name="absy-x-mode"/>
+   </choice>
+  </var>
+  <var name="operation">
+   <choice>
+    <ref name="ldx-instr"/>
+   </choice>
+  </var>
+  <pattern>
+   <const>01</const>
+   <ref name="operand"/>
+   <ref name="operation"/>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="operation"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="operation">
+    <bind name="operand">
+     <ref name="operand"/>
+    </bind>
+   </ref>
+  </effect>
  </fragment>
 
  <ref name="txa-instr"/>
