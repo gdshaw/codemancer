@@ -248,6 +248,44 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="clse-operand">
+ <fragment>
+  <pattern>
+   <const>00</const>
+  </pattern>
+  <phrase>
+   <literal>C</literal>
+  </phrase>
+  <effect>
+   <register name="C"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10</const>
+  </pattern>
+  <phrase>
+   <literal>I</literal>
+  </phrase>
+  <effect>
+   <register name="I"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <literal>D</literal>
+  </phrase>
+  <effect>
+   <register name="D"/>
+  </effect>
+ </fragment>
+</define>
+
 <define name="or-instr">
  <fragment>
   <pattern>
@@ -770,6 +808,58 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="cl-instr">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>CL</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <const>0</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="se-instr">
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>SE</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <const>1</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="clv-instr">
+ <fragment>
+  <pattern>
+   <const>00011101</const>
+  </pattern>
+  <phrase>
+   <literal>CLV</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="V"/>
+    <const>0</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -885,6 +975,25 @@ GNU General Public License (version 3 or any later version).
   </phrase>
  </fragment>
 
+ <fragment>
+  <var name="operand">
+   <ref name="zp-mode"/>
+   <ref name="abs-mode"/>
+  </var>
+  <pattern>
+   <const>00</const>
+   <ref name="operand"/>
+   <const>100</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <literal>BIT</literal>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+ </fragment>
+
  <ref name="txa-instr"/>
  <ref name="tya-instr"/>
  <ref name="txs-instr"/>
@@ -924,5 +1033,34 @@ GNU General Public License (version 3 or any later version).
    </ref>
   </effect>
  </fragment>
+
+ <fragment>
+  <var name="operation">
+   <ref name="cl-instr"/>
+   <ref name="se-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="clse-operand"/>
+  </var>
+  <pattern>
+   <const>00011</const>
+   <ref name="operation"/>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="operation"/>
+   <ref name="operand"/>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <ref name="operation">
+    <bind name="operand">
+     <ref name="operand"/>
+    </bind>
+   </ref>
+  </effect>
+ </fragment>
+
+ <ref name="clv-instr"/>
 </start>
 </cpudl>
