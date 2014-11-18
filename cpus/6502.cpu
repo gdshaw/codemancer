@@ -222,6 +222,32 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="phpl-operand">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>P</literal>
+  </phrase>
+  <effect>
+   <register name="SR"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>A</literal>
+  </phrase>
+  <effect>
+   <register name="A"/>
+  </effect>
+ </fragment>
+</define>
+
 <define name="or-instr">
  <fragment>
   <pattern>
@@ -494,6 +520,172 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="txa-instr">
+ <fragment>
+  <pattern>
+   <const>01010001</const>
+  </pattern>
+  <phrase>
+   <literal>TXA</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <register name="X"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tya-instr">
+ <fragment>
+  <pattern>
+   <const>00011001</const>
+  </pattern>
+  <phrase>
+   <literal>TYA</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <register name="Y"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="txs-instr">
+ <fragment>
+  <pattern>
+   <const>01011001</const>
+  </pattern>
+  <phrase>
+   <literal>TXS</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="S"/>
+    <register name="X"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tay-instr">
+ <fragment>
+  <pattern>
+   <const>00010101</const>
+  </pattern>
+  <phrase>
+   <literal>TAY</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="Y"/>
+    <register name="A"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tax-instr">
+ <fragment>
+  <pattern>
+   <const>01010101</const>
+  </pattern>
+  <phrase>
+   <literal>TAX</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="X"/>
+    <register name="A"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tsx-instr">
+ <fragment>
+  <pattern>
+   <const>01011101</const>
+  </pattern>
+  <phrase>
+   <literal>TSX</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="X"/>
+    <register name="S"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ph-instr">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>PH</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <memory>
+     <add>
+      <const>256</const>
+      <register name="S"/>
+     </add>
+    </memory>
+    <ref name="operand"/>
+   </assign>
+   <assign>
+    <register name="S"/>
+    <sub>
+     <register name="S"/>
+     <const>1</const>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="pl-instr">
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>PL</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="S"/>
+    <add>
+     <register name="S"/>
+     <const>1</const>
+    </add>
+   </assign>
+   <assign>
+    <ref name="operand"/>
+    <memory>
+     <add>
+      <const>256</const>
+      <register name="S"/>
+     </add>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -609,99 +801,38 @@ GNU General Public License (version 3 or any later version).
   </phrase>
  </fragment>
 
- <fragment>
-  <pattern>
-   <const>01010001</const>
-  </pattern>
-  <phrase>
-   <literal>TXA</literal>
-  </phrase>
-  <phrase></phrase>
-  <effect>
-   <assign>
-    <register name="A"/>
-    <register name="X"/>
-   </assign>
-  </effect>
- </fragment>
+ <ref name="txa-instr"/>
+ <ref name="tya-instr"/>
+ <ref name="txs-instr"/>
+ <ref name="tay-instr"/>
+ <ref name="tax-instr"/>
+ <ref name="tsx-instr"/>
 
  <fragment>
+  <var name="operation">
+   <ref name="ph-instr"/>
+   <ref name="pl-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="phpl-operand"/>
+  </var>
   <pattern>
-   <const>00011001</const>
+   <const>00010</const>
+   <ref name="operation"/>
+   <ref name="operand"/>
+   <const>0</const>
   </pattern>
   <phrase>
-   <literal>TYA</literal>
+   <ref name="operation"/>
+   <ref name="operand"/>
   </phrase>
   <phrase></phrase>
   <effect>
-   <assign>
-    <register name="A"/>
-    <register name="Y"/>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <pattern>
-   <const>01011001</const>
-  </pattern>
-  <phrase>
-   <literal>TXS</literal>
-  </phrase>
-  <phrase></phrase>
-  <effect>
-   <assign>
-    <register name="SP"/>
-    <register name="X"/>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <pattern>
-   <const>00010101</const>
-  </pattern>
-  <phrase>
-   <literal>TAY</literal>
-  </phrase>
-  <phrase></phrase>
-  <effect>
-   <assign>
-    <register name="Y"/>
-    <register name="A"/>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <pattern>
-   <const>01010101</const>
-  </pattern>
-  <phrase>
-   <literal>TAX</literal>
-  </phrase>
-  <phrase></phrase>
-  <effect>
-   <assign>
-    <register name="X"/>
-    <register name="A"/>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <pattern>
-   <const>01011101</const>
-  </pattern>
-  <phrase>
-   <literal>TSX</literal>
-  </phrase>
-  <phrase></phrase>
-  <effect>
-   <assign>
-    <register name="X"/>
-    <register name="SP"/>
-   </assign>
+   <ref name="operation">
+    <bind name="operand">
+     <ref name="operand"/>
+    </bind>
+   </ref>
   </effect>
  </fragment>
 </start>
