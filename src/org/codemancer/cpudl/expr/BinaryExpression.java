@@ -7,6 +7,7 @@ package org.codemancer.cpudl.expr;
 
 import java.util.Map;
 
+import org.codemancer.cpudl.State;
 import org.codemancer.cpudl.CpudlReferenceException;
 import org.codemancer.cpudl.type.Type;
 import org.codemancer.cpudl.type.FragmentType;
@@ -62,6 +63,12 @@ public abstract class BinaryExpression extends Expression {
 		Expression resolvedLhs = lhs.resolve(frag, args, part);
 		Expression resolvedRhs = rhs.resolve(frag, args, part);
 		return partialClone(resolvedLhs, resolvedRhs);
+	}
+
+	public Expression evaluate(State state) {
+		Expression evaluatedLhs = lhs.evaluate(state);
+		Expression evaluatedRhs = rhs.evaluate(state);
+		return partialClone(evaluatedLhs, evaluatedRhs);
 	}
 
 	public String unparse() {

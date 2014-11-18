@@ -32,8 +32,9 @@ public class Assignment extends BinaryExpression {
 	}
 
 	public Expression evaluate(State state) {
-		getLhs().assign(state, getRhs());
-		return getRhs();
+		Expression evalRhs = getRhs().evaluate(state).simplify();
+		getLhs().assign(state, evalRhs);
+		return evalRhs;
 	}
 
 	/** Make assignment operation from XML element.

@@ -71,6 +71,30 @@ public abstract class Expression {
 		throw new IllegalArgumentException("not an l-value");
 	}
 
+	/** Attempt to simplify this expression.
+	 * The only hard constraint on the return value is that it
+	 * must be mathematically equivalent to this. The default
+	 * behaviour is to return a reference to this, which is
+	 * always an acceptable outcome, however it is better to
+	 * return a simplified expression where that is achievable.
+	 * The question of what qualifies as simplification is a
+	 * matter for the implementation.
+	 * @return a reference to this, or to a simplified equivalent
+	 */
+	public Expression simplify() {
+		return this;
+	}
+
+	/** Add the terms of this expression to an accumulator.
+	 * By default this expression is added whole, but if it can be broken
+	 * into multiple terms then they should be added separately.
+	 * @param acc an accumulator to which the terms should be added
+	 * @param multiplier a multiplier to be applied to this expression
+	 */
+	public void accumulate(Accumulator acc, long multiplier) {
+		acc.accumulate(this, multiplier);
+	}
+
 	/** Make expression from XML node.
 	 * @param node the expression as XML
 	 * @return a corresponding expression, or null if node does not contain an expression

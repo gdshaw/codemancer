@@ -30,6 +30,17 @@ public class Multiplication extends BinaryExpression {
 		return "*";
 	}
 
+	public Expression simplify() {
+		Expression simpleLhs = getLhs().simplify();
+		Expression simpleRhs = getRhs().simplify();
+		if ((simpleLhs instanceof Constant) && (simpleRhs instanceof Constant)) {
+			long longLhs = ((Constant)simpleLhs).getValue();
+			long longRhs = ((Constant)simpleRhs).getValue();
+			return new Constant(getType(), longLhs * longRhs);
+		}
+		return this;
+	}
+
 	/** Make multiplication expression from XML element.
 	 * If the element contains two or more subexpressions then the result is
 	 * a multiplication expression.

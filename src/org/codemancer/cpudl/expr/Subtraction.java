@@ -30,6 +30,17 @@ public class Subtraction extends BinaryExpression {
 		return "-";
 	}
 
+	public Expression simplify() {
+		Accumulator acc = new Accumulator();
+		accumulate(acc, 1);
+		return acc.simplify();
+	}
+
+	public void accumulate(Accumulator acc, long multiplier) {
+		getLhs().accumulate(acc, multiplier);
+		getRhs().accumulate(acc, -multiplier);
+	}
+
 	/** Make subtraction expression from XML element.
 	 * If the element contains two or more subexpressions then the result is
 	 * a subtraction expression.

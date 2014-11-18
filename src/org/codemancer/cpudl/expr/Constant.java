@@ -34,6 +34,10 @@ public class Constant extends Expression {
 		return new Long(value).toString();
 	}
 
+	public void accumulate(Accumulator acc, long multiplier) {
+		acc.accumulate(null, multiplier * value);
+	}
+
 	/** Make constant from XML element.
 	 * @param el the constant as XML
 	 * @return a corresponding expression
