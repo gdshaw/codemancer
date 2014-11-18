@@ -628,6 +628,90 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="dey-instr">
+ <fragment>
+  <pattern>
+   <const>00010001</const>
+  </pattern>
+  <phrase>
+   <literal>DEY</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="Y"/>
+    <sub>
+     <register name="Y"/>
+     <const>1</const>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="iny-instr">
+ <fragment>
+  <pattern>
+   <const>00010011</const>
+  </pattern>
+  <phrase>
+   <literal>INY</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="Y"/>
+    <add>
+     <register name="Y"/>
+     <const>1</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="dex-instr">
+ <fragment>
+  <pattern>
+   <const>01010011</const>
+  </pattern>
+  <phrase>
+   <literal>DEX</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="X"/>
+    <sub>
+     <register name="X"/>
+     <const>1</const>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="inx-instr">
+ <fragment>
+  <pattern>
+   <const>00010111</const>
+  </pattern>
+  <phrase>
+   <literal>INX</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="X"/>
+    <add>
+     <register name="X"/>
+     <const>1</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <define name="ph-instr">
  <fragment>
   <pattern>
@@ -807,6 +891,11 @@ GNU General Public License (version 3 or any later version).
  <ref name="tay-instr"/>
  <ref name="tax-instr"/>
  <ref name="tsx-instr"/>
+
+ <ref name="dey-instr"/>
+ <ref name="iny-instr"/>
+ <ref name="dex-instr"/>
+ <ref name="inx-instr"/>
 
  <fragment>
   <var name="operation">
