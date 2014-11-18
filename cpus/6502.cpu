@@ -860,6 +860,227 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="brk-instr">
+ <fragment>
+  <pattern>
+   <const>00000000</const>
+  </pattern>
+  <phrase>
+   <literal>BRK</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <memory>
+     <add>
+      <const>255</const>
+      <register name="SP"/>
+     </add>
+    </memory>
+    <register name="PC"/>
+   </assign>
+   <assign>
+    <memory>
+     <add>
+      <const>254</const>
+      <register name="SP"/>
+     </add>
+    </memory>
+    <register name="SR"/>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>3</const>
+    </sub>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <const>65534</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="jsr-instr">
+ <fragment>
+  <var name="addr">
+   <integer size="16"/>
+  </var>
+  <pattern>
+   <const>00000100</const>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <literal>JSR</literal>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory>
+     <add>
+      <const>255</const>
+      <register name="SP"/>
+     </add>
+    </memory>
+    <register name="PC"/>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>2</const>
+    </sub>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <ref name="addr"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="rti-instr">
+ <fragment>
+  <pattern>
+   <const>00000010</const>
+  </pattern>
+  <phrase>
+   <literal>RTI</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="SR"/>
+    <memory>
+     <add>
+      <const>257</const>
+      <register name="SP"/>
+     </add>
+    </memory>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <add>
+     <memory>
+      <add>
+       <const>258</const>
+       <register name="SP"/>
+      </add>
+     </memory>
+     <const>1</const>
+    </add>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>3</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="rts-instr">
+ <fragment>
+  <pattern>
+   <const>00000110</const>
+  </pattern>
+  <phrase>
+   <literal>RTS</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <add>
+     <memory>
+      <add>
+       <const>257</const>
+       <register name="SP"/>
+      </add>
+     </memory>
+     <const>1</const>
+    </add>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>2</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="jmp-instr">
+ <fragment>
+  <var name="addr">
+   <integer size="16"/>
+  </var>
+  <pattern>
+   <const>00110010</const>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <literal>JMP</literal>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <ref name="addr"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="addr">
+   <integer size="16"/>
+  </var>
+  <pattern>
+   <const>00110110</const>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <literal>JMP</literal>
+  </phrase>
+  <phrase>
+   <literal>(</literal>
+   <ref name="addr"/>
+   <literal>)</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <memory>
+     <ref name="addr"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="nop-instr">
+ <fragment>
+  <pattern>
+   <const>01010111</const>
+  </pattern>
+  <phrase>
+   <literal>NOP</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect></effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -1062,5 +1283,11 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 
  <ref name="clv-instr"/>
+ <ref name="brk-instr"/>
+ <ref name="jsr-instr"/>
+ <ref name="rti-instr"/>
+ <ref name="rts-instr"/>
+ <ref name="jmp-instr"/>
+ <ref name="nop-instr"/>
 </start>
 </cpudl>
