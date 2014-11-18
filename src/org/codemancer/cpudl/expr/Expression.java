@@ -93,6 +93,8 @@ public abstract class Expression {
 			return Addition.make(el);
 		} else if (tagName.equals("sub")) {
 			return Subtraction.make(el);
+		} else if (tagName.equals("mul")) {
+			return Multiplication.make(el);
 		} else if (tagName.equals("and")) {
 			return BitwiseAnd.make(el);
 		} else if (tagName.equals("or")) {
