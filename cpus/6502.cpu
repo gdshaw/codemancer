@@ -359,6 +359,46 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="dec-instr">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>DEC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <sub>
+     <ref name="operand"/>
+     <const>1</const>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="inc-instr">
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>INC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <add>
+     <ref name="operand"/>
+     <const>1</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -411,6 +451,32 @@ GNU General Public License (version 3 or any later version).
    <const>10</const>
    <ref name="operand"/>
    <ref name="opcode"/>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="dec-instr"/>
+   <ref name="inc-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="zp-mode"/>
+   <ref name="abs-mode"/>
+   <ref name="zpx-mode"/>
+   <ref name="absx-mode"/>
+  </var>
+  <pattern>
+   <const>01</const>
+   <ref name="operand"/>
+   <ref name="opcode"/>
+   <const>11</const>
    <ref name="operand"/>
   </pattern>
   <phrase>
