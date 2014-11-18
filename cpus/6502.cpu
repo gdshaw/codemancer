@@ -608,5 +608,101 @@ GNU General Public License (version 3 or any later version).
    <ref name="operand"/>
   </phrase>
  </fragment>
+
+ <fragment>
+  <pattern>
+   <const>01010001</const>
+  </pattern>
+  <phrase>
+   <literal>TXA</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <register name="X"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>00011001</const>
+  </pattern>
+  <phrase>
+   <literal>TYA</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <register name="Y"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>01011001</const>
+  </pattern>
+  <phrase>
+   <literal>TXS</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="SP"/>
+    <register name="X"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>00010101</const>
+  </pattern>
+  <phrase>
+   <literal>TAY</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="Y"/>
+    <register name="A"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>01010101</const>
+  </pattern>
+  <phrase>
+   <literal>TAX</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="X"/>
+    <register name="A"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>01011101</const>
+  </pattern>
+  <phrase>
+   <literal>TSX</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="X"/>
+    <register name="SP"/>
+   </assign>
+  </effect>
+ </fragment>
 </start>
 </cpudl>
