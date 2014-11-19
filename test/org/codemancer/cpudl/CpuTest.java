@@ -27,6 +27,7 @@ import org.codemancer.cpudl.type.Type;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Constant;
 import org.codemancer.cpudl.expr.Register;
+import org.codemancer.cpudl.expr.Memory;
 import org.codemancer.cpudl.expr.Fragment;
 
 @RunWith(Parameterized.class)
@@ -38,7 +39,7 @@ public class CpuTest {
 	String[] preconds;
 	String[] postconds;
 
-	private static int hexValue(char c) {
+	private static int parseHexValue(char c) {
 		if ((c >= '0') && (c <= '9')) {
 			return c - '0';
 		} else if ((c >= 'A') && (c <= 'F')) {
@@ -48,6 +49,28 @@ public class CpuTest {
 		} else {
 			throw new IllegalArgumentException("hex digit expected");
 		}
+	}
+
+	private static Expression parseLvalue(String s) {
+		if (s.length() == 0) {
+			throw new IllegalArgumentException("l-value in pre/post-condition is empty string");
+		}
+		if (s.charAt(0) == '[') {
+			if (s.charAt(s.length() - 1) != ']') {
+				throw new IllegalArgumentException("unmatched brackets in pre/post-condition");
+			}
+			long addr = Long.parseLong(s.substring(1, s.length() - 1), 16);
+			return new Memory(null, new Constant(null, addr));
+		} else {
+			return Register.make(s);
+		}
+	}
+
+	private static Expression parseRvalue(String s) {
+		if (s.length() == 0) {
+			throw new IllegalArgumentException("r-value in pre/post-condition is empty string");
+		}
+		return new Constant(null, Long.parseLong(s, 16));
 	}
 
 	public CpuTest(Architecture arch, String line, String setup) throws Exception {
@@ -65,8 +88,8 @@ public class CpuTest {
 		this.code = new ShortBitString();
 		String codeField = this.fields[0];
 		for (int i = 0; i + 1 < codeField.length(); i += 2) {
-			int v = (hexValue(codeField.charAt(i)) << 4) |
-				hexValue(codeField.charAt(i + 1));
+			int v = (parseHexValue(codeField.charAt(i)) << 4) |
+				parseHexValue(codeField.charAt(i + 1));
 			code = code.concat(new ShortBitString(v, 8));
 		}
 
@@ -83,6 +106,8 @@ public class CpuTest {
 		assertTrue(expr != null);
 		Expression effect = expr.resolve(null, null, false);
 
+		if (effect != null) System.err.printf("Effect: %s\n", effect.unparse());
+
 		EphemeralState state = new EphemeralState();
 		for (int i = 0; i != preconds.length; ++i) {
 			String precond = preconds[i];
@@ -90,9 +115,13 @@ public class CpuTest {
 			if (f == -1) {
 				throw new IllegalArgumentException("missing = in precondition");
 			}
-			String name = precond.substring(0, f);
-			long value = Long.parseLong(precond.substring(f + 1, precond.length()));
-			state.put(Register.make(name), new Constant(null, value));
+			Expression lvalue = parseLvalue(precond.substring(0, f));
+			Expression rvalue = parseRvalue(precond.substring(f + 1, precond.length()));
+			if (lvalue instanceof Register) {
+				state.put((Register)lvalue, rvalue);
+			} else if (lvalue instanceof Memory) {
+				state.put((Memory)lvalue, rvalue);
+			}
 		}
 		if (effect != null) effect.evaluate(state);
 
@@ -102,10 +131,15 @@ public class CpuTest {
 			if (f == -1) {
 				throw new IllegalArgumentException("missing = in postcondition");
 			}
-			String name = postcond.substring(0, f);
+			Expression lvalue = parseLvalue(postcond.substring(0, f));
 			String expected = postcond.substring(f + 1, postcond.length());
-			String found = state.get(Register.make(name)).unparse();
-			assertEquals(found, expected);
+			if (lvalue instanceof Register) {
+				String found = state.get((Register)lvalue).unparse();
+				assertEquals(expected, found);
+			} else if (lvalue instanceof Memory) {
+				String found = state.get((Register)lvalue).unparse();
+				assertEquals(expected, found);
+			}
 		}
 
 		for (int i = 0; i != start.getPieceCount(); ++i) {
