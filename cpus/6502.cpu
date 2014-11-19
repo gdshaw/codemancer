@@ -359,7 +359,7 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="or-instr">
+<define name="ora-instr">
  <fragment>
   <pattern>
    <const>000</const>
@@ -1259,7 +1259,7 @@ GNU General Public License (version 3 or any later version).
 <start>
  <fragment>
   <var name="opcode">
-   <ref name="or-instr"/>
+   <ref name="ora-instr"/>
    <ref name="and-instr"/>
    <ref name="xor-instr"/>
    <ref name="adc-instr"/>
@@ -1289,6 +1289,11 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <ref name="operand"/>
   </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="operand"/>
+   </ref>
+  </effect>
  </fragment>
 
  <fragment>
@@ -1316,6 +1321,11 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <ref name="operand"/>
   </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="operand"/>
+   </ref>
+  </effect>
  </fragment>
 
  <fragment>
@@ -1344,6 +1354,11 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <ref name="operand"/>
   </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="operand"/>
+   </ref>
+  </effect>
  </fragment>
 
  <fragment>
@@ -1369,6 +1384,11 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <ref name="operand"/>
   </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="operand"/>
+   </ref>
+  </effect>
  </fragment>
 
  <fragment>
@@ -1388,6 +1408,12 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <ref name="operand"/>
   </phrase>
+  <effect>
+   <and>
+    <register name="A"/>
+    <ref name="operand"/>
+   </and>
+  </effect>
  </fragment>
 
  <fragment>
@@ -1419,9 +1445,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="operation">
-    <bind name="operand">
-     <ref name="operand"/>
-    </bind>
+    <bind name="operand" src="operand"/>
    </ref>
   </effect>
  </fragment>
@@ -1452,9 +1476,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="operation">
-    <bind name="operand">
-     <ref name="operand"/>
-    </bind>
+    <bind name="operand" src="operand"/>
    </ref>
   </effect>
  </fragment>
@@ -1486,9 +1508,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="operation">
-    <bind name="operand">
-     <ref name="operand"/>
-    </bind>
+    <bind name="operand" src="operand"/>
    </ref>
   </effect>
  </fragment>
@@ -1520,9 +1540,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="operation">
-    <bind name="operand">
-     <ref name="operand"/>
-    </bind>
+    <bind name="operand" src="operand"/>
    </ref>
   </effect>
  </fragment>
@@ -1556,9 +1574,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="operation">
-    <bind name="operand">
-     <ref name="operand"/>
-    </bind>
+    <bind name="operand" src="operand"/>
    </ref>
   </effect>
  </fragment>
@@ -1596,9 +1612,7 @@ GNU General Public License (version 3 or any later version).
   <phrase></phrase>
   <effect>
    <ref name="operation">
-    <bind name="operand">
-     <ref name="operand"/>
-    </bind>
+    <bind name="operand" src="operand"/>
    </ref>
   </effect>
  </fragment>
@@ -1623,9 +1637,7 @@ GNU General Public License (version 3 or any later version).
   <phrase></phrase>
   <effect>
    <ref name="operation">
-    <bind name="operand">
-     <ref name="operand"/>
-    </bind>
+    <bind name="operand" src="operand"/>
    </ref>
   </effect>
  </fragment>
