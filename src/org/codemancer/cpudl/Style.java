@@ -34,7 +34,7 @@ public class Style {
 	 * @return the value of the property, as a string
 	 */
 	public String get(String propName, String defaultValue) {
-		String value = null;
+		String value = defaultValue;
 		if (stylesheet != null) {
 			value = stylesheet.get(className, propName, defaultValue);
 		}
