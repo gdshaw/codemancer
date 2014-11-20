@@ -12,7 +12,7 @@ import org.w3c.dom.Element;
 /** A class to represent a CPUDL stylesheet. */
 public class Stylesheet {
 	/** The properties of this stylesheet. */
-	private static HashMap<String, String> properties =
+	private HashMap<String, String> properties =
 		new HashMap<String, String>();
 
 	/** Construct empty stylesheet. */
