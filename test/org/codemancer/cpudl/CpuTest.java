@@ -99,6 +99,7 @@ public class CpuTest {
 
 	@Test
 	public void disassemble() throws Exception {
+		Style style = arch.getStylesheet().getStyle(null);
 		BitReader reader = new BitStringReader(code);
 		List<BitReader> readers = new ArrayList<BitReader>();
 		readers.add(reader);
@@ -133,10 +134,12 @@ public class CpuTest {
 			Expression lvalue = parseLvalue(postcond.substring(0, f));
 			String expected = postcond.substring(f + 1, postcond.length());
 			if (lvalue instanceof Register) {
-				String found = state.get((Register)lvalue).unparse(new Style());
+				String found = state.get((Register)lvalue).unparse(style);
 				assertEquals(expected, found);
 			} else if (lvalue instanceof Memory) {
-				String found = state.get((Register)lvalue).unparse(new Style());
+				Expression foundExpr = state.get((Memory)lvalue);
+				assertTrue(foundExpr != null);
+				String found = foundExpr.unparse(style);
 				assertEquals(expected, found);
 			}
 		}
