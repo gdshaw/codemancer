@@ -10,6 +10,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
 import org.codemancer.cpudl.State;
+import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.CpudlReferenceException;
 import org.codemancer.cpudl.type.Type;
@@ -35,8 +36,8 @@ public class Memory extends Expression {
 		return address;
 	}
 
-	public String unparse() {
-		return "[" + address.unparse() + "]";
+	public String unparse(Style style) {
+		return "[" + address.unparse(style) + "]";
 	}
 
 	public Expression resolve(Fragment frag, Map<String, Expression> args, boolean part)

@@ -35,6 +35,13 @@ public class Context {
 		return arch;
 	}
 
+	/** Get the stylesheet.
+	 * @return the stylesheet
+	 */
+	public final Stylesheet getStylesheet() {
+		return arch.getStylesheet();
+	}
+
 	/** Make type from XML node.
 	 * @param node the node to be interpreted as a type
 	 * @return the corresponding type, or null if node does not contain a type

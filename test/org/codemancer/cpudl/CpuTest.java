@@ -23,6 +23,7 @@ import org.codemancer.cpudl.BitString;
 import org.codemancer.cpudl.ShortBitString;
 import org.codemancer.cpudl.Architecture;
 import org.codemancer.cpudl.EphemeralState;
+import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.type.Type;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Constant;
@@ -106,8 +107,6 @@ public class CpuTest {
 		assertTrue(expr != null);
 		Expression effect = expr.resolve(null, null, false);
 
-		if (effect != null) System.err.printf("Effect: %s\n", effect.unparse());
-
 		EphemeralState state = new EphemeralState();
 		for (int i = 0; i != preconds.length; ++i) {
 			String precond = preconds[i];
@@ -134,10 +133,10 @@ public class CpuTest {
 			Expression lvalue = parseLvalue(postcond.substring(0, f));
 			String expected = postcond.substring(f + 1, postcond.length());
 			if (lvalue instanceof Register) {
-				String found = state.get((Register)lvalue).unparse();
+				String found = state.get((Register)lvalue).unparse(new Style());
 				assertEquals(expected, found);
 			} else if (lvalue instanceof Memory) {
-				String found = state.get((Register)lvalue).unparse();
+				String found = state.get((Register)lvalue).unparse(new Style());
 				assertEquals(expected, found);
 			}
 		}

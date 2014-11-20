@@ -29,6 +29,9 @@ public class Architecture {
 	/** The types defined by this architecture, indexed by name. */
 	private final HashMap<String, Type> types = new HashMap<String, Type>();
 
+	/** The stylesheet for this architecture. */
+	private Stylesheet stylesheet = new Stylesheet();
+
 	/** Construct architecture from XML.
 	 * @param element the required content as an XML element
 	 */
@@ -51,6 +54,8 @@ public class Architecture {
 					}
 					Type type = ctx.makeChoice(childElement);
 					types.put(typeName, type);
+				} else if (tagName.equals("style")) {
+					stylesheet.merge(childElement);
 				}
 			}
 			child = child.getNextSibling();
@@ -71,6 +76,13 @@ public class Architecture {
 	 */
 	public final Type getType(String typeName) {
 		return types.get(typeName);
+	}
+
+	/** Get stylesheet.
+	 * @return the stylesheet for this architecture
+	 */
+	public final Stylesheet getStylesheet() {
+		return stylesheet;
 	}
 
 	/** Make architecture from CPUDL file.

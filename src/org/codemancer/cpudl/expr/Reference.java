@@ -10,6 +10,7 @@ import java.util.HashMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
+import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.CpudlReferenceException;
 import org.codemancer.cpudl.type.Type;
@@ -40,7 +41,7 @@ public class Reference extends Expression {
 		return name;
 	}
 
-	public String unparse() {
+	public String unparse(Style style) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("%");
 		sb.append(name);

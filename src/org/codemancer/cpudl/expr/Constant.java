@@ -7,6 +7,7 @@ package org.codemancer.cpudl.expr;
 
 import org.w3c.dom.Element;
 
+import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.type.Type;
 
 /** An expression class to represent a known integer constant. */
@@ -30,8 +31,9 @@ public class Constant extends Expression {
 		return value;
 	}
 
-	public String unparse() {
-		return new Long(value).toString();
+	public String unparse(Style style) {
+		int base = style.getInteger("base", 10);
+		return Long.toString(value, base);
 	}
 
 	public void accumulate(Accumulator acc, long multiplier) {

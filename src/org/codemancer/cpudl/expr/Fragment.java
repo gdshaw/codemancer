@@ -8,6 +8,7 @@ package org.codemancer.cpudl.expr;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.CpudlReferenceException;
 import org.codemancer.cpudl.type.Type;
 
@@ -62,13 +63,13 @@ public class Fragment extends Expression {
 		return (effect != null) ? effect.resolve(this, args, part) : null;
 	}
 
-	public String unparse() {
+	public String unparse(Style style) {
 		StringBuffer result = new StringBuffer();
 		result.append("{");
 		for (Map.Entry<String, Expression> entry: members.entrySet()) {
 			result.append(entry.getKey());
 			result.append(":");
-			result.append(entry.getValue().unparse());
+			result.append(entry.getValue().unparse(style));
 		}
 		result.append("}");
 		return result.toString();

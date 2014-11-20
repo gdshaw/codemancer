@@ -11,6 +11,7 @@ import org.w3c.dom.Element;
 import org.codemancer.cpudl.BitString;
 import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.Context;
+import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Constant;
@@ -29,13 +30,18 @@ public class IntegerType extends Type {
 	/** The encoding method used to represent this integer type. */
 	private final int encoding;
 
+	/** The style to be used for this integer type. */
+	private final Style style;
+
 	/** Construct integer type from attributes.
 	 * @param size the required size, in bits
 	 * @param sign the required encoding method
+	 * @param style the required style
 	 */
-	public IntegerType(int size, int encoding) {
+	public IntegerType(int size, int encoding, Style style) {
 		this.size = size;
 		this.encoding = encoding;
+		this.style = style;
 	}
 
 	/** Construct integer type from XML.
@@ -68,6 +74,8 @@ public class IntegerType extends Type {
 		} else {
 			throw new CpudlParseException(element, "invalid integer encoding attribute");
 		}
+
+		this.style = ctx.getStylesheet().getStyle(null);
 	}
 
 	public final int getChunkCount() {
@@ -123,6 +131,6 @@ public class IntegerType extends Type {
 		if (piece != 0) {
 			throw new IllegalArgumentException("invalid piece number");
 		}
-		return expr.unparse();
+		return expr.unparse(style);
 	}
 }

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import org.w3c.dom.Element;
 
 import org.codemancer.cpudl.State;
+import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.type.Type;
 
@@ -33,7 +34,7 @@ public class Register extends Expression {
 		return name;
 	}
 
-	public String unparse() {
+	public String unparse(Style style) {
 		return name;
 	}
 

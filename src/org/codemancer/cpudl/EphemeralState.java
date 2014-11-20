@@ -54,11 +54,12 @@ public class EphemeralState implements State {
 	 * @param out the stream to which output should be sent
 	 */
 	public final void dump(PrintWriter out) {
+		Style style = new Style();
 		for (Map.Entry<String, Expression> entry: registers.entrySet()) {
-			out.printf("%s: %s\n", entry.getKey(), entry.getValue().unparse());
+			out.printf("%s: %s\n", entry.getKey(), entry.getValue().unparse(style));
 		}
 		for (Map.Entry<Long, Expression> entry: locations.entrySet()) {
-			out.printf("%08X: %s\n", entry.getKey(), entry.getValue().unparse());
+			out.printf("%08X: %s\n", entry.getKey(), entry.getValue().unparse(style));
 		}
 	}
 }

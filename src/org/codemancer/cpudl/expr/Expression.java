@@ -10,6 +10,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
 import org.codemancer.cpudl.State;
+import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.CpudlReferenceException;
 import org.codemancer.cpudl.type.Type;
@@ -37,9 +38,10 @@ public abstract class Expression {
 	}
 
 	/** Convert this expression to a string.
+	 * @param st the required style
 	 * @return this expression as a string
 	 */
-	public abstract String unparse();
+	public abstract String unparse(Style style);
 
 	/** Recursively resolve references within this expression.
 	 * @param frag the instruction fragment that is currently in scope, or null if none
