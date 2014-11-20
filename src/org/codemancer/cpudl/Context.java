@@ -12,6 +12,7 @@ import org.w3c.dom.Element;
 import org.codemancer.cpudl.type.Type;
 import org.codemancer.cpudl.type.ConstantType;
 import org.codemancer.cpudl.type.LiteralType;
+import org.codemancer.cpudl.type.Whitespace;
 import org.codemancer.cpudl.type.IntegerType;
 import org.codemancer.cpudl.type.FragmentType;
 import org.codemancer.cpudl.type.Choice;
@@ -66,6 +67,8 @@ public class Context {
 			return new ConstantType(this, element);
 		} else if (tagName.equals("literal")) {
 			return new LiteralType(this, element);
+		} else if (tagName.equals("ws")) {
+			return new Whitespace(this, element);
 		} else if (tagName.equals("integer")) {
 			return new IntegerType(this, element);
 		} else if (tagName.equals("fragment")) {

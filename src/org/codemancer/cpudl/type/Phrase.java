@@ -58,6 +58,10 @@ public class Phrase {
 					Type type = new LiteralType(ctx, childElement);
 					MemberInfo member = new MemberInfo(type, 0);
 					add(childElement, null, member);
+				} else if (tagName.equals("ws")) {
+					Type type = new Whitespace(ctx, childElement);
+					MemberInfo member = new MemberInfo(type, 0);
+					add(childElement, null, member);
 				} else if (tagName.equals("ref")) {
 					String name = childElement.getAttribute("name");
 					if (name == null) {
