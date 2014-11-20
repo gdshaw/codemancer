@@ -6,10 +6,25 @@ GNU General Public License (version 3 or any later version).
 -->
 
 <cpudl>
+<style>
+ <property name="base" value="16"/>
+ <property name="prefix" value="$"/>
+ <property name="suffix" value=""/>
+ <select class="imm">
+  <property name="width" value="2"/>
+ </select>
+ <select class="zp">
+  <property name="width" value="2"/>
+ </select>
+ <select class="abs">
+  <property name="width" value="4"/>
+ </select>
+</style>
+
 <define name="indx-mode">
  <fragment>
   <var name="addr">
-   <integer size="8"/>
+   <integer class="zp" size="8"/>
   </var>
   <pattern>
    <const>000</const>
@@ -38,7 +53,7 @@ GNU General Public License (version 3 or any later version).
 <define name="zp-mode">
  <fragment>
   <var name="addr">
-   <integer size="8"/>
+   <integer class="zp" size="8"/>
   </var>
   <pattern>
    <const>100</const>
@@ -60,7 +75,7 @@ GNU General Public License (version 3 or any later version).
 <define name="imm-mode">
  <fragment>
   <var name="imm">
-   <integer size="8"/>
+   <integer class="imm" size="8"/>
   </var>
   <pattern>
    <const>010</const>
@@ -96,7 +111,7 @@ GNU General Public License (version 3 or any later version).
 <define name="abs-mode">
  <fragment>
   <var name="addr">
-   <integer size="16"/>
+   <integer class="abs" size="16"/>
   </var>
   <pattern>
    <const>110</const>
@@ -118,7 +133,7 @@ GNU General Public License (version 3 or any later version).
 <define name="indy-mode">
  <fragment>
   <var name="addr">
-   <integer size="8"/>
+   <integer class="zp" size="8"/>
   </var>
   <pattern>
    <const>001</const>
@@ -147,7 +162,7 @@ GNU General Public License (version 3 or any later version).
 <define name="zpx-mode">
  <fragment>
   <var name="addr">
-   <integer size="8"/>
+   <integer class="zp" size="8"/>
   </var>
   <pattern>
    <const>101</const>
@@ -173,7 +188,7 @@ GNU General Public License (version 3 or any later version).
 <define name="zpy-x-mode">
  <fragment>
   <var name="addr">
-   <integer size="8"/>
+   <integer class="zp" size="8"/>
   </var>
   <pattern>
    <const>101</const>
@@ -199,7 +214,7 @@ GNU General Public License (version 3 or any later version).
 <define name="absy-mode">
  <fragment>
   <var name="addr">
-   <integer size="16"/>
+   <integer class="abs" size="16"/>
   </var>
   <pattern>
    <const>011</const>
@@ -225,7 +240,7 @@ GNU General Public License (version 3 or any later version).
 <define name="absx-mode">
  <fragment>
   <var name="addr">
-   <integer size="16"/>
+   <integer class="abs" size="16"/>
   </var>
   <pattern>
    <const>111</const>
@@ -251,7 +266,7 @@ GNU General Public License (version 3 or any later version).
 <define name="absy-x-mode">
  <fragment>
   <var name="addr">
-   <integer size="16"/>
+   <integer class="abs" size="16"/>
   </var>
   <pattern>
    <const>111</const>
@@ -277,7 +292,7 @@ GNU General Public License (version 3 or any later version).
 <define name="imm-xy-mode">
  <fragment>
   <var name="value">
-   <integer size="8"/>
+   <integer class="imm" size="8"/>
   </var>
   <pattern>
    <const>000</const>
@@ -1081,7 +1096,7 @@ GNU General Public License (version 3 or any later version).
 <define name="jsr-instr">
  <fragment>
   <var name="addr">
-   <integer size="16"/>
+   <integer class="abs" size="16"/>
   </var>
   <pattern>
    <const>00000100</const>
@@ -1196,7 +1211,7 @@ GNU General Public License (version 3 or any later version).
 <define name="jmp-instr">
  <fragment>
   <var name="addr">
-   <integer size="16"/>
+   <integer class="abs" size="16"/>
   </var>
   <pattern>
    <const>00110010</const>
@@ -1218,7 +1233,7 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="addr">
-   <integer size="16"/>
+   <integer class="abs" size="16"/>
   </var>
   <pattern>
    <const>00110110</const>
