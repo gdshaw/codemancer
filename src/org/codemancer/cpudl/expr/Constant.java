@@ -33,7 +33,23 @@ public class Constant extends Expression {
 
 	public String unparse(Style style) {
 		int base = style.getInteger("base", 10);
-		return Long.toString(value, base);
+		int width = style.getInteger("width", 0);
+		String prefix = style.get("prefix", "");
+		String suffix = style.get("suffix", "");
+		if (width < 1) width = 1;
+		if (width > 64) width = 64;
+
+		char[] digits = new char[64];
+		int i = digits.length;
+		long v = value;
+		while ((v != 0) || (width != 0)) {
+			int dv = (int)(v % base);
+			char digit = (dv < 10) ? (char)('0' + dv) : (char)('A' + dv - 10);
+			digits[--i] = digit;
+			v = v / base;
+			if (width != 0) --width;
+		}
+		return prefix + new String(digits, i, digits.length - i) + suffix;
 	}
 
 	public void accumulate(Accumulator acc, long multiplier) {
