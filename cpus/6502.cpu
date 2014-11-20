@@ -10,6 +10,7 @@ GNU General Public License (version 3 or any later version).
  <property name="base" value="16"/>
  <property name="prefix" value="$"/>
  <property name="suffix" value=""/>
+ <property name="whitespace" value=" "/>
  <select class="imm">
   <property name="width" value="2"/>
  </select>
@@ -35,7 +36,8 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <literal>(</literal>
    <ref name="addr"/>
-   <literal>,X)</literal>
+   <literal>,</literal><ws/>
+   <literal>X)</literal>
   </phrase>
   <effect>
    <memory size="8">
@@ -144,7 +146,8 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <literal>(</literal>
    <ref name="addr"/>
-   <literal>),Y</literal>
+   <literal>),</literal><ws/>
+   <literal>Y</literal>
   </phrase>
   <effect>
    <memory size="8">
@@ -172,7 +175,8 @@ GNU General Public License (version 3 or any later version).
   </pattern>
   <phrase>
    <ref name="addr"/>
-   <literal>,X</literal>
+   <literal>,</literal><ws/>
+   <literal>X</literal>
   </phrase>
   <effect>
    <memory size="8">
@@ -198,7 +202,8 @@ GNU General Public License (version 3 or any later version).
   </pattern>
   <phrase>
    <ref name="addr"/>
-   <literal>,Y</literal>
+   <literal>,</literal><ws/>
+   <literal>Y</literal>
   </phrase>
   <effect>
    <memory>
@@ -224,7 +229,8 @@ GNU General Public License (version 3 or any later version).
   </pattern>
   <phrase>
    <ref name="addr"/>
-   <literal>,Y</literal>
+   <literal>,</literal><ws/>
+   <literal>Y</literal>
   </phrase>
   <effect>
    <memory size="8">
@@ -250,7 +256,8 @@ GNU General Public License (version 3 or any later version).
   </pattern>
   <phrase>
    <ref name="addr"/>
-   <literal>,X</literal>
+   <literal>,</literal><ws/>
+   <literal>X</literal>
   </phrase>
   <effect>
    <memory size="8">
@@ -276,7 +283,8 @@ GNU General Public License (version 3 or any later version).
   </pattern>
   <phrase>
    <ref name="addr"/>
-   <literal>,Y</literal>
+   <literal>,</literal><ws/>
+   <literal>Y</literal>
   </phrase>
   <effect>
    <memory>
