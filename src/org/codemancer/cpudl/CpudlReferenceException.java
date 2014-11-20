@@ -7,7 +7,7 @@ package org.codemancer.cpudl;
 
 /** An exception class to indicate that a CPUDL reference could not be resolved. */
 @SuppressWarnings("serial")
-public class CpudlReferenceException extends Exception {
+public class CpudlReferenceException extends RuntimeException {
 	/** Construct a CPUDL reference exception.
 	 * @param name the name to which the reference refers
 	 */
