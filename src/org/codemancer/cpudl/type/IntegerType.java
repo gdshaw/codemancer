@@ -75,7 +75,7 @@ public class IntegerType extends Type {
 			throw new CpudlParseException(element, "invalid integer encoding attribute");
 		}
 
-		this.style = ctx.getStylesheet().getStyle(null);
+		this.style = ctx.getStylesheet().getStyle(element.getAttribute("class"));
 	}
 
 	public final int getChunkCount() {

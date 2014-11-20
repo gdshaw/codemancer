@@ -11,9 +11,9 @@ import org.w3c.dom.Element;
 
 /** A class to represent a CPUDL stylesheet. */
 public class Stylesheet {
-	/** The properties of this stylesheet. */
-	private HashMap<String, String> properties =
-		new HashMap<String, String>();
+	/** The properties of this stylesheet, indexed by class then name. */
+	private HashMap<String, HashMap<String, String>> properties =
+		new HashMap<String, HashMap<String, String>>();
 
 	/** Construct empty stylesheet. */
 	public Stylesheet() {}
@@ -28,7 +28,9 @@ public class Stylesheet {
 				Element childElement = (Element)child;
 				String tagName = childElement.getTagName();
 				if (tagName.equals("property")) {
-					parseProperty(childElement);
+					parseProperty(null, childElement);
+				} else if (tagName.equals("select")) {
+					parseSelect(childElement);
 				}
 			}
 			child = child.getNextSibling();
@@ -38,10 +40,33 @@ public class Stylesheet {
 	/** Parse property element.
 	 * @param element the property, as an XML element
 	 */
-	private void parseProperty(Element element) {
-		String name = element.getAttribute("name");
+	private void parseProperty(String className, Element element) {
+		String propName = element.getAttribute("name");
 		String value = element.getAttribute("value");
-		properties.put(name, value);
+		HashMap<String, String> classProperties = properties.get(className);
+		if (classProperties == null) {
+			classProperties = new HashMap<String, String>();
+			properties.put(className, classProperties);
+		}
+		classProperties.put(propName, value);
+	}
+
+	/** Parse select element.
+	 * @param element the class selection, as an XML element
+	 */
+	private void parseSelect(Element element) {
+		String className = element.getAttribute("class");
+		Node child = element.getFirstChild();
+		while (child != null) {
+			if (child instanceof Element) {
+				Element childElement = (Element)child;
+				String tagName = childElement.getTagName();
+				if (tagName.equals("property")) {
+					parseProperty(className, childElement);
+				}
+			}
+			child = child.getNextSibling();
+		}
 	}
 
 	/** Get style for given class name.
@@ -59,8 +84,17 @@ public class Stylesheet {
 	 * @return the value of the property
 	 */
 	public String get(String className, String propName, String defaultValue) {
-		String result = properties.get(propName);
-		if (result == null) result = defaultValue;
+		String result = defaultValue;
+		HashMap<String, String> globalProperties = properties.get(null);
+		if (globalProperties != null) {
+			String value = globalProperties.get(propName);
+			if (value != null) result = value;
+		}
+		HashMap<String, String> classProperties = properties.get(className);
+		if (classProperties != null) {
+			String value = classProperties.get(propName);
+			if (value != null) result = value;
+		}
 		return result;
 	}
 }
