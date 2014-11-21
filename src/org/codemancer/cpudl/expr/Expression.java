@@ -130,7 +130,7 @@ public abstract class Expression {
 		} else if (tagName.equals("shift")) {
 			return Shift.make(el);
 		} else if (tagName.equals("equals")) {
-			return Equals.make(el);
+			return Equality.make(el);
 		} else if (tagName.equals("assign")) {
 			return Assignment.make(el);
 		} else if (tagName.equals("sequence")) {

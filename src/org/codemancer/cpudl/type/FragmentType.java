@@ -16,6 +16,7 @@ import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.expr.Expression;
+import org.codemancer.cpudl.expr.Constant;
 import org.codemancer.cpudl.expr.Sequence;
 import org.codemancer.cpudl.expr.Fragment;
 
@@ -58,6 +59,9 @@ public class FragmentType extends Type {
 	/** The effect of this fragment. */
 	private Expression effect = null;
 
+	/** A list of constraints which instances of this type must satisfy. */
+	private final List<Expression> constraints = new ArrayList<Expression>();
+
 	/** The number of bitstring assembly buffers needed to decode this compound fragment. */
 	private int bufferCount = 1;
 
@@ -79,6 +83,8 @@ public class FragmentType extends Type {
 					phrases.add(new Phrase(ctx, childElement, members));
 				} else if (tagName.equals("effect")) {
 					parseEffect(ctx, childElement);
+				} else if (tagName.equals("where")) {
+					parseConstraints(ctx, childElement);
 				}
 			}
 			child = child.getNextSibling();
@@ -108,6 +114,35 @@ public class FragmentType extends Type {
 			throw new CpudlParseException(element, "multiple <effect> elements in <fragment>");
 		}
 		effect = Sequence.make(element);
+	}
+
+	/** Parse constraints.
+	 * @param ctx the context of this fragment
+	 * @param element the constraint element to be parsed
+	 */
+	private final void parseConstraints(Context ctx, Element element) throws CpudlParseException {
+		Node child = element.getFirstChild();
+		while (child != null) {
+			Expression constraint = Expression.make(child);
+			if (constraint != null) {
+				constraints.add(constraint);
+			}
+			child = child.getNextSibling();
+		}
+	}
+
+	/** Check that constraints have been satisfied.
+	 * @param frag the proposed fragment to be checked
+	 * @return true if all constraints are satisfied, otherwise false
+	 */
+	boolean check(Fragment frag) {
+		for (Expression constraint: constraints) {
+			Expression result = constraint.resolve(frag, null, true).simplify();
+			if (!(result instanceof Constant)) return false;
+			Constant constResult = (Constant)result;
+			if (constResult.getValue() == 0) return false;
+		}
+		return true;
 	}
 
 	public final int getChunkCount() {
@@ -148,6 +183,7 @@ public class FragmentType extends Type {
 			}
 		}
 		frag.setEffect(effect);
+		if (!check(frag)) return null;
 		return frag;
 	}
 
