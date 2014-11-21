@@ -7,6 +7,7 @@ package org.codemancer.cpudl.type;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import org.w3c.dom.Node;
@@ -16,9 +17,11 @@ import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.expr.Expression;
+import org.codemancer.cpudl.expr.Reference;
 import org.codemancer.cpudl.expr.Constant;
 import org.codemancer.cpudl.expr.Sequence;
 import org.codemancer.cpudl.expr.Fragment;
+import org.codemancer.cpudl.expr.Equality;
 
 /** A class to represent a type of instruction fragment. */
 public class FragmentType extends Type {
@@ -35,6 +38,9 @@ public class FragmentType extends Type {
 		/** The number of pieces that have been referenced from this member. */
 		public int piece;
 
+		/** An expression for deducing the value of this member, or null if none available. */
+		public Expression solution;
+
 		/** Construct member information.
 		 * @param type the type of this member
 		 * @param buffer the assembly buffer index for this subfragment
@@ -44,6 +50,7 @@ public class FragmentType extends Type {
 			this.buffer = buffer;
 			this.chunk = 0;
 			this.piece = 0;
+			this.solution = null;
 		}
 	}
 
@@ -89,6 +96,29 @@ public class FragmentType extends Type {
 			}
 			child = child.getNextSibling();
 		}
+
+		// The following method selects the first constraint capable of providing
+		// a solution for a missing fragment member without checking that any other
+		// members referenced by the solution are available. It is therefore
+		// unlikely to handle chains of dependencies correctly.
+		for (Expression constraint: constraints) {
+			if (constraint instanceof Equality) {
+				Equality equality = (Equality)constraint;
+				for (Map.Entry<String, MemberInfo> entry: members.entrySet()) {
+					String name = entry.getKey();
+					MemberInfo member = entry.getValue();
+					Reference solveFor = new Reference(null, name, null);
+					if (member.solution == null) {
+						Expression solution = equality.getLhs().solve(solveFor, equality.getRhs());
+						if (solution != null) member.solution = solution;
+					}
+					if (member.solution == null) {
+						Expression solution = equality.getRhs().solve(solveFor, equality.getLhs());
+						if (solution != null) member.solution = solution;
+					}
+				}
+			}
+		}
 	}
 
 	/** Parse member.
@@ -128,6 +158,28 @@ public class FragmentType extends Type {
 				constraints.add(constraint);
 			}
 			child = child.getNextSibling();
+		}
+	}
+
+	/** Deduce the values of members which have not yet been determined.
+	 * @param frag the fragment on which to act
+	 */
+	public final void deduce(Fragment frag) {
+		for (Map.Entry<String, MemberInfo> entry: members.entrySet()) {
+			String name = entry.getKey();
+			MemberInfo member = entry.getValue();
+			if (frag.get(name) == null) {
+
+
+				if (member.solution == null) {
+					System.err.printf("No solution for %s\n", name);
+				}
+
+
+
+				Expression value = member.solution.resolve(frag, null, true);
+				frag.put(name, value);
+			}
 		}
 	}
 
@@ -183,6 +235,7 @@ public class FragmentType extends Type {
 			}
 		}
 		frag.setEffect(effect);
+		deduce(frag);
 		if (!check(frag)) return null;
 		return frag;
 	}
