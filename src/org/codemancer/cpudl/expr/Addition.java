@@ -36,6 +36,18 @@ public class Addition extends BinaryExpression {
 		return acc.simplify();
 	}
 
+	public Expression solve(Reference solveFor, Expression placeholder) {
+		Expression solveLhs = getLhs().solve(solveFor, new Subtraction(getType(), placeholder, getRhs()));
+		if (solveLhs != null) {
+			return solveLhs.simplify();
+		}
+		Expression solveRhs = getRhs().solve(solveFor, new Subtraction(getType(), placeholder, getLhs()));
+		if (solveRhs != null) {
+			return solveRhs.simplify();
+		}
+		return null;
+	}
+
 	public void accumulate(Accumulator acc, long multiplier) {
 		getLhs().accumulate(acc, multiplier);
 		getRhs().accumulate(acc, multiplier);

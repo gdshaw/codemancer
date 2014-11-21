@@ -87,6 +87,20 @@ public abstract class Expression {
 		return this;
 	}
 
+	/** Attempt to solve for a given variable.
+	 * A limitation of the current implementation is that it does
+	 * not correctly handle the case where the value to be solved
+	 * for occurs more than once in the supplied expression.
+	 * @param solveFor the variable for which a solution is required,
+	 *  in the form of a reference.
+	 * @param placeholder an expression (most likely a reference)
+	 *  to be used to represent the value of this expression
+	 * @return the solution, or null if not found
+	 */
+	public Expression solve(Reference solveFor, Expression placeholder) {
+		return null;
+	}
+
 	/** Add the terms of this expression to an accumulator.
 	 * By default this expression is added whole, but if it can be broken
 	 * into multiple terms then they should be added separately.

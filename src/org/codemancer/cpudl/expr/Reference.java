@@ -88,6 +88,13 @@ public class Reference extends Expression {
 		return result;
 	}
 
+	public Expression solve(Reference solveFor, Expression placeholder) {
+		if (name.equals(solveFor.getName())) {
+			return placeholder;
+		}
+		return null;
+	}
+
 	/** Make reference from XML element.
 	 * @param element the reference as XML
 	 * @return the reference as an object
