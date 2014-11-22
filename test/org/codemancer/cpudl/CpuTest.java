@@ -11,6 +11,8 @@ import java.io.BufferedReader;
 import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -106,7 +108,11 @@ public class CpuTest {
 
 		Expression expr = start.decode(readers);
 		assertTrue(expr != null);
-		Expression effect = expr.resolve(null, null, false);
+		expr = expr.resolveReferences(null, null);
+
+		Map<String, Expression> registers = new HashMap<String, Expression>();
+		registers.put("PC", new Constant(null, 0));
+		expr = expr.resolveRegisters(registers).simplify();
 
 		EphemeralState state = new EphemeralState();
 		for (int i = 0; i != preconds.length; ++i) {
@@ -123,7 +129,7 @@ public class CpuTest {
 				state.put((Memory)lvalue, rvalue);
 			}
 		}
-		if (effect != null) effect.evaluate(state);
+		expr.evaluate(state);
 
 		for (int i = 0; i != postconds.length; ++i) {
 			String postcond = postconds[i];
@@ -147,7 +153,7 @@ public class CpuTest {
 		for (int i = 0; i != start.getPieceCount(); ++i) {
 			String asm = start.unparse(i, expr);
 			if (i + 1 < fields.length) {
-				assertEquals(fields[i + 1].replace(" ", ""), asm);
+				assertEquals(fields[i + 1], asm);
 			} else {
 				assertEquals(new String(), asm);
 			}

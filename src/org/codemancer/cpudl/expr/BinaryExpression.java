@@ -58,11 +58,15 @@ public abstract class BinaryExpression extends Expression {
 		return rhs;
 	}
 
-	public Expression resolve(Fragment frag, Map<String, Expression> args, boolean part)
-		throws CpudlReferenceException {
+	public Expression resolveReferences(Fragment frag, Map<String, Expression> args) {
+		Expression resolvedLhs = lhs.resolveReferences(frag, args);
+		Expression resolvedRhs = rhs.resolveReferences(frag, args);
+		return partialClone(resolvedLhs, resolvedRhs);
+	}
 
-		Expression resolvedLhs = lhs.resolve(frag, args, part);
-		Expression resolvedRhs = rhs.resolve(frag, args, part);
+	public Expression resolveRegisters(Map<String, Expression> registers) {
+		Expression resolvedLhs = lhs.resolveRegisters(registers);
+		Expression resolvedRhs = rhs.resolveRegisters(registers);
 		return partialClone(resolvedLhs, resolvedRhs);
 	}
 

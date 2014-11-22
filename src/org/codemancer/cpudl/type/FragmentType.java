@@ -169,15 +169,7 @@ public class FragmentType extends Type {
 			String name = entry.getKey();
 			MemberInfo member = entry.getValue();
 			if (frag.get(name) == null) {
-
-
-				if (member.solution == null) {
-					System.err.printf("No solution for %s\n", name);
-				}
-
-
-
-				Expression value = member.solution.resolve(frag, null, true);
+				Expression value = member.solution.resolveReferences(frag, null);
 				frag.put(name, value);
 			}
 		}
@@ -189,7 +181,7 @@ public class FragmentType extends Type {
 	 */
 	boolean check(Fragment frag) {
 		for (Expression constraint: constraints) {
-			Expression result = constraint.resolve(frag, null, true).simplify();
+			Expression result = constraint.resolveReferences(frag, null).simplify();
 			if (!(result instanceof Constant)) return false;
 			Constant constResult = (Constant)result;
 			if (constResult.getValue() == 0) return false;

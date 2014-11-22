@@ -40,10 +40,12 @@ public class Memory extends Expression {
 		return "[" + address.unparse(style) + "]";
 	}
 
-	public Expression resolve(Fragment frag, Map<String, Expression> args, boolean part)
-		throws CpudlReferenceException {
+	public Expression resolveReferences(Fragment frag, Map<String, Expression> args) {
+		return new Memory(getType(), address.resolveReferences(frag, args));
+	}
 
-		return new Memory(getType(), address.resolve(frag, args, part));
+	public Expression resolveRegisters(Map<String, Expression> registers) {
+		return new Memory(getType(), address.resolveRegisters(registers));
 	}
 
 	public void assign(State state, Expression value) {

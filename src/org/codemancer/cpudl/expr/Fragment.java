@@ -57,10 +57,45 @@ public class Fragment extends Expression {
 		this.effect = effect;
 	}
 
-	public Expression resolve(Fragment frag, Map<String, Expression> args, boolean part)
+	public Expression resolveReferences(Fragment frag, Map<String, Expression> args)
 		throws CpudlReferenceException {
 
-		return (effect != null) ? effect.resolve(this, args, part) : null;
+		Fragment resolvedFragment = new Fragment(getType());
+		for (Map.Entry<String, Expression> entry: members.entrySet()) {
+			Expression resolvedValue = entry.getValue().resolveReferences(this, args);
+			resolvedFragment.put(entry.getKey(), resolvedValue);
+		}
+		if (effect != null) {
+			Expression resolvedEffect = effect.resolveReferences(this, args);
+			resolvedFragment.setEffect(resolvedEffect);
+		}
+		return resolvedFragment;
+	}
+
+	public Expression resolveRegisters(Map<String, Expression> registers) {
+		Fragment resolvedFragment = new Fragment(getType());
+		for (Map.Entry<String, Expression> entry: members.entrySet()) {
+			Expression resolvedValue = entry.getValue().resolveRegisters(registers);
+			resolvedFragment.put(entry.getKey(), resolvedValue);
+		}
+		if (effect != null) {
+			Expression resolvedEffect = effect.resolveRegisters(registers);
+			resolvedFragment.setEffect(resolvedEffect);
+		}
+		return resolvedFragment;
+	}
+
+	public Expression simplify() {
+		Fragment simplifiedFragment = new Fragment(getType());
+		for (Map.Entry<String, Expression> entry: members.entrySet()) {
+			Expression simplifiedValue = entry.getValue().simplify();
+			simplifiedFragment.put(entry.getKey(), simplifiedValue);
+		}
+		if (effect != null) {
+			Expression simplifiedEffect = effect.simplify();
+			simplifiedFragment.setEffect(simplifiedEffect);
+		}
+		return simplifiedFragment;
 	}
 
 	public String unparse(Style style) {

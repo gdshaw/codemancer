@@ -5,6 +5,7 @@
 
 package org.codemancer.cpudl.expr;
 
+import java.util.Map;
 import java.util.HashMap;
 import org.w3c.dom.Element;
 
@@ -36,6 +37,12 @@ public class Register extends Expression {
 
 	public String unparse(Style style) {
 		return name;
+	}
+
+	public Expression resolveRegisters(Map<String, Expression> registers) {
+		Expression value = registers.get(name);
+		if (value != null) return value;
+		return this;
 	}
 
 	public void assign(State state, Expression value) {

@@ -46,13 +46,17 @@ public abstract class Expression {
 	/** Recursively resolve references within this expression.
 	 * @param frag the instruction fragment that is currently in scope, or null if none
 	 * @param args the arguments that are currently in scope, or null if none
-	 * @param part true if it is acceptable for references to be left unresolved
-	 *  where necessary, otherwise false
 	 * @return the resolved expression
 	 */
-	public Expression resolve(Fragment frag, Map<String, Expression> args, boolean part)
-		throws CpudlReferenceException {
+	public Expression resolveReferences(Fragment frag, Map<String, Expression> args) {
+		return this;
+	}
 
+	/** Recursively resolve register values within this expression.
+	 * @param state the known register values
+	 * @return the resolved expression
+	 */
+	public Expression resolveRegisters(Map<String, Expression> registers) {
 		return this;
 	}
 

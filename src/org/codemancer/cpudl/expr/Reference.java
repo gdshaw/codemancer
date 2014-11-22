@@ -48,14 +48,13 @@ public class Reference extends Expression {
 		return sb.toString();
 	}
 
-	public Expression resolve(Fragment frag, Map<String, Expression> args, boolean part)
-		throws CpudlReferenceException {
+	public Expression resolveReferences(Fragment frag, Map<String, Expression> args) {
 
 		// Resolve the supplied argument list, so far as is possible, in the current context.
 		Map<String, Expression> resolvedArgs = new HashMap<String, Expression>();
 		if (this.args != null) {
 			for (Map.Entry<String, Expression> entry: this.args.entrySet()) {
-				resolvedArgs.put(entry.getKey(), entry.getValue().resolve(frag, args, true));
+				resolvedArgs.put(entry.getKey(), entry.getValue().resolveReferences(frag, args));
 			}
 		}
 
@@ -72,17 +71,13 @@ public class Reference extends Expression {
 
 		// If the name was resolved then resolve the associated value.
 		if (result != null) {
-			result = result.resolve(frag, resolvedArgs, part);
+			result = result.resolveReferences(frag, resolvedArgs);
 		}
 
 		// If resolution failed then either throw an exception or return
 		// this unresolved reference, as appropriate.
 		if (result == null) {
-			if (part) {
-				result = new Reference(getType(), name, resolvedArgs);
-			} else {
-				throw new CpudlReferenceException(name);
-			}
+			result = new Reference(getType(), name, resolvedArgs);
 		}
 
 		return result;
