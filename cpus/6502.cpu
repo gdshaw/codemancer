@@ -1209,7 +1209,7 @@ GNU General Public License (version 3 or any later version).
     <memory>
      <add>
       <const>255</const>
-      <register name="SP"/>
+      <register name="S"/>
      </add>
     </memory>
     <register name="PC"/>
@@ -1218,15 +1218,15 @@ GNU General Public License (version 3 or any later version).
     <memory>
      <add>
       <const>254</const>
-      <register name="SP"/>
+      <register name="S"/>
      </add>
     </memory>
     <register name="P"/>
    </assign>
    <assign>
-    <register name="SP"/>
+    <register name="S"/>
     <sub>
-     <register name="SP"/>
+     <register name="S"/>
      <const>3</const>
     </sub>
    </assign>
@@ -1258,15 +1258,15 @@ GNU General Public License (version 3 or any later version).
     <memory>
      <add>
       <const>255</const>
-      <register name="SP"/>
+      <register name="S"/>
      </add>
     </memory>
     <register name="PC"/>
    </assign>
    <assign>
-    <register name="SP"/>
+    <register name="S"/>
     <sub>
-     <register name="SP"/>
+     <register name="S"/>
      <const>2</const>
     </sub>
    </assign>
@@ -1293,7 +1293,7 @@ GNU General Public License (version 3 or any later version).
     <memory>
      <add>
       <const>257</const>
-      <register name="SP"/>
+      <register name="S"/>
      </add>
     </memory>
    </assign>
@@ -1303,16 +1303,16 @@ GNU General Public License (version 3 or any later version).
      <memory>
       <add>
        <const>258</const>
-       <register name="SP"/>
+       <register name="S"/>
       </add>
      </memory>
      <const>1</const>
     </add>
    </assign>
    <assign>
-    <register name="SP"/>
+    <register name="S"/>
     <add>
-     <register name="SP"/>
+     <register name="S"/>
      <const>3</const>
     </add>
    </assign>
@@ -1336,16 +1336,16 @@ GNU General Public License (version 3 or any later version).
      <memory>
       <add>
        <const>257</const>
-       <register name="SP"/>
+       <register name="S"/>
       </add>
      </memory>
      <const>1</const>
     </add>
    </assign>
    <assign>
-    <register name="SP"/>
+    <register name="S"/>
     <add>
-     <register name="SP"/>
+     <register name="S"/>
      <const>2</const>
     </add>
    </assign>
