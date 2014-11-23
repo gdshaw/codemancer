@@ -22,6 +22,21 @@ GNU General Public License (version 3 or any later version).
  </select>
 </style>
 
+<register name="A" size="8"/>
+<register name="X" size="8"/>
+<register name="Y" size="8"/>
+<register name="S" size="8"/>
+<register name="P" size="8"/>
+<register name="PC" size="16"/>
+
+<register name="N" size="1"/>
+<register name="V" size="1"/>
+<register name="B" size="1"/>
+<register name="D" size="1"/>
+<register name="I" size="1"/>
+<register name="Z" size="1"/>
+<register name="C" size="1"/>
+
 <define name="indx-mode">
  <fragment>
   <var name="addr">
@@ -327,7 +342,7 @@ GNU General Public License (version 3 or any later version).
    <literal>P</literal>
   </phrase>
   <effect>
-   <register name="SR"/>
+   <register name="P"/>
   </effect>
  </fragment>
 
@@ -1084,7 +1099,7 @@ GNU General Public License (version 3 or any later version).
       <register name="SP"/>
      </add>
     </memory>
-    <register name="SR"/>
+    <register name="P"/>
    </assign>
    <assign>
     <register name="SP"/>
@@ -1152,7 +1167,7 @@ GNU General Public License (version 3 or any later version).
   <phrase></phrase>
   <effect>
    <assign>
-    <register name="SR"/>
+    <register name="P"/>
     <memory>
      <add>
       <const>257</const>

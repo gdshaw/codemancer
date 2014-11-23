@@ -17,6 +17,19 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   <property name="whitespace" value=" "/>
  </style>
 
+ <register name="B" size="8"/>
+ <register name="C" size="8"/>
+ <register name="D" size="8"/>
+ <register name="E" size="8"/>
+ <register name="H" size="8"/>
+ <register name="L" size="8"/>
+ <register name="A" size="8"/>
+ <register name="F" size="8"/>
+ <register name="BC" size="16"/>
+ <register name="DE" size="16"/>
+ <register name="HL" size="16"/>
+ <register name="SP" size="16"/>
+
  <define name="reg8">
   <fragment>
    <pattern>

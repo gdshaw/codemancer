@@ -26,8 +26,11 @@ public class Architecture {
 	/** A type which describes any instruction of this architecture. */
 	private Type start = null;
 
-	/** The types defined by this architecture, indexed by name. */
+	/** The fragment types defined by this architecture, indexed by name. */
 	private final HashMap<String, Type> types = new HashMap<String, Type>();
+
+	/** The registers defined by this architecture, indexed by name. */
+	private final HashMap<String, RegisterDef> registers = new HashMap<String, RegisterDef>();
 
 	/** The stylesheet for this architecture. */
 	private Stylesheet stylesheet = new Stylesheet();
@@ -54,6 +57,13 @@ public class Architecture {
 					}
 					Type type = ctx.makeChoice(childElement);
 					types.put(typeName, type);
+				} else if (tagName.equals("register")) {
+					RegisterDef register = RegisterDef.make(childElement);
+					if (registers.get(register.getName()) != null) {
+						throw new CpudlParseException(childElement,
+							"multiple definitions for register '" + register.getName() + "'");
+					}
+					registers.put(register.getName(), register);
 				} else if (tagName.equals("style")) {
 					stylesheet.merge(childElement);
 				}
@@ -76,6 +86,14 @@ public class Architecture {
 	 */
 	public final Type getType(String typeName) {
 		return types.get(typeName);
+	}
+
+	/** Get register.
+	 * @param registerName the required register name
+	 * @return the corresponding register, or null if not found
+	 */
+	public final RegisterDef getRegister(String registerName) {
+		return registers.get(registerName);
 	}
 
 	/** Get stylesheet.
