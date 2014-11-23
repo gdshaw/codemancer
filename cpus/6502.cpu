@@ -37,6 +37,128 @@ GNU General Public License (version 3 or any later version).
 <register name="Z" size="1"/>
 <register name="C" size="1"/>
 
+<define name="cc">
+ <fragment>
+  <pattern>
+   <const>000</const>
+  </pattern>
+  <phrase>
+   <literal>PL</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <ref name="N"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>100</const>
+  </pattern>
+  <phrase>
+   <literal>MI</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <ref name="N"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>010</const>
+  </pattern>
+  <phrase>
+   <literal>VC</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <ref name="V"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>110</const>
+  </pattern>
+  <phrase>
+   <literal>VS</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <ref name="V"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>001</const>
+  </pattern>
+  <phrase>
+   <literal>CC</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <ref name="C"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>101</const>
+  </pattern>
+  <phrase>
+   <literal>CS</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <ref name="C"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>011</const>
+  </pattern>
+  <phrase>
+   <literal>NE</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <ref name="Z"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>111</const>
+  </pattern>
+  <phrase>
+   <literal>EQ</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <ref name="Z"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+</define>
+
 <define name="indx-mode">
  <fragment>
   <var name="addr">
@@ -1252,6 +1374,40 @@ GNU General Public License (version 3 or any later version).
     <ref name="addr"/>
    </assign>
   </effect>
+ </fragment>
+
+ <fragment>
+  <var name="cc">
+   <ref name="cc"/>
+  </var>
+  <var name="offset">
+   <integer size="8" encoding="2c"/>
+  </var>
+  <var name="addr">
+   <integer class="abs" size="16"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="addr"/>
+    <add>
+     <register name="PC"/>
+     <const>2</const>
+     <ref name="offset"/>
+    </add>
+   </equals>
+  </where>
+  <pattern>
+   <const>00001</const>
+   <ref name="cc"/>
+   <ref name="offset"/>
+  </pattern>
+  <phrase>
+   <literal>B</literal>
+   <ref name="cc"/>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
  </fragment>
 
  <fragment>

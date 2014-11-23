@@ -42,6 +42,7 @@ public class CpuTest {
 	String[] fields;
 	String[] preconds;
 	String[] postconds;
+	long pc;
 
 	private static int parseHexValue(char c) {
 		if ((c >= '0') && (c <= '9')) {
@@ -77,7 +78,7 @@ public class CpuTest {
 		return new Constant(null, Long.parseLong(s, 16));
 	}
 
-	public CpuTest(Architecture arch, String line, String setup) throws Exception {
+	public CpuTest(Architecture arch, String line, String setup, Long pc) throws Exception {
 		this.arch = arch;
 		this.start = arch.getStart();
 
@@ -98,6 +99,7 @@ public class CpuTest {
 		}
 
 		this.preconds = setup.split(",");
+		this.pc = pc;
 	}
 
 	@Test
@@ -112,7 +114,7 @@ public class CpuTest {
 		expr = expr.resolveReferences(null, null);
 
 		Map<String, Expression> registers = new HashMap<String, Expression>();
-		registers.put("PC", new Constant(null, 0));
+		registers.put("PC", new Constant(null, pc));
 		expr = expr.resolveRegisters(registers).simplify();
 
 		Context ctx = new Context(arch);
@@ -166,6 +168,7 @@ public class CpuTest {
 	public static Collection<Object[]> getParameters() throws Exception {
 		Collection<Object[]> params = new ArrayList<Object[]>();
 		String setup = new String();
+		Long pc = new Long(0);
 		File[] testFiles = new File("testdata/cpus").listFiles();
 		for (int i = 0; i != testFiles.length; ++i) {
 			File testFile = testFiles[i];
@@ -178,12 +181,18 @@ public class CpuTest {
 				String line = null;
 				while ((line = reader.readLine()) != null) {
 					if (line.length() == 0) continue;
-					if (line.charAt(0) == ';') continue;
-					if (line.charAt(0) == '!') {
+					switch (line.charAt(0)) {
+					case ';':
+						continue;
+					case '!':
 						setup = line.substring(1, line.length());
 						continue;
+					case '@':
+						pc = Long.parseLong(line.substring(1, line.length()), 16);
+						continue;
+					default:
+						params.add(new Object[] {arch, line, setup, pc});
 					}
-					params.add(new Object[] {arch, line, setup});
 				}
 			}
 		}
