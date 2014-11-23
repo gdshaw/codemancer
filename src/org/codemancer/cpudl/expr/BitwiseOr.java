@@ -47,7 +47,7 @@ public class BitwiseOr extends BinaryExpression {
 				if (result == null) {
 					result = operand;
 				} else {
-					result = new BitwiseOr(null, result, operand);
+					result = new BitwiseOr(result.getType(), result, operand);
 				}
 			}
 			child = child.getNextSibling();

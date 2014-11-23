@@ -47,7 +47,7 @@ public class BitwiseAnd extends BinaryExpression {
 				if (result == null) {
 					result = operand;
 				} else {
-					result = new BitwiseAnd(null, result, operand);
+					result = new BitwiseAnd(result.getType(), result, operand);
 				}
 			}
 			child = child.getNextSibling();

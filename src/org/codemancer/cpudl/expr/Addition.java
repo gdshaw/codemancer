@@ -31,7 +31,7 @@ public class Addition extends BinaryExpression {
 	}
 
 	public Expression simplify() {
-		Accumulator acc = new Accumulator();
+		Accumulator acc = new Accumulator(getLhs().getType());
 		accumulate(acc, 1);
 		return acc.simplify();
 	}
@@ -70,7 +70,7 @@ public class Addition extends BinaryExpression {
 				if (result == null) {
 					result = operand;
 				} else {
-					result = new Addition(null, result, operand);
+					result = new Addition(result.getType(), result, operand);
 				}
 			}
 			child = child.getNextSibling();

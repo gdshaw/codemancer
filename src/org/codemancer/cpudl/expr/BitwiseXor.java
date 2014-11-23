@@ -47,7 +47,7 @@ public class BitwiseXor extends BinaryExpression {
 				if (result == null) {
 					result = operand;
 				} else {
-					result = new BitwiseXor(null, result, operand);
+					result = new BitwiseXor(result.getType(), result, operand);
 				}
 			}
 			child = child.getNextSibling();
