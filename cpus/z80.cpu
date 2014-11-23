@@ -10,6 +10,13 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
 -->
 
 <cpudl>
+ <style>
+  <property name="base" value="16"/>
+  <property name="prefix" value=""/>
+  <property name="suffix" value="H"/>
+  <property name="whitespace" value=" "/>
+ </style>
+
  <define name="reg8">
   <fragment>
    <pattern>
@@ -377,7 +384,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    </phrase>
    <phrase>
     <ref name="rd"/>
-    <literal>,</literal>
+    <literal>,</literal><ws/>
     <ref name="rs"/>
    </phrase>
    <effect>
@@ -406,7 +413,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
     <ref name="opcode"/>
    </phrase>
    <phrase>
-    <literal>A,</literal>
+    <literal>A,</literal><ws/>
     <ref name="r"/>
    </phrase>
    <effect>
@@ -490,7 +497,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    </phrase>
    <phrase>
     <ref name="r"/>
-    <literal>,</literal>
+    <literal>,</literal><ws/>
     <ref name="imm"/>
    </phrase>
    <effect>
@@ -519,7 +526,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    </phrase>
    <phrase>
     <ref name="r"/>
-    <literal>,</literal>
+    <literal>,</literal><ws/>
     <ref name="imm"/>
    </phrase>
    <effect>
@@ -538,7 +545,8 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
     <literal>LD</literal>
    </phrase>
    <phrase>
-    <literal>SP,HL</literal>
+    <literal>SP,</literal><ws/>
+    <literal>HL</literal>
    </phrase>
    <effect>
     <assign>
@@ -561,7 +569,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
     <literal>ADD</literal>
    </phrase>
    <phrase>
-    <literal>HL,</literal>
+    <literal>HL,</literal><ws/>
     <ref name="r"/>
    </phrase>
    <effect>
