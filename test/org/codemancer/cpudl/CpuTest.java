@@ -98,7 +98,7 @@ public class CpuTest {
 			code = code.concat(new ShortBitString(v, 8));
 		}
 
-		this.preconds = setup.split(",");
+		this.preconds = (setup.isEmpty()) ? new String[0] : setup.split(",");
 		this.pc = pc;
 	}
 
