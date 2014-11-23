@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
+import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.State;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.type.Type;
@@ -38,14 +39,15 @@ public class Assignment extends BinaryExpression {
 	}
 
 	/** Make assignment operation from XML element.
+	 * @param ctx the context of this expression
 	 * @param the expression as an XML element
 	 * @return the expression as an object
 	 */
-	public static Expression make(Element element) throws CpudlParseException {
+	public static Expression make(Context ctx, Element element) throws CpudlParseException {
 		ArrayList<Expression> operands = new ArrayList<Expression>();
 		Node child = element.getFirstChild();
 		while (child != null) {
-			Expression operand = Expression.make(child);
+			Expression operand = ctx.makeExpression(child);
 			if (operand != null) {
 				operands.add(operand);
 			}

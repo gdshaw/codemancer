@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
+import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.type.Type;
 
@@ -48,14 +49,15 @@ public class Equality extends BinaryExpression {
 	}
 
 	/** Make equality expression from XML element.
+	 * @param ctx the context of this expression
 	 * @param element the equality as an XML element
 	 * @return the equality as an object
 	 */
-	public static Expression make(Element element) throws CpudlParseException {
+	public static Expression make(Context ctx, Element element) throws CpudlParseException {
 		List<Expression> operands = new ArrayList<Expression>();
 		Node child = element.getFirstChild();
 		while (child != null) {
-			Expression operand = Expression.make(child);
+			Expression operand = ctx.makeExpression(child);
 			if (operand != null) {
 				operands.add(operand);
 			}

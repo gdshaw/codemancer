@@ -7,6 +7,7 @@ package org.codemancer.cpudl.expr;
 
 import org.w3c.dom.Element;
 
+import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.type.Type;
 
@@ -57,10 +58,11 @@ public class Constant extends Expression {
 	}
 
 	/** Make constant from XML element.
+	 * @param ctx the context of this expression
 	 * @param el the constant as XML
 	 * @return a corresponding expression
 	 */
-	public static Constant make(Element el) {
+	public static Constant make(Context ctx, Element el) {
 		return new Constant(null, Long.decode(el.getTextContent()));
 	}
 }

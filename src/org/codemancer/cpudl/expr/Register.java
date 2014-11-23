@@ -9,10 +9,13 @@ import java.util.Map;
 import java.util.HashMap;
 import org.w3c.dom.Element;
 
+import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.State;
 import org.codemancer.cpudl.Style;
+import org.codemancer.cpudl.RegisterDef;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.type.Type;
+import org.codemancer.cpudl.type.IntegerType;
 
 /** An expression class to represent a reference to a register. */
 public class Register extends Expression {
@@ -61,27 +64,33 @@ public class Register extends Expression {
 	/** Make register reference from register name.
 	 * References to a given register obtained using this method
 	 * are guaranteed to refer to the same object.
+	 * @param ctx the context of this expression
 	 * @param name the register name
 	 * @return the register reference
 	 */
-	public static Register make(String name) {
+	public static Register make(Context ctx, String name) {
 		Register register = registers.get(name);
 		if (register == null) {
-			register = new Register(null, name);
+			RegisterDef def = ctx.getArchitecture().getRegister(name);
+			if (def == null) {
+				throw new IllegalArgumentException("undefined register '" + name + "'");
+			}
+			register = new Register(def.getType(), name);
 			registers.put(name, register);
 		}
 		return register;
 	}
 
 	/** Make register reference from XML element.
+	 * @param ctx the context of this expression
 	 * @param element the register reference as XML
 	 * @return the register reference as an object
 	 */
-	public static Register make(Element element) throws CpudlParseException {
+	public static Register make(Context ctx, Element element) throws CpudlParseException {
 		String name = element.getAttribute("name");
 		if (name == null) {
 			throw new CpudlParseException(element, "register name not specified");
 		}
-		return make(name);
+		return make(ctx, name);
 	}
 }

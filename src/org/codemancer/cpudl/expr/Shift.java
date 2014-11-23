@@ -8,6 +8,7 @@ package org.codemancer.cpudl.expr;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
+import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.expr.Addition;
 import org.codemancer.cpudl.type.Type;
@@ -68,10 +69,11 @@ public class Shift extends BinaryExpression {
 	 * a shift expression.
 	 * If there is only one subexpression then the result is that subexpression.
 	 * If there are no subexpressions then the result is zero.
+	 * @param ctx the context of this expression
 	 * @param the expression as an XML element
 	 * @return the expression as an object
 	 */
-	public static Expression make(Element element) throws CpudlParseException {
+	public static Expression make(Context ctx, Element element) throws CpudlParseException {
 		int width = Integer.decode(element.getAttribute("width"));
 
 		String methodString = element.getAttribute("method");
@@ -93,7 +95,7 @@ public class Shift extends BinaryExpression {
 		Expression result = null;
 		Node child = element.getFirstChild();
 		while (child != null) {
-			Expression operand = Expression.make(child);
+			Expression operand = ctx.makeExpression(child);
 			if (operand != null) {
 				if (result == null) {
 					result = operand;

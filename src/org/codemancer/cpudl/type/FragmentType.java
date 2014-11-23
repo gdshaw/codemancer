@@ -143,7 +143,7 @@ public class FragmentType extends Type {
 		if (effect != null) {
 			throw new CpudlParseException(element, "multiple <effect> elements in <fragment>");
 		}
-		effect = Sequence.make(element);
+		effect = Sequence.make(ctx, element);
 	}
 
 	/** Parse constraints.
@@ -153,7 +153,7 @@ public class FragmentType extends Type {
 	private final void parseConstraints(Context ctx, Element element) throws CpudlParseException {
 		Node child = element.getFirstChild();
 		while (child != null) {
-			Expression constraint = Expression.make(child);
+			Expression constraint = ctx.makeExpression(child);
 			if (constraint != null) {
 				constraints.add(constraint);
 			}

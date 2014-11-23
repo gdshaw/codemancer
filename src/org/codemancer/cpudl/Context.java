@@ -16,6 +16,21 @@ import org.codemancer.cpudl.type.Whitespace;
 import org.codemancer.cpudl.type.IntegerType;
 import org.codemancer.cpudl.type.FragmentType;
 import org.codemancer.cpudl.type.Choice;
+import org.codemancer.cpudl.expr.Expression;
+import org.codemancer.cpudl.expr.Reference;
+import org.codemancer.cpudl.expr.Constant;
+import org.codemancer.cpudl.expr.Register;
+import org.codemancer.cpudl.expr.Memory;
+import org.codemancer.cpudl.expr.Addition;
+import org.codemancer.cpudl.expr.Subtraction;
+import org.codemancer.cpudl.expr.Multiplication;
+import org.codemancer.cpudl.expr.BitwiseAnd;
+import org.codemancer.cpudl.expr.BitwiseOr;
+import org.codemancer.cpudl.expr.BitwiseXor;
+import org.codemancer.cpudl.expr.Shift;
+import org.codemancer.cpudl.expr.Equality;
+import org.codemancer.cpudl.expr.Assignment;
+import org.codemancer.cpudl.expr.Sequence;
 
 /** The static context within which a CPUDL element should be interpreted. */
 public class Context {
@@ -102,6 +117,49 @@ public class Context {
 			return types.get(0);
 		} else {
 			return new Choice(types);
+		}
+	}
+
+	/** Make expression from XML node.
+	 * @param node the expression as XML
+	 * @return a corresponding expression, or null if the node is not an expression
+	 */
+	public Expression makeExpression(Node node) throws CpudlParseException {
+		if (!(node instanceof Element)) {
+			return null;
+		}
+		Element el = (Element)node;
+		String tagName = el.getTagName();
+		if (tagName.equals("ref")) {
+			return Reference.make(this, el);
+		} else if (tagName.equals("const")) {
+			return Constant.make(this, el);
+		} else if (tagName.equals("register")) {
+			return Register.make(this, el);
+		} else if (tagName.equals("memory")) {
+			return Memory.make(this, el);
+		} else if (tagName.equals("add")) {
+			return Addition.make(this, el);
+		} else if (tagName.equals("sub")) {
+			return Subtraction.make(this, el);
+		} else if (tagName.equals("mul")) {
+			return Multiplication.make(this, el);
+		} else if (tagName.equals("and")) {
+			return BitwiseAnd.make(this, el);
+		} else if (tagName.equals("or")) {
+			return BitwiseOr.make(this, el);
+		} else if (tagName.equals("xor")) {
+			return BitwiseXor.make(this, el);
+		} else if (tagName.equals("shift")) {
+			return Shift.make(this, el);
+		} else if (tagName.equals("equals")) {
+			return Equality.make(this, el);
+		} else if (tagName.equals("assign")) {
+			return Assignment.make(this, el);
+		} else if (tagName.equals("sequence")) {
+			return Sequence.make(this, el);
+		} else {
+			return null;
 		}
 	}
 }

@@ -11,8 +11,6 @@ import java.io.BufferedReader;
 import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -26,7 +24,6 @@ import org.codemancer.cpudl.ShortBitString;
 import org.codemancer.cpudl.Architecture;
 import org.codemancer.cpudl.EphemeralState;
 import org.codemancer.cpudl.Style;
-import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.type.Type;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Constant;
@@ -55,7 +52,7 @@ public class CpuTest {
 		}
 	}
 
-	private static Expression parseLvalue(Context ctx, String s) {
+	private static Expression parseLvalue(String s) {
 		if (s.length() == 0) {
 			throw new IllegalArgumentException("l-value in pre/post-condition is empty string");
 		}
@@ -66,7 +63,7 @@ public class CpuTest {
 			long addr = Long.parseLong(s.substring(1, s.length() - 1), 16);
 			return new Memory(null, new Constant(null, addr));
 		} else {
-			return Register.make(ctx, s);
+			return Register.make(s);
 		}
 	}
 
@@ -109,13 +106,8 @@ public class CpuTest {
 
 		Expression expr = start.decode(readers);
 		assertTrue(expr != null);
-		expr = expr.resolveReferences(null, null);
+		Expression effect = expr.resolve(null, null, false);
 
-		Map<String, Expression> registers = new HashMap<String, Expression>();
-		registers.put("PC", new Constant(null, 0));
-		expr = expr.resolveRegisters(registers).simplify();
-
-		Context ctx = new Context(arch);
 		EphemeralState state = new EphemeralState();
 		for (int i = 0; i != preconds.length; ++i) {
 			String precond = preconds[i];
@@ -123,7 +115,7 @@ public class CpuTest {
 			if (f == -1) {
 				throw new IllegalArgumentException("missing = in precondition");
 			}
-			Expression lvalue = parseLvalue(ctx, precond.substring(0, f));
+			Expression lvalue = parseLvalue(precond.substring(0, f));
 			Expression rvalue = parseRvalue(precond.substring(f + 1, precond.length()));
 			if (lvalue instanceof Register) {
 				state.put((Register)lvalue, rvalue);
@@ -131,7 +123,7 @@ public class CpuTest {
 				state.put((Memory)lvalue, rvalue);
 			}
 		}
-		expr.evaluate(state);
+		if (effect != null) effect.evaluate(state);
 
 		for (int i = 0; i != postconds.length; ++i) {
 			String postcond = postconds[i];
@@ -139,7 +131,7 @@ public class CpuTest {
 			if (f == -1) {
 				throw new IllegalArgumentException("missing = in postcondition");
 			}
-			Expression lvalue = parseLvalue(ctx, postcond.substring(0, f));
+			Expression lvalue = parseLvalue(postcond.substring(0, f));
 			String expected = postcond.substring(f + 1, postcond.length());
 			if (lvalue instanceof Register) {
 				String found = state.get((Register)lvalue).unparse(style);
@@ -155,7 +147,7 @@ public class CpuTest {
 		for (int i = 0; i != start.getPieceCount(); ++i) {
 			String asm = start.unparse(i, expr);
 			if (i + 1 < fields.length) {
-				assertEquals(fields[i + 1], asm);
+				assertEquals(fields[i + 1].replace(" ", ""), asm);
 			} else {
 				assertEquals(new String(), asm);
 			}
@@ -165,7 +157,6 @@ public class CpuTest {
 	@Parameters
 	public static Collection<Object[]> getParameters() throws Exception {
 		Collection<Object[]> params = new ArrayList<Object[]>();
-		String setup = new String();
 		File[] testFiles = new File("testdata/cpus").listFiles();
 		for (int i = 0; i != testFiles.length; ++i) {
 			File testFile = testFiles[i];
@@ -175,6 +166,7 @@ public class CpuTest {
 				Architecture arch = Architecture.makeArchitecture(architectureName);
 				String testDataPath = "testdata/cpus/" + architectureName + ".test";
 				BufferedReader reader = new BufferedReader(new FileReader(testDataPath));
+				String setup = new String();
 				String line = null;
 				while ((line = reader.readLine()) != null) {
 					if (line.length() == 0) continue;

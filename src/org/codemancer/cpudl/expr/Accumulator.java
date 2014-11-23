@@ -8,13 +8,35 @@ package org.codemancer.cpudl.expr;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.codemancer.cpudl.type.Type;
+import org.codemancer.cpudl.type.IntegerType;
+
 /** A class for collecting terms when simplifying an addition or subtraction. */
 public class Accumulator {
+	/** The result type for this accumulator. */
+	Type type;
+
 	/** The accumulated non-constant terms, indexed by expression. */
 	Map<Expression, Long> terms = new HashMap<Expression, Long>();
 
 	/** The accumulated constant term. */
 	long constantTerm = 0;
+
+	/** The result mask. */
+	long resultMask = -1L;
+
+	/** Construct accumulator of given type.
+	 * @param type the result type for this accumulator
+	 */
+	public Accumulator(Type type) {
+		this.type = type;
+		if (type instanceof IntegerType) {
+			int size = ((IntegerType)type).getSize();
+			if (size < 64) {
+				resultMask = (1L << size) - 1;
+			}
+		}
+	}
 
 	/** Add a given term to this accumulator
 	 * @param term the term to be added, or null for a constant term
@@ -41,40 +63,42 @@ public class Accumulator {
 	 * @return the simplified content
 	 */
 	public final Expression simplify() {
+		constantTerm &= resultMask;
+
 		Expression result = null;
 		for (Map.Entry<Expression, Long> entry: terms.entrySet()) {
 			Expression term = entry.getKey();
 			long multiplier = entry.getValue();
 			if (multiplier > 1) {
-				term = new Multiplication(term.getType(), new Constant(null, multiplier), term);
+				term = new Multiplication(type, new Constant(type, multiplier), term);
 			}
 			if (multiplier > 0) {
 				if (result == null) {
 					result = term;
 				} else {
-					result = new Addition(term.getType(), result, term);
+					result = new Addition(type, result, term);
 				}
 			}
 		}
 		if (result == null) {
-			result = new Constant(null, constantTerm);
+			result = new Constant(type, constantTerm);
 			constantTerm = 0;
 		} else if (constantTerm > 0) {
-			result = new Addition(result.getType(), result, new Constant(null, constantTerm));
+			result = new Addition(type, result, new Constant(type, constantTerm));
 			constantTerm = 0;
 		}
 		for (Map.Entry<Expression, Long> entry: terms.entrySet()) {
 			Expression term = entry.getKey();
 			long multiplier = entry.getValue();
 			if (multiplier < -1) {
-				term = new Multiplication(term.getType(), new Constant(null, -multiplier), term);
+				term = new Multiplication(type, new Constant(type, -multiplier), term);
 			}
 			if (multiplier < 0) {
-				result = new Subtraction(term.getType(), result, term);
+				result = new Subtraction(type, result, term);
 			}
 		}
 		if (constantTerm < 0) {
-			result = new Subtraction(result.getType(), result, new Constant(null, -constantTerm));
+			result = new Subtraction(type, result, new Constant(type, -constantTerm));
 			constantTerm = 0;
 		}
 		return result;

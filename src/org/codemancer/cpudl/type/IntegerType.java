@@ -78,6 +78,10 @@ public class IntegerType extends Type {
 		this.style = ctx.getStylesheet().getStyle(element.getAttribute("class"));
 	}
 
+	public final int getSize() {
+		return size;
+	}
+
 	public final int getChunkCount() {
 		return 1;
 	}

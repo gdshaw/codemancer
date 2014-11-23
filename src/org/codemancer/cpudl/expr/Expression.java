@@ -114,47 +114,4 @@ public abstract class Expression {
 	public void accumulate(Accumulator acc, long multiplier) {
 		acc.accumulate(this, multiplier);
 	}
-
-	/** Make expression from XML node.
-	 * @param node the expression as XML
-	 * @return a corresponding expression, or null if node does not contain an expression
-	 */
-	public static Expression make(Node node) throws CpudlParseException {
-		if (!(node instanceof Element)) {
-			return null;
-		}
-		Element el = (Element)node;
-		String tagName = el.getTagName();
-		if (tagName.equals("ref")) {
-			return Reference.make(el);
-		} else if (tagName.equals("const")) {
-			return Constant.make(el);
-		} else if (tagName.equals("register")) {
-			return Register.make(el);
-		} else if (tagName.equals("memory")) {
-			return Memory.make(el);
-		} else if (tagName.equals("add")) {
-			return Addition.make(el);
-		} else if (tagName.equals("sub")) {
-			return Subtraction.make(el);
-		} else if (tagName.equals("mul")) {
-			return Multiplication.make(el);
-		} else if (tagName.equals("and")) {
-			return BitwiseAnd.make(el);
-		} else if (tagName.equals("or")) {
-			return BitwiseOr.make(el);
-		} else if (tagName.equals("xor")) {
-			return BitwiseXor.make(el);
-		} else if (tagName.equals("shift")) {
-			return Shift.make(el);
-		} else if (tagName.equals("equals")) {
-			return Equality.make(el);
-		} else if (tagName.equals("assign")) {
-			return Assignment.make(el);
-		} else if (tagName.equals("sequence")) {
-			return Sequence.make(el);
-		} else {
-			return null;
-		}
-	}
 }

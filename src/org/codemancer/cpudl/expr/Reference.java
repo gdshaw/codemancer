@@ -10,6 +10,7 @@ import java.util.HashMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
+import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.CpudlReferenceException;
@@ -91,10 +92,11 @@ public class Reference extends Expression {
 	}
 
 	/** Make reference from XML element.
+	 * @param ctx the context of this expression
 	 * @param element the reference as XML
 	 * @return the reference as an object
 	 */
-	public static Reference make(Element element) throws CpudlParseException {
+	public static Reference make(Context ctx, Element element) throws CpudlParseException {
 		String name = element.getAttribute("name");
 		if (name == null) {
 			throw new CpudlParseException(element, "missing name attribute in <ref> element");
@@ -118,7 +120,7 @@ public class Reference extends Expression {
 						argValue = new Reference(null, argSrc, null);
 					}
 					if (argValue == null) {
-						argValue = Sequence.make(childElement);
+						argValue = Sequence.make(ctx, childElement);
 					}
 					args.put(argName, argValue);
 				}

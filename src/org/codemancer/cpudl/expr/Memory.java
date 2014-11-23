@@ -9,6 +9,7 @@ import java.util.Map;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
+import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.State;
 import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.CpudlParseException;
@@ -59,14 +60,15 @@ public class Memory extends Expression {
 	}
 
 	/** Make memory reference from XML element.
+	 * @param ctx the context of this expression
 	 * @param element the reference as XML
 	 * @return the reference as an object
 	 */
-	public static Memory make(Element element) throws CpudlParseException {
+	public static Memory make(Context ctx, Element element) throws CpudlParseException {
 		Expression address = null;
 		Node child = element.getFirstChild();
 		while (child != null) {
-			Expression operand = Expression.make(child);
+			Expression operand = ctx.makeExpression(child);
 			if (operand != null) {
 				if (address == null) {
 					address = operand;
