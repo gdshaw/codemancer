@@ -180,6 +180,67 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   </fragment>
  </define>
 
+ <define name="ind16">
+  <fragment>
+   <pattern>
+    <const>00</const>
+   </pattern>
+   <pattern></pattern>
+   <phrase>
+    <literal>(BC)</literal>
+   </phrase>
+   <effect>
+    <register name="BC"/>
+   </effect>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>10</const>
+   </pattern>
+   <pattern></pattern>
+   <phrase>
+    <literal>(DE)</literal>
+   </phrase>
+   <effect>
+    <register name="DE"/>
+   </effect>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>01</const>
+   </pattern>
+   <pattern></pattern>
+   <phrase>
+    <literal>(HL)</literal>
+   </phrase>
+   <effect>
+    <register name="HL"/>
+   </effect>
+  </fragment>
+
+  <fragment>
+   <var name="addr">
+    <integer size="16"/>
+   </var>
+   <pattern>
+    <const>11</const>
+   </pattern>
+   <pattern>
+    <ref name="addr"/>
+   </pattern>
+   <phrase>
+    <literal>(</literal>
+    <ref name="addr"/>
+    <literal>)</literal>
+   </phrase>
+   <effect>
+    <register name="SP"/>
+   </effect>
+  </fragment>
+ </define>
+
  <define name="add">
   <fragment>
    <pattern>
@@ -546,6 +607,58 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
     <assign>
      <ref name="r"/>
      <ref name="imm"/>
+    </assign>
+   </effect>
+  </fragment>
+
+  <fragment>
+   <var name="ind">
+    <ref name="ind16"/>
+   </var>
+   <pattern>
+    <const>0100</const>
+    <ref name="ind"/>
+    <const>00</const>
+    <ref name="ind"/>
+   </pattern>
+   <phrase>
+    <literal>LD</literal>
+   </phrase>
+   <phrase>
+    <ref name="ind"/>
+    <literal>,</literal><ws/>
+    <literal>A</literal>
+   </phrase>
+   <effect>
+    <assign>
+     <ref name="ind"/>
+     <register name="A"/>
+    </assign>
+   </effect>
+  </fragment>
+
+  <fragment>
+   <var name="ind">
+    <ref name="ind16"/>
+   </var>
+   <pattern>
+    <const>0101</const>
+    <ref name="ind"/>
+    <const>00</const>
+    <ref name="ind"/>
+   </pattern>
+   <phrase>
+    <literal>LD</literal>
+   </phrase>
+   <phrase>
+    <literal>A</literal>
+    <literal>,</literal><ws/>
+    <ref name="ind"/>
+   </phrase>
+   <effect>
+    <assign>
+     <register name="A"/>
+     <ref name="ind"/>
     </assign>
    </effect>
   </fragment>
