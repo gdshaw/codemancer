@@ -1,0 +1,113 @@
+# This file is part of Codemancer.
+# Copyright 2014 Graham Shaw.
+# Distribution and modification are permitted within the terms of the
+# GNU General Public License (version 3 or any later version).
+
+-----------------------------------------------------------------------
+Codemancer
+
+Pre-release version
+-----------------------------------------------------------------------
+
+Introduction
+
+  Codemancer is ultimately intended to be an Open Source interactive
+  disassembler for reverse engineering of executable code. Planned
+  features include:
+
+  - support for multiple instruction set architectures by means of an
+    XML-based description language;
+  - a database for recording information about the behaviour and purpose
+    of code which has been disassembled;
+  - an inference engine for augmenting the content of the database; and
+  - an interactive front end for the user to supply information which
+    cannot be deduced automatically.
+
+  Since these goals will likely take several years to realise, features
+  will be released incrementally as they are developed.
+
+Current status
+
+  Disassembler
+
+  - plain disassembly: working
+  - semantic modelling: working, but accessible only via API
+  - control flow analysis: not started
+  - data flow analysis: not started
+  - interactive user interface: not started
+
+  Architectures
+
+  - 6502: complete, but not including variants such as the 65C02
+  - z80: incomplete
+  - more to follow
+
+  Object file formats:
+
+  - ELF: working, but no relocations
+  - COFF: working, but no relocations
+  - AOF: working, but no relocations
+  - more to follow
+  - integration with disassembler: not started
+
+Building Codemancer
+
+  The source code can be checked out from the public repository using git:
+
+    git clone git://codemancer.org/codemancer.git
+
+  The result will be placed in a newly-created directory named 'codemancer'.
+  Subsequent changes can be fetched using the git pull command from within
+  that directory:
+
+    git pull
+
+  To build the code you will need the following:
+
+  - Java (tested with OpenJDK 6)
+  - Ant (tested with version 1.7.1)
+
+  Executing the 'ant' command with no arguments will build the default
+  target, which is the Codemancer jar file:
+
+    ant
+
+  This is written to the pathname build/jar/codemancer.jar. You can
+  additionally run the automated tests by building the 'test' target:
+
+    ant test
+
+Running Codemancer
+
+  To use the jar file it must be listed on the CLASSPATH:
+
+    export CLASSPATH=build/jar/codemancer.jar
+
+  The class org.codemancer.Disassemble is provided to demonstrate the
+  ability to disassemble a raw binary file. It can be invoked from the
+  command line as follows:
+
+    java org.codemancer.Disassemble <architecture> <pathname>
+
+  for example:
+
+    java org.codemancer.Disassemble 6502 image.bin
+
+  The resulting assembly language listing is written to stdout.
+
+Limitations
+
+  Whilst the disassembler is now technically usable, taken at face value
+  its current capabilities are neither novel nor conspicuously useful.
+  However, it does demonstrate that a real CPU architecture can be
+  described using a relatively small set of generic primitives.
+
+  Specific known limitations at present include the following:
+
+  - Status flags are not properly supported.
+  - There is no easy way to handle registers which are part of larger
+    registers.
+  - There will be a need to support register bitmaps, for example as
+    used by ARM LDM and STM instructions.
+  - There will be a need to support instruction prefixes, for example
+    as used by the x86 family and to a lesser extent the Z80.
