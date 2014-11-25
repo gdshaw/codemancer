@@ -1,4 +1,10 @@
+; This file is part of Codemancer.
+; Copyright 2014 Graham Shaw.
+; Distribution and modification are permitted within the terms of the
+; GNU General Public License (version 3 or any later version).
+
 !PC=8000
+00	NOP
 013412	LD	BC, 1234H
 02	LD	(BC), A
 03	INC	BC
@@ -14,6 +20,7 @@
 0D	DEC	C
 0E12	LD	C, 12H
 0F	RRCA
+1012	DJNZ	0014H
 113412	LD	DE, 1234H
 12	LD	(DE), A
 13	INC	DE
@@ -21,6 +28,7 @@
 15	DEC	D
 1612	LD	D, 12H
 17	RLA
+1812	JR	0014H
 19	ADD	HL, DE
 1A	LD	A, (DE)
 1B	DEC	DE
@@ -28,24 +36,28 @@
 1D	DEC	E
 1E12	LD	E, 12H
 1F	RRA
+2012	JR	NZ, 0014H
 213412	LD	HL, 1234H
 22	LD	(HL), A
 23	INC	HL
 24	INC	H
 25	DEC	H
 2612	LD	H, 12H
+2812	JR	Z, 0014H
 29	ADD	HL, HL
 2A	LD	A, (HL)
 2B	DEC	HL
 2C	INC	L
 2D	DEC	L
 2E12	LD	L, 12H
+3012	JR	NC, 0014H
 313412	LD	SP, 1234H
 323412	LD	(1234H), A
 33	INC	SP
 34	INC	(HL)
 35	DEC	(HL)
 3612	LD	(HL), 12H
+3812	JR	C, 0014H
 39	ADD	HL, SP
 3A3412	LD	A, (1234H)
 3B	DEC	SP

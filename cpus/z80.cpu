@@ -18,6 +18,9 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  <select class="bit">
   <property name="suffix" value=""/>
  </select>
+ <select class="addr">
+  <property name="width" value="4"/>
+ </select>
 </style>
 
 <register name="B" size="8"/>
@@ -43,7 +46,69 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
 <register name="ZF" size="1"/>
 <register name="SF" size="1"/>
 
-<define name="cc">
+<define name="cc2">
+ <fragment>
+  <pattern>
+   <const>00</const>
+  </pattern>
+  <phrase>
+   <literal>NZ</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="ZF"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10</const>
+  </pattern>
+  <phrase>
+   <literal>Z</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="ZF"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>01</const>
+  </pattern>
+  <phrase>
+   <literal>NC</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="CF"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <literal>C</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="CF"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cc3">
  <fragment>
   <pattern>
    <const>000</const>
@@ -1184,8 +1249,138 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  </fragment>
 
  <fragment>
+  <pattern>
+   <const>00000000</const>
+  </pattern>
+  <phrase>
+   <literal>NOP</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect></effect>
+ </fragment>
+
+ <fragment>
+  <var name="offset">
+   <integer size="8" encoding="2c"/>
+  </var>
+  <var name="addr">
+   <integer class="addr" size="16"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="addr"/>
+    <add>
+     <register name="PC"/>
+     <const>2</const>
+     <ref name="offset"/>
+    </add>
+   </equals>
+  </where>
+  <pattern>
+   <const>00001000</const>
+   <ref name="offset"/>
+  </pattern>
+  <phrase>
+   <literal>DJNZ</literal>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="B"/>
+    <sub>
+     <register name="B"/>
+     <const>1</const>
+    </sub>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <ref name="addr"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="offset">
+   <integer size="8" encoding="2c"/>
+  </var>
+  <var name="addr">
+   <integer class="addr" size="16"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="addr"/>
+    <add>
+     <register name="PC"/>
+     <const>2</const>
+     <ref name="offset"/>
+    </add>
+   </equals>
+  </where>
+  <pattern>
+   <const>00011000</const>
+   <ref name="offset"/>
+  </pattern>
+  <phrase>
+   <literal>JR</literal>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <ref name="addr"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
   <var name="cc">
+   <ref name="cc2"/>
+  </var>
+  <var name="offset">
+   <integer size="8" encoding="2c"/>
+  </var>
+  <var name="addr">
+   <integer class="addr" size="16"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="addr"/>
+    <add>
+     <register name="PC"/>
+     <const>2</const>
+     <ref name="offset"/>
+    </add>
+   </equals>
+  </where>
+  <pattern>
+   <const>000</const>
    <ref name="cc"/>
+   <const>100</const>
+   <ref name="offset"/>
+  </pattern>
+  <phrase>
+   <literal>JR</literal>
+  </phrase>
+  <phrase>
+   <ref name="cc"/>
+   <literal>,</literal><ws/>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <ref name="addr"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="cc">
+   <ref name="cc3"/>
   </var>
   <pattern>
    <const>000</const>
@@ -1217,7 +1412,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
 
  <fragment>
   <var name="cc">
-   <ref name="cc"/>
+   <ref name="cc3"/>
   </var>
   <var name="nn">
    <integer size="16"/>
@@ -1246,7 +1441,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
 
  <fragment>
   <var name="cc">
-   <ref name="cc"/>
+   <ref name="cc3"/>
   </var>
   <var name="nn">
    <integer size="16"/>
