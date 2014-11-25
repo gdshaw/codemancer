@@ -1989,5 +1989,138 @@ GNU General Public License (version 3 or any later version).
    <ref name="r"/>
   </phrase>
  </fragment>
+
+ <fragment>
+  <var name="ss">
+   <ref name="reg16"/>
+   <ref name="sp16"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <const>0100</const>
+   <ref name="ss"/>
+   <const>10</const>
+   <ref name="ss"/>
+  </pattern>
+  <phrase>
+   <literal>SBC</literal>
+  </phrase>
+  <phrase>
+   <literal>HL,</literal><ws/>
+   <ref name="ss"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="HL"/>
+    <sub>
+     <register name="HL"/>
+     <ref name="ss"/>
+     <register name="CF"/>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="ss">
+   <ref name="reg16"/>
+   <ref name="sp16"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <const>0101</const>
+   <ref name="ss"/>
+   <const>10</const>
+   <ref name="ss"/>
+  </pattern>
+  <phrase>
+   <literal>ADC</literal>
+  </phrase>
+  <phrase>
+   <literal>HL,</literal><ws/>
+   <ref name="ss"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="HL"/>
+    <add>
+     <register name="HL"/>
+     <ref name="ss"/>
+     <register name="CF"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="ss">
+   <ref name="reg16"/>
+   <ref name="sp16"/>
+  </var>
+  <var name="nn">
+   <integer class="addr" size="16"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <const>1100</const>
+   <ref name="ss"/>
+   <const>10</const>
+   <ref name="ss"/>
+   <ref name="nn"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <literal>(</literal>
+   <ref name="nn"/>
+   <literal>),</literal><ws/>
+   <ref name="ss"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="16">
+     <ref name="nn"/>
+    </memory>
+    <ref name="ss"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="ss">
+   <ref name="reg16"/>
+   <ref name="sp16"/>
+  </var>
+  <var name="nn">
+   <integer class="addr" size="16"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <const>1101</const>
+   <ref name="ss"/>
+   <const>10</const>
+   <ref name="ss"/>
+   <ref name="nn"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <ref name="ss"/>
+   <literal>,</literal><ws/>
+   <literal>(</literal>
+   <ref name="nn"/>
+   <literal>)</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="ss"/>
+    <memory size="16">
+     <ref name="nn"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
 </start>
 </cpudl>
