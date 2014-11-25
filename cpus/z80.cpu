@@ -49,6 +49,8 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
 <register name="ZF" size="1"/>
 <register name="SF" size="1"/>
 
+<register name="IFF" size="1"/>
+
 <define name="cc2">
  <fragment>
   <pattern>
@@ -1769,6 +1771,76 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <literal>DE,</literal><ws/>
    <literal>HL</literal>
   </phrase>
+ </fragment>
+
+ <fragment>
+  <var name="n">
+   <integer size="8"/>
+  </var>
+  <pattern>
+   <const>11001011</const>
+   <ref name="n"/>
+  </pattern>
+  <phrase>
+   <literal>OUT</literal>
+  </phrase>
+  <phrase>
+   <literal>(</literal>
+   <ref name="n"/>
+   <literal>),</literal><ws/>
+   <literal>A</literal>
+  </phrase>
+ </fragment>
+
+ <fragment>
+  <var name="n">
+   <integer size="8"/>
+  </var>
+  <pattern>
+   <const>11011011</const>
+   <ref name="n"/>
+  </pattern>
+  <phrase>
+   <literal>IN</literal>
+  </phrase>
+  <phrase>
+   <literal>A,</literal><ws/>
+   <literal>(</literal>
+   <ref name="n"/>
+   <literal>)</literal>
+  </phrase>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>11001111</const>
+  </pattern>
+  <phrase>
+   <literal>DI</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="IFF"/>
+    <const>0</const>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>11011111</const>
+  </pattern>
+  <phrase>
+   <literal>EI</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="IFF"/>
+    <const>1</const>
+   </assign>
+  </effect>
  </fragment>
 
  <fragment>
