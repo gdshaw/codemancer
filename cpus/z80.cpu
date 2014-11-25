@@ -28,6 +28,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
 <register name="BC" size="16"/>
 <register name="DE" size="16"/>
 <register name="HL" size="16"/>
+<register name="AF" size="16"/>
 <register name="SP" size="16"/>
 
 <define name="reg8">
@@ -182,6 +183,21 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   </phrase>
   <effect>
    <register name="SP"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="af16">
+ <fragment>
+  <pattern>
+   <const>11</const>
+  </pattern>
+  <pattern></pattern>
+  <phrase>
+   <literal>AF</literal>
+  </phrase>
+  <effect>
+   <register name="AF"/>
   </effect>
  </fragment>
 </define>
@@ -400,6 +416,58 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
      <ref name="operand"/>
      <const>1</const>
     </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="pop-instr">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>POP</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <memory size="16">
+     <register name="SP"/>
+    </memory>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>2</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="push-instr">
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>PUSH</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>2</const>
+    </sub>
+   </assign>
+   <assign>
+    <memory size="16">
+     <register name="SP"/>
+    </memory>
+    <ref name="operand"/>
    </assign>
   </effect>
  </fragment>
@@ -701,6 +769,36 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <ref name="opcode"/>
    <ref name="dd"/>
    <const>00</const>
+   <ref name="dd"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="dd"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="dd"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="dd">
+   <ref name="reg16"/>
+   <ref name="af16"/>
+  </var>
+  <var name="opcode">
+   <ref name="pop-instr"/>
+   <ref name="push-instr"/>
+  </var>
+  <pattern>
+   <const>10</const>
+   <ref name="opcode"/>
+   <const>0</const>
+   <ref name="dd"/>
+   <const>11</const>
    <ref name="dd"/>
   </pattern>
   <phrase>
