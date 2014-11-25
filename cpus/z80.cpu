@@ -5,10 +5,6 @@ Distribution and modification are permitted within the terms of the
 GNU General Public License (version 3 or any later version).
 -->
 
-<!--
-Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
--->
-
 <cpudl>
 <style>
  <property name="base" value="16"/>
@@ -310,6 +306,20 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
 
  <fragment>
   <pattern>
+   <const>111</const>
+  </pattern>
+  <phrase>
+   <literal>A</literal>
+  </phrase>
+  <effect>
+   <register name="A"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ind8">
+ <fragment>
+  <pattern>
    <const>011</const>
   </pattern>
   <phrase>
@@ -319,18 +329,6 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <memory>
     <register name="HL"/>
    </memory>
-  </effect>
- </fragment>
-
- <fragment>
-  <pattern>
-   <const>111</const>
-  </pattern>
-  <phrase>
-   <literal>A</literal>
-  </phrase>
-  <effect>
-   <register name="A"/>
   </effect>
  </fragment>
 </define>
@@ -904,6 +902,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  <fragment>
   <var name="rs">
    <ref name="reg8"/>
+   <ref name="ind8"/>
   </var>
   <var name="rd">
    <ref name="reg8"/>
@@ -930,8 +929,37 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  </fragment>
 
  <fragment>
+  <var name="rs">
+   <ref name="reg8"/>
+  </var>
+  <var name="rd">
+   <ref name="ind8"/>
+  </var>
+  <pattern>
+   <ref name="rs"/>
+   <ref name="rd"/>
+   <const>10</const>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <ref name="rd"/>
+   <literal>,</literal><ws/>
+   <ref name="rs"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="rd"/>
+    <ref name="rs"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
   <var name="r">
    <ref name="reg8"/>
+   <ref name="ind8"/>
   </var>
   <var name="opcode">
    <ref name="add-instr"/>
@@ -999,6 +1027,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  <fragment>
   <var name="r">
    <ref name="reg8"/>
+   <ref name="ind8"/>
   </var>
   <var name="opcode">
    <ref name="inc-instr"/>
@@ -1026,6 +1055,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  <fragment>
   <var name="r">
    <ref name="reg8"/>
+   <ref name="ind8"/>
   </var>
   <var name="imm">
    <integer size="8"/>
@@ -1726,6 +1756,16 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
 
  <fragment>
   <pattern>
+   <const>01101110</const>
+  </pattern>
+  <phrase>
+   <literal>HALT</literal>
+  </phrase>
+  <phrase></phrase>
+ </fragment>
+
+ <fragment>
+  <pattern>
    <const>00010000</const>
   </pattern>
   <phrase>
@@ -1846,6 +1886,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  <fragment>
   <var name="r">
    <ref name="reg8"/>
+   <ref name="ind8"/>
   </var>
   <var name="opcode">
    <ref name="rlc-instr"/>
@@ -1881,6 +1922,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   </var>
   <var name="r">
    <ref name="reg8"/>
+   <ref name="ind8"/>
   </var>
   <var name="opcode">
    <ref name="bit-instr"/>
@@ -1907,6 +1949,45 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
     <bind name="operand" src="r"/>
    </ref>
   </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="reg8"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <const>000</const>
+   <ref name="r"/>
+   <const>10</const>
+  </pattern>
+  <phrase>
+   <literal>IN</literal>
+  </phrase>
+  <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
+   <literal>(C)</literal>
+  </phrase>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="reg8"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <const>100</const>
+   <ref name="r"/>
+   <const>10</const>
+  </pattern>
+  <phrase>
+   <literal>OUT</literal>
+  </phrase>
+  <phrase>
+   <literal>(C),</literal><ws/>
+   <ref name="r"/>
+  </phrase>
  </fragment>
 </start>
 </cpudl>
