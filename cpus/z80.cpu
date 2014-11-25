@@ -10,730 +10,710 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
 -->
 
 <cpudl>
- <style>
-  <property name="base" value="16"/>
-  <property name="prefix" value=""/>
-  <property name="suffix" value="H"/>
-  <property name="whitespace" value=" "/>
- </style>
+<style>
+ <property name="base" value="16"/>
+ <property name="prefix" value=""/>
+ <property name="suffix" value="H"/>
+ <property name="whitespace" value=" "/>
+</style>
 
- <register name="B" size="8"/>
- <register name="C" size="8"/>
- <register name="D" size="8"/>
- <register name="E" size="8"/>
- <register name="H" size="8"/>
- <register name="L" size="8"/>
- <register name="A" size="8"/>
- <register name="F" size="8"/>
- <register name="BC" size="16"/>
- <register name="DE" size="16"/>
- <register name="HL" size="16"/>
- <register name="SP" size="16"/>
+<register name="B" size="8"/>
+<register name="C" size="8"/>
+<register name="D" size="8"/>
+<register name="E" size="8"/>
+<register name="H" size="8"/>
+<register name="L" size="8"/>
+<register name="A" size="8"/>
+<register name="F" size="8"/>
+<register name="BC" size="16"/>
+<register name="DE" size="16"/>
+<register name="HL" size="16"/>
+<register name="SP" size="16"/>
 
- <define name="reg8">
-  <fragment>
-   <pattern>
-    <const>000</const>
-   </pattern>
-   <phrase>
-    <literal>B</literal>
-   </phrase>
-   <effect>
-    <register name="B"/>
-   </effect>
-  </fragment>
+<define name="reg8">
+ <fragment>
+  <pattern>
+   <const>000</const>
+  </pattern>
+  <phrase>
+   <literal>B</literal>
+  </phrase>
+  <effect>
+   <register name="B"/>
+  </effect>
+ </fragment>
 
-  <fragment>
-   <pattern>
-    <const>100</const>
-   </pattern>
-   <phrase>
-    <literal>C</literal>
-   </phrase>
-   <effect>
-    <register name="C"/>
-   </effect>
-  </fragment>
+ <fragment>
+  <pattern>
+   <const>100</const>
+  </pattern>
+  <phrase>
+   <literal>C</literal>
+  </phrase>
+  <effect>
+   <register name="C"/>
+  </effect>
+ </fragment>
 
-  <fragment>
-   <pattern>
-    <const>010</const>
-   </pattern>
-   <phrase>
-    <literal>D</literal>
-   </phrase>
-   <effect>
-    <register name="D"/>
-   </effect>
-  </fragment>
+ <fragment>
+  <pattern>
+   <const>010</const>
+  </pattern>
+  <phrase>
+   <literal>D</literal>
+  </phrase>
+  <effect>
+   <register name="D"/>
+  </effect>
+ </fragment>
 
-  <fragment>
-   <pattern>
-    <const>110</const>
-   </pattern>
-   <phrase>
-    <literal>E</literal>
-   </phrase>
-   <effect>
-    <register name="E"/>
-   </effect>
-  </fragment>
+ <fragment>
+  <pattern>
+   <const>110</const>
+  </pattern>
+  <phrase>
+   <literal>E</literal>
+  </phrase>
+  <effect>
+   <register name="E"/>
+  </effect>
+ </fragment>
 
-  <fragment>
-   <pattern>
-    <const>001</const>
-   </pattern>
-   <phrase>
-    <literal>H</literal>
-   </phrase>
-   <effect>
-    <register name="H"/>
-   </effect>
-  </fragment>
+ <fragment>
+  <pattern>
+   <const>001</const>
+  </pattern>
+  <phrase>
+   <literal>H</literal>
+  </phrase>
+  <effect>
+   <register name="H"/>
+  </effect>
+ </fragment>
 
-  <fragment>
-   <pattern>
-    <const>101</const>
-   </pattern>
-   <phrase>
-    <literal>L</literal>
-   </phrase>
-   <effect>
-    <register name="L"/>
-   </effect>
-  </fragment>
+ <fragment>
+  <pattern>
+   <const>101</const>
+  </pattern>
+  <phrase>
+   <literal>L</literal>
+  </phrase>
+  <effect>
+   <register name="L"/>
+  </effect>
+ </fragment>
 
-  <fragment>
-   <pattern>
-    <const>011</const>
-   </pattern>
-   <phrase>
-    <literal>(HL)</literal>
-   </phrase>
-   <effect>
-    <memory>
-     <register name="HL"/>
-    </memory>
-   </effect>
-  </fragment>
+ <fragment>
+  <pattern>
+   <const>011</const>
+  </pattern>
+  <phrase>
+   <literal>(HL)</literal>
+  </phrase>
+  <effect>
+   <memory>
+    <register name="HL"/>
+   </memory>
+  </effect>
+ </fragment>
 
-  <fragment>
-   <pattern>
-    <const>111</const>
-   </pattern>
-   <phrase>
-    <literal>A</literal>
-   </phrase>
-   <effect>
+ <fragment>
+  <pattern>
+   <const>111</const>
+  </pattern>
+  <phrase>
+   <literal>A</literal>
+  </phrase>
+  <effect>
+   <register name="A"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="reg16">
+ <fragment>
+  <pattern>
+   <const>00</const>
+  </pattern>
+  <pattern></pattern>
+  <phrase>
+   <literal>BC</literal>
+  </phrase>
+  <effect>
+   <register name="BC"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10</const>
+  </pattern>
+  <pattern></pattern>
+  <phrase>
+   <literal>DE</literal>
+  </phrase>
+  <effect>
+   <register name="DE"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>01</const>
+  </pattern>
+  <pattern></pattern>
+  <phrase>
+   <literal>HL</literal>
+  </phrase>
+  <effect>
+   <register name="HL"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sp16">
+ <fragment>
+  <pattern>
+   <const>11</const>
+  </pattern>
+  <pattern></pattern>
+  <phrase>
+   <literal>SP</literal>
+  </phrase>
+  <effect>
+   <register name="SP"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="addr16">
+ <fragment>
+  <var name="addr">
+   <integer size="16"/>
+  </var>
+  <pattern>
+   <const>11</const>
+  </pattern>
+  <pattern>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <ref name="addr"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="add-instr">
+ <fragment>
+  <pattern>
+   <const>000</const>
+  </pattern>
+  <phrase>
+   <literal>ADD</literal>
+  </phrase>
+  <effect>
+   <assign>
     <register name="A"/>
-   </effect>
-  </fragment>
- </define>
-
- <define name="reg16">
-  <fragment>
-   <pattern>
-    <const>00</const>
-   </pattern>
-   <phrase>
-    <literal>BC</literal>
-   </phrase>
-   <effect>
-    <register name="BC"/>
-   </effect>
-  </fragment>
-
-  <fragment>
-   <pattern>
-    <const>10</const>
-   </pattern>
-   <phrase>
-    <literal>DE</literal>
-   </phrase>
-   <effect>
-    <register name="DE"/>
-   </effect>
-  </fragment>
-
-  <fragment>
-   <pattern>
-    <const>01</const>
-   </pattern>
-   <phrase>
-    <literal>HL</literal>
-   </phrase>
-   <effect>
-    <register name="HL"/>
-   </effect>
-  </fragment>
-
-  <fragment>
-   <pattern>
-    <const>11</const>
-   </pattern>
-   <phrase>
-    <literal>SP</literal>
-   </phrase>
-   <effect>
-    <register name="SP"/>
-   </effect>
-  </fragment>
- </define>
-
- <define name="ind16">
-  <fragment>
-   <pattern>
-    <const>00</const>
-   </pattern>
-   <pattern></pattern>
-   <phrase>
-    <literal>(BC)</literal>
-   </phrase>
-   <effect>
-    <register name="BC"/>
-   </effect>
-  </fragment>
-
-  <fragment>
-   <pattern>
-    <const>10</const>
-   </pattern>
-   <pattern></pattern>
-   <phrase>
-    <literal>(DE)</literal>
-   </phrase>
-   <effect>
-    <register name="DE"/>
-   </effect>
-  </fragment>
-
-  <fragment>
-   <pattern>
-    <const>01</const>
-   </pattern>
-   <pattern></pattern>
-   <phrase>
-    <literal>(HL)</literal>
-   </phrase>
-   <effect>
-    <register name="HL"/>
-   </effect>
-  </fragment>
-
-  <fragment>
-   <var name="addr">
-    <integer size="16"/>
-   </var>
-   <pattern>
-    <const>11</const>
-   </pattern>
-   <pattern>
-    <ref name="addr"/>
-   </pattern>
-   <phrase>
-    <literal>(</literal>
-    <ref name="addr"/>
-    <literal>)</literal>
-   </phrase>
-   <effect>
-    <register name="SP"/>
-   </effect>
-  </fragment>
- </define>
-
- <define name="add">
-  <fragment>
-   <pattern>
-    <const>000</const>
-   </pattern>
-   <phrase>
-    <literal>ADD</literal>
-   </phrase>
-   <effect>
-    <assign>
+    <add>
      <register name="A"/>
-     <add>
-      <register name="A"/>
-      <ref name="operand"/>
-     </add>
-    </assign>
-   </effect>
-  </fragment>
- </define>
+     <ref name="operand"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
 
- <define name="adc">
-  <fragment>
-   <pattern>
-    <const>100</const>
-   </pattern>
-   <phrase>
-    <literal>ADC</literal>
-   </phrase>
-   <effect>
-    <assign>
+<define name="adc-instr">
+ <fragment>
+  <pattern>
+   <const>100</const>
+  </pattern>
+  <phrase>
+   <literal>ADC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <add>
      <register name="A"/>
-     <add>
-      <register name="A"/>
-      <ref name="operand"/>
-      <register name="C"/>
-     </add>
-    </assign>
-   </effect>
-  </fragment>
- </define>
+     <ref name="operand"/>
+     <register name="C"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
 
- <define name="sub">
-  <fragment>
-   <pattern>
-    <const>010</const>
-   </pattern>
-   <phrase>
-    <literal>SUB</literal>
-   </phrase>
-   <effect>
-    <assign>
-     <register name="A"/>
-     <sub>
-      <register name="A"/>
-      <ref name="operand"/>
-     </sub>
-    </assign>
-   </effect>
-  </fragment>
- </define>
-
- <define name="sbc">
-  <fragment>
-   <pattern>
-    <const>110</const>
-   </pattern>
-   <phrase>
-    <literal>SBC</literal>
-   </phrase>
-   <effect>
-    <assign>
-     <register name="A"/>
-     <sub>
-      <register name="A"/>
-      <ref name="operand"/>
-      <register name="C"/>
-     </sub>
-    </assign>
-   </effect>
-  </fragment>
- </define>
-
- <define name="and">
-  <fragment>
-   <pattern>
-    <const>001</const>
-   </pattern>
-   <phrase>
-    <literal>AND</literal>
-   </phrase>
-   <effect>
-    <assign>
-     <register name="A"/>
-     <and>
-      <register name="A"/>
-      <ref name="operand"/>
-     </and>
-    </assign>
-   </effect>
-  </fragment>
- </define>
-
- <define name="xor">
-  <fragment>
-   <pattern>
-    <const>101</const>
-   </pattern>
-   <phrase>
-    <literal>XOR</literal>
-   </phrase>
-   <effect>
-    <assign>
-     <register name="A"/>
-     <xor>
-      <register name="A"/>
-      <ref name="operand"/>
-     </xor>
-    </assign>
-   </effect>
-  </fragment>
- </define>
-
- <define name="or">
-  <fragment>
-   <pattern>
-    <const>011</const>
-   </pattern>
-   <phrase>
-    <literal>OR</literal>
-   </phrase>
-   <effect>
-    <assign>
-     <register name="A"/>
-     <or>
-      <register name="A"/>
-      <ref name="operand"/>
-     </or>
-    </assign>
-   </effect>
-  </fragment>
- </define>
-
- <define name="cp">
-  <fragment>
-   <pattern>
-    <const>111</const>
-   </pattern>
-   <phrase>
-    <literal>CP</literal>
-   </phrase>
-   <effect>
+<define name="sub-instr">
+ <fragment>
+  <pattern>
+   <const>010</const>
+  </pattern>
+  <phrase>
+   <literal>SUB</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
     <sub>
      <register name="A"/>
      <ref name="operand"/>
     </sub>
-   </effect>
-  </fragment>
- </define>
+   </assign>
+  </effect>
+ </fragment>
+</define>
 
- <define name="inc">
-  <fragment>
-   <pattern>
-    <const>0</const>
-   </pattern>
-   <phrase>
-    <literal>INC</literal>
-   </phrase>
-   <effect>
-    <assign>
-     <ref name="operand"/>
-     <add>
-      <ref name="operand"/>
-      <const>1</const>
-     </add>
-    </assign>
-   </effect>
-  </fragment>
- </define>
-
- <define name="dec">
-  <fragment>
-   <pattern>
-    <const>1</const>
-   </pattern>
-   <phrase>
-    <literal>DEC</literal>
-   </phrase>
-   <effect>
-    <assign>
-     <ref name="operand"/>
-     <sub>
-      <ref name="operand"/>
-      <const>1</const>
-     </sub>
-    </assign>
-   </effect>
-  </fragment>
- </define>
-
- <start>
-  <fragment>
-   <var name="rs">
-    <ref name="reg8"/>
-   </var>
-   <var name="rd">
-    <ref name="reg8"/>
-   </var>
-   <pattern>
-    <ref name="rs"/>
-    <ref name="rd"/>
-    <const>10</const>
-   </pattern>
-   <phrase>
-    <literal>LD</literal>
-   </phrase>
-   <phrase>
-    <ref name="rd"/>
-    <literal>,</literal><ws/>
-    <ref name="rs"/>
-   </phrase>
-   <effect>
-    <assign>
-     <ref name="rd"/>
-     <ref name="rs"/>
-    </assign>
-   </effect>
-  </fragment>
-
-  <fragment>
-   <var name="r">
-    <ref name="reg8"/>
-   </var>
-   <var name="opcode">
-    <ref name="add"/>
-    <ref name="adc"/>
-    <ref name="sbc"/>
-   </var>
-   <pattern>
-    <ref name="r"/>
-    <ref name="opcode"/>
-    <const>01</const>
-   </pattern>
-   <phrase>
-    <ref name="opcode"/>
-   </phrase>
-   <phrase>
-    <literal>A,</literal><ws/>
-    <ref name="r"/>
-   </phrase>
-   <effect>
-    <ref name="opcode">
-     <bind name="operand" src="r"/>
-    </ref>
-   </effect>
-  </fragment>
-
-  <fragment>
-   <var name="r">
-    <ref name="reg8"/>
-   </var>
-   <var name="opcode">
-    <ref name="sub"/>
-    <ref name="and"/>
-    <ref name="xor"/>
-    <ref name="or"/>
-    <ref name="cp"/>
-   </var>
-   <pattern>
-    <ref name="r"/>
-    <ref name="opcode"/>
-    <const>01</const>
-   </pattern>
-   <phrase>
-    <ref name="opcode"/>
-   </phrase>
-   <phrase>
-    <ref name="r"/>
-   </phrase>
-   <effect>
-    <ref name="opcode">
-     <bind name="operand" src="r"/>
-    </ref>
-   </effect>
-  </fragment>
-
-  <fragment>
-   <var name="r">
-    <ref name="reg8"/>
-   </var>
-   <var name="opcode">
-    <ref name="inc"/>
-    <ref name="dec"/>
-   </var>
-   <pattern>
-    <ref name="opcode"/>
-    <const>01</const>
-    <ref name="r"/>
-    <const>00</const>
-   </pattern>
-   <phrase>
-    <ref name="opcode"/>
-   </phrase>
-   <phrase>
-    <ref name="r"/>
-   </phrase>
-   <effect>
-    <ref name="opcode">
-     <bind name="operand" src="r"/>
-    </ref>
-   </effect>
-  </fragment>
-
-  <fragment>
-   <var name="r">
-    <ref name="reg8"/>
-   </var>
-   <var name="imm">
-    <integer size="8"/>
-   </var>
-   <pattern>
-    <const>011</const>
-    <ref name="r"/>
-    <const>00</const>
-    <ref name="imm"/>
-   </pattern>
-   <phrase>
-    <literal>LD</literal>
-   </phrase>
-   <phrase>
-    <ref name="r"/>
-    <literal>,</literal><ws/>
-    <ref name="imm"/>
-   </phrase>
-   <effect>
-    <assign>
-     <ref name="r"/>
-     <ref name="imm"/>
-    </assign>
-   </effect>
-  </fragment>
-
-  <fragment>
-   <var name="r">
-    <ref name="reg16"/>
-   </var>
-   <var name="imm">
-    <integer size="16"/>
-   </var>
-   <pattern>
-    <const>1000</const>
-    <ref name="r"/>
-    <const>00</const>
-    <ref name="imm"/>
-   </pattern>
-   <phrase>
-    <literal>LD</literal>
-   </phrase>
-   <phrase>
-    <ref name="r"/>
-    <literal>,</literal><ws/>
-    <ref name="imm"/>
-   </phrase>
-   <effect>
-    <assign>
-     <ref name="r"/>
-     <ref name="imm"/>
-    </assign>
-   </effect>
-  </fragment>
-
-  <fragment>
-   <var name="ind">
-    <ref name="ind16"/>
-   </var>
-   <pattern>
-    <const>0100</const>
-    <ref name="ind"/>
-    <const>00</const>
-    <ref name="ind"/>
-   </pattern>
-   <phrase>
-    <literal>LD</literal>
-   </phrase>
-   <phrase>
-    <ref name="ind"/>
-    <literal>,</literal><ws/>
-    <literal>A</literal>
-   </phrase>
-   <effect>
-    <assign>
-     <ref name="ind"/>
+<define name="sbc-instr">
+ <fragment>
+  <pattern>
+   <const>110</const>
+  </pattern>
+  <phrase>
+   <literal>SBC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <sub>
      <register name="A"/>
-    </assign>
-   </effect>
-  </fragment>
+     <ref name="operand"/>
+     <register name="C"/>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
 
-  <fragment>
-   <var name="ind">
-    <ref name="ind16"/>
-   </var>
-   <pattern>
-    <const>0101</const>
-    <ref name="ind"/>
-    <const>00</const>
-    <ref name="ind"/>
-   </pattern>
-   <phrase>
-    <literal>LD</literal>
-   </phrase>
-   <phrase>
-    <literal>A</literal>
-    <literal>,</literal><ws/>
-    <ref name="ind"/>
-   </phrase>
-   <effect>
-    <assign>
+<define name="and-instr">
+ <fragment>
+  <pattern>
+   <const>001</const>
+  </pattern>
+  <phrase>
+   <literal>AND</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <and>
      <register name="A"/>
-     <ref name="ind"/>
-    </assign>
-   </effect>
-  </fragment>
+     <ref name="operand"/>
+    </and>
+   </assign>
+  </effect>
+ </fragment>
+</define>
 
-  <fragment>
-   <pattern>
-    <const>10011111</const>
-   </pattern>
-   <phrase>
-    <literal>LD</literal>
-   </phrase>
-   <phrase>
-    <literal>SP,</literal><ws/>
-    <literal>HL</literal>
-   </phrase>
-   <effect>
-    <assign>
-     <register name="SP"/>
+<define name="xor-instr">
+ <fragment>
+  <pattern>
+   <const>101</const>
+  </pattern>
+  <phrase>
+   <literal>XOR</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <xor>
+     <register name="A"/>
+     <ref name="operand"/>
+    </xor>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="or-instr">
+ <fragment>
+  <pattern>
+   <const>011</const>
+  </pattern>
+  <phrase>
+   <literal>OR</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <or>
+     <register name="A"/>
+     <ref name="operand"/>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cp-instr">
+ <fragment>
+  <pattern>
+   <const>111</const>
+  </pattern>
+  <phrase>
+   <literal>CP</literal>
+  </phrase>
+  <effect>
+   <sub>
+    <register name="A"/>
+    <ref name="operand"/>
+   </sub>
+  </effect>
+ </fragment>
+</define>
+
+<define name="inc-instr">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>INC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <add>
+     <ref name="operand"/>
+     <const>1</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="dec-instr">
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>DEC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <sub>
+     <ref name="operand"/>
+     <const>1</const>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<start>
+ <fragment>
+  <var name="rs">
+   <ref name="reg8"/>
+  </var>
+  <var name="rd">
+   <ref name="reg8"/>
+  </var>
+  <pattern>
+   <ref name="rs"/>
+   <ref name="rd"/>
+   <const>10</const>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <ref name="rd"/>
+   <literal>,</literal><ws/>
+   <ref name="rs"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="rd"/>
+    <ref name="rs"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="reg8"/>
+  </var>
+  <var name="opcode">
+   <ref name="add-instr"/>
+   <ref name="adc-instr"/>
+   <ref name="sbc-instr"/>
+  </var>
+  <pattern>
+   <ref name="r"/>
+   <ref name="opcode"/>
+   <const>01</const>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <literal>A,</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="reg8"/>
+  </var>
+  <var name="opcode">
+   <ref name="sub-instr"/>
+   <ref name="and-instr"/>
+   <ref name="xor-instr"/>
+   <ref name="or-instr"/>
+   <ref name="cp-instr"/>
+  </var>
+  <pattern>
+   <ref name="r"/>
+   <ref name="opcode"/>
+   <const>01</const>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="reg8"/>
+  </var>
+  <var name="opcode">
+   <ref name="inc-instr"/>
+   <ref name="dec-instr"/>
+  </var>
+  <pattern>
+   <ref name="opcode"/>
+   <const>01</const>
+   <ref name="r"/>
+   <const>00</const>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="reg8"/>
+  </var>
+  <var name="imm">
+   <integer size="8"/>
+  </var>
+  <pattern>
+   <const>011</const>
+   <ref name="r"/>
+   <const>00</const>
+   <ref name="imm"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="r"/>
+    <ref name="imm"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="dd">
+   <ref name="reg16"/>
+   <ref name="sp16"/>
+  </var>
+  <var name="imm">
+   <integer size="16"/>
+  </var>
+  <pattern>
+   <const>1000</const>
+   <ref name="dd"/>
+   <const>00</const>
+   <ref name="imm"/>
+   <ref name="dd"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <ref name="dd"/>
+   <literal>,</literal><ws/>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dd"/>
+    <ref name="imm"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="dd">
+   <ref name="reg16"/>
+   <ref name="addr16"/>
+  </var>
+  <pattern>
+   <const>0100</const>
+   <ref name="dd"/>
+   <const>00</const>
+   <ref name="dd"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <literal>(</literal>
+   <ref name="dd"/>
+   <literal>),</literal><ws/>
+   <literal>A</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <ref name="dd"/>
+    </memory>
+    <register name="A"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="dd">
+   <ref name="reg16"/>
+   <ref name="addr16"/>
+  </var>
+  <pattern>
+   <const>0101</const>
+   <ref name="dd"/>
+   <const>00</const>
+   <ref name="dd"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <literal>A</literal>
+   <literal>,</literal><ws/>
+   <literal>(</literal>
+   <ref name="dd"/>
+   <literal>)</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <memory size="8">
+     <ref name="dd"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10011111</const>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <literal>SP,</literal><ws/>
+   <literal>HL</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="SP"/>
+    <register name="HL"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="dd">
+   <ref name="reg16"/>
+   <ref name="sp16"/>
+  </var>
+  <pattern>
+   <const>1001</const>
+   <ref name="dd"/>
+   <const>00</const>
+   <ref name="dd"/>
+  </pattern>
+  <phrase>
+   <literal>ADD</literal>
+  </phrase>
+  <phrase>
+   <literal>HL,</literal><ws/>
+   <ref name="dd"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="HL"/>
+    <add>
      <register name="HL"/>
-    </assign>
-   </effect>
-  </fragment>
+     <ref name="dd"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
 
-  <fragment>
-   <var name="r">
-    <ref name="reg16"/>
-   </var>
-   <pattern>
-    <const>1001</const>
-    <ref name="r"/>
-    <const>00</const>
-   </pattern>
-   <phrase>
-    <literal>ADD</literal>
-   </phrase>
-   <phrase>
-    <literal>HL,</literal><ws/>
-    <ref name="r"/>
-   </phrase>
-   <effect>
-    <assign>
-     <register name="HL"/>
-     <add>
-      <register name="HL"/>
-      <ref name="r"/>
-     </add>
-    </assign>
-   </effect>
-  </fragment>
-
-  <fragment>
-   <var name="r">
-    <ref name="reg16"/>
-   </var>
-   <var name="opcode">
-    <ref name="inc"/>
-    <ref name="dec"/>
-   </var>
-   <pattern>
-    <const>110</const>
-    <ref name="opcode"/>
-    <ref name="r"/>
-    <const>00</const>
-   </pattern>
-   <phrase>
-    <ref name="opcode"/>
-   </phrase>
-   <phrase>
-    <ref name="r"/>
-   </phrase>
-   <effect>
-    <ref name="opcode">
-     <bind name="operand" src="r"/>
-    </ref>
-   </effect>
-  </fragment>
- </start>
+ <fragment>
+  <var name="dd">
+   <ref name="reg16"/>
+   <ref name="sp16"/>
+  </var>
+  <var name="opcode">
+   <ref name="inc-instr"/>
+   <ref name="dec-instr"/>
+  </var>
+  <pattern>
+   <const>110</const>
+   <ref name="opcode"/>
+   <ref name="dd"/>
+   <const>00</const>
+   <ref name="dd"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="dd"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="dd"/>
+   </ref>
+  </effect>
+ </fragment>
+</start>
 </cpudl>
