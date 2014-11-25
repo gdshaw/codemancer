@@ -1260,6 +1260,70 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  </fragment>
 
  <fragment>
+  <pattern>
+   <const>11100100</const>
+  </pattern>
+  <phrase>
+   <literal>DAA</literal>
+  </phrase>
+  <phrase></phrase>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>11110100</const>
+  </pattern>
+  <phrase>
+   <literal>CPL</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <xor>
+     <register name="A"/>
+     <const>0xFF</const>
+    </xor>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>11101100</const>
+  </pattern>
+  <phrase>
+   <literal>SCF</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="CF"/>
+    <const>1</const>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>11111100</const>
+  </pattern>
+  <phrase>
+   <literal>CCF</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="CF"/>
+    <xor>
+     <register name="CF"/>
+     <const>1</const>
+    </xor>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
   <var name="offset">
    <integer size="8" encoding="2c"/>
   </var>
