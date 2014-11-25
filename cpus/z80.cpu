@@ -473,6 +473,146 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  </fragment>
 </define>
 
+<define name="rlc-instr">
+ <fragment>
+  <pattern>
+   <const>000</const>
+  </pattern>
+  <phrase>
+   <literal>RLC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="rotation" carry="C">
+     <ref name="operand"/>
+     <const>1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="rrc-instr">
+ <fragment>
+  <pattern>
+   <const>100</const>
+  </pattern>
+  <phrase>
+   <literal>RRC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="rotation" carry="C">
+     <ref name="operand"/>
+     <const>-1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="rl-instr">
+ <fragment>
+  <pattern>
+   <const>010</const>
+  </pattern>
+  <phrase>
+   <literal>RL</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="extended" carry="C">
+     <ref name="operand"/>
+     <const>1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="rr-instr">
+ <fragment>
+  <pattern>
+   <const>110</const>
+  </pattern>
+  <phrase>
+   <literal>RR</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="extended" carry="C">
+     <ref name="operand"/>
+     <const>-1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sla-instr">
+ <fragment>
+  <pattern>
+   <const>001</const>
+  </pattern>
+  <phrase>
+   <literal>SLA</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="arithmetic" carry="C">
+     <ref name="operand"/>
+     <const>1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sra-instr">
+ <fragment>
+  <pattern>
+   <const>101</const>
+  </pattern>
+  <phrase>
+   <literal>SRA</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="arithmetic" carry="C">
+     <ref name="operand"/>
+     <const>-1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="srl-instr">
+ <fragment>
+  <pattern>
+   <const>111</const>
+  </pattern>
+  <phrase>
+   <literal>SRL</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="logical" carry="C">
+     <ref name="operand"/>
+     <const>-1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="rs">
@@ -810,6 +950,38 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   <effect>
    <ref name="opcode">
     <bind name="operand" src="dd"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="reg8"/>
+  </var>
+  <var name="opcode">
+   <ref name="rlc-instr"/>
+   <ref name="rrc-instr"/>
+   <ref name="rl-instr"/>
+   <ref name="rr-instr"/>
+   <ref name="sla-instr"/>
+   <ref name="sra-instr"/>
+   <ref name="srl-instr"/>
+  </var>
+  <pattern>
+   <const>11010011</const>
+   <ref name="r"/>
+   <ref name="opcode"/>
+   <const>00</const>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="r"/>
    </ref>
   </effect>
  </fragment>
