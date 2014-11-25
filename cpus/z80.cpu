@@ -15,6 +15,9 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  <property name="prefix" value=""/>
  <property name="suffix" value="H"/>
  <property name="whitespace" value=" "/>
+ <select class="bit">
+  <property name="suffix" value=""/>
+ </select>
 </style>
 
 <register name="B" size="8"/>
@@ -613,6 +616,75 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  </fragment>
 </define>
 
+<define name="bit-instr">
+ <fragment>
+  <pattern>
+   <const>10</const>
+  </pattern>
+  <phrase>
+   <literal>BIT</literal>
+  </phrase>
+  <effect>
+   <and>
+    <ref name="operand"/>
+    <shift width="8" method="logical">
+     <const>1</const>
+     <ref name="bit"/>
+    </shift>
+   </and>
+  </effect>
+ </fragment>
+</define>
+
+<define name="res-instr">
+ <fragment>
+  <pattern>
+   <const>01</const>
+  </pattern>
+  <phrase>
+   <literal>RES</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <and>
+     <ref name="operand"/>
+     <xor>
+      <shift width="8" method="logical">
+       <const>1</const>
+       <ref name="bit"/>
+      </shift>
+      <const>11111111</const>
+     </xor>
+    </and>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="set-instr">
+ <fragment>
+  <pattern>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <literal>SET</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <or>
+     <ref name="operand"/>
+     <shift width="8" method="logical">
+      <const>1</const>
+      <ref name="bit"/>
+     </shift>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="rs">
@@ -981,6 +1053,40 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   </phrase>
   <effect>
    <ref name="opcode">
+    <bind name="operand" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="bit">
+   <integer class="bit" size="3"/>
+  </var>
+  <var name="r">
+   <ref name="reg8"/>
+  </var>
+  <var name="opcode">
+   <ref name="bit-instr"/>
+   <ref name="res-instr"/>
+   <ref name="set-instr"/>
+  </var>
+  <pattern>
+   <const>11010011</const>
+   <ref name="r"/>
+   <ref name="bit"/>
+   <ref name="opcode"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="bit"/>
+   <literal>,</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="bit" src="bit"/>
     <bind name="operand" src="r"/>
    </ref>
   </effect>
