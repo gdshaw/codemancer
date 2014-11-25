@@ -62,7 +62,14 @@ public class RegisterDef {
 			throw new CpudlParseException(element, "register name not specified");
 		}
 		String sizeString = element.getAttribute("size");
-		int size = Integer.decode(sizeString);
-		return new RegisterDef(name, size);
+		if (sizeString.isEmpty()) {
+			throw new CpudlParseException(element, "missing size attribute in register definition");
+		}
+		try {
+			int size = Integer.decode(sizeString);
+			return new RegisterDef(name, size);
+		} catch (NumberFormatException ex) {
+			throw new CpudlParseException(element, "invalid size attribute in register definition");
+		}
 	}
 }
