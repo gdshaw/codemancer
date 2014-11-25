@@ -959,6 +959,32 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  </fragment>
 
  <fragment>
+  <var name="opcode">
+   <ref name="rlc-instr"/>
+   <ref name="rrc-instr"/>
+   <ref name="rl-instr"/>
+   <ref name="rr-instr"/>
+  </var>
+  <pattern>
+   <const>111</const>
+   <ref name="opcode"/>
+   <const>00</const>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+   <literal>A</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand">
+     <register name="A"/>
+    </bind>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
   <var name="dd">
    <ref name="reg16"/>
    <ref name="sp16"/>
