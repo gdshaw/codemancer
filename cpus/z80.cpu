@@ -1287,6 +1287,55 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  </fragment>
 
  <fragment>
+  <pattern>
+   <const>00010000</const>
+  </pattern>
+  <phrase>
+   <literal>EX</literal>
+  </phrase>
+  <phrase>
+   <literal>AF,</literal><ws/>
+   <literal>AF'</literal>
+  </phrase>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10011011</const>
+  </pattern>
+  <phrase>
+   <literal>EXX</literal>
+  </phrase>
+  <phrase></phrase>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>11000111</const>
+  </pattern>
+  <phrase>
+   <literal>EX</literal>
+  </phrase>
+  <phrase>
+   <literal>(SP),</literal><ws/>
+   <literal>HL</literal>
+  </phrase>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>11010111</const>
+  </pattern>
+  <phrase>
+   <literal>EX</literal>
+  </phrase>
+  <phrase>
+   <literal>DE,</literal><ws/>
+   <literal>HL</literal>
+  </phrase>
+ </fragment>
+
+ <fragment>
   <var name="r">
    <ref name="reg8"/>
   </var>
