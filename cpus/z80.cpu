@@ -21,6 +21,9 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  <select class="addr">
   <property name="width" value="4"/>
  </select>
+ <select class="rst">
+  <property name="width" value="2"/>
+ </select>
 </style>
 
 <register name="B" size="8"/>
@@ -1467,6 +1470,31 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  </fragment>
 
  <fragment>
+  <pattern>
+   <const>10010011</const>
+  </pattern>
+  <phrase>
+   <literal>RET</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <memory size="16">
+     <register name="SP"/>
+    </memory>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>2</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
   <var name="cc">
    <ref name="cc3"/>
   </var>
@@ -1499,6 +1527,28 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
  </fragment>
 
  <fragment>
+  <var name="nn">
+   <integer size="16"/>
+  </var>
+  <pattern>
+   <const>11000011</const>
+   <ref name="nn"/>
+  </pattern>
+  <phrase>
+   <literal>JP</literal>
+  </phrase>
+  <phrase>
+   <ref name="nn"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <ref name="nn"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
   <var name="cc">
    <ref name="cc3"/>
   </var>
@@ -1520,6 +1570,61 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <ref name="nn"/>
   </phrase>
   <effect>
+   <assign>
+    <register name="PC"/>
+    <ref name="nn"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10010111</const>
+  </pattern>
+  <phrase>
+   <literal>JP</literal>
+  </phrase>
+  <phrase>
+   <literal>(HL)</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <memory size="16">
+     <register name="HL"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="nn">
+   <integer size="16"/>
+  </var>
+  <pattern>
+   <const>10110011</const>
+   <ref name="nn"/>
+  </pattern>
+  <phrase>
+   <literal>CALL</literal>
+  </phrase>
+  <phrase>
+   <ref name="nn"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>2</const>
+    </sub>
+   </assign>
+   <assign>
+    <memory size="16">
+     <register name="SP"/>
+    </memory>
+    <register name="PC+"/>
+   </assign>
    <assign>
     <register name="PC"/>
     <ref name="nn"/>
@@ -1565,6 +1670,54 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <assign>
     <register name="PC"/>
     <ref name="nn"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="t">
+   <integer size="3"/>
+  </var>
+  <var name="p">
+   <integer class="rst" size="8"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="p"/>
+    <mul>
+     <ref name="t"/>
+     <const>8</const>
+    </mul>
+   </equals>
+  </where>
+  <pattern>
+   <const>111</const>
+   <ref name="t"/>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <literal>RST</literal>
+  </phrase>
+  <phrase>
+   <ref name="p"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>2</const>
+    </sub>
+   </assign>
+   <assign>
+    <memory size="16">
+     <register name="SP"/>
+    </memory>
+    <register name="PC+"/>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <ref name="p"/>
    </assign>
   </effect>
  </fragment>
