@@ -40,9 +40,12 @@ public class Constant extends Expression {
 		if (width < 1) width = 1;
 		if (width > 64) width = 64;
 
+		boolean negative = (value < 0);
+		String sign = (negative) ? "-" : "";
+
 		char[] digits = new char[64];
 		int i = digits.length;
-		long v = value;
+		long v = (negative) ? -value : value;
 		while ((v != 0) || (width != 0)) {
 			int dv = (int)(v % base);
 			char digit = (dv < 10) ? (char)('0' + dv) : (char)('A' + dv - 10);
@@ -50,7 +53,7 @@ public class Constant extends Expression {
 			v = v / base;
 			if (width != 0) --width;
 		}
-		return prefix + new String(digits, i, digits.length - i) + suffix;
+		return prefix + sign + new String(digits, i, digits.length - i) + suffix;
 	}
 
 	public void accumulate(Accumulator acc, long multiplier) {
