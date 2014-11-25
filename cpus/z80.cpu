@@ -33,6 +33,137 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
 <register name="HL" size="16"/>
 <register name="AF" size="16"/>
 <register name="SP" size="16"/>
+<register name="PC" size="16"/>
+<register name="PC+" size="16"/>
+
+<register name="CF" size="1"/>
+<register name="NF" size="1"/>
+<register name="PVF" size="1"/>
+<register name="HF" size="1"/>
+<register name="ZF" size="1"/>
+<register name="SF" size="1"/>
+
+<define name="cc">
+ <fragment>
+  <pattern>
+   <const>000</const>
+  </pattern>
+  <phrase>
+   <literal>NZ</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="ZF"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>100</const>
+  </pattern>
+  <phrase>
+   <literal>Z</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="ZF"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>010</const>
+  </pattern>
+  <phrase>
+   <literal>NC</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="CF"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>110</const>
+  </pattern>
+  <phrase>
+   <literal>C</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="CF"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>001</const>
+  </pattern>
+  <phrase>
+   <literal>PO</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="PVF"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>101</const>
+  </pattern>
+  <phrase>
+   <literal>PE</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="PVF"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>011</const>
+  </pattern>
+  <phrase>
+   <literal>P</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="SF"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>111</const>
+  </pattern>
+  <phrase>
+   <literal>M</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="SF"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+</define>
 
 <define name="reg8">
  <fragment>
@@ -1023,6 +1154,109 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <ref name="opcode">
     <bind name="operand" src="dd"/>
    </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="cc">
+   <ref name="cc"/>
+  </var>
+  <pattern>
+   <const>000</const>
+   <ref name="cc"/>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <literal>RET</literal>
+  </phrase>
+  <phrase>
+   <ref name="cc"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <memory size="16">
+     <register name="SP"/>
+    </memory>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>2</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="cc">
+   <ref name="cc"/>
+  </var>
+  <var name="nn">
+   <integer size="16"/>
+  </var>
+  <pattern>
+   <const>010</const>
+   <ref name="cc"/>
+   <const>11</const>
+   <ref name="nn"/>
+  </pattern>
+  <phrase>
+   <literal>JP</literal>
+  </phrase>
+  <phrase>
+   <ref name="cc"/>
+   <literal>,</literal><ws/>
+   <ref name="nn"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <ref name="nn"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="cc">
+   <ref name="cc"/>
+  </var>
+  <var name="nn">
+   <integer size="16"/>
+  </var>
+  <pattern>
+   <const>001</const>
+   <ref name="cc"/>
+   <const>11</const>
+   <ref name="nn"/>
+  </pattern>
+  <phrase>
+   <literal>CALL</literal>
+  </phrase>
+  <phrase>
+   <ref name="cc"/>
+   <literal>,</literal><ws/>
+   <ref name="nn"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>2</const>
+    </sub>
+   </assign>
+   <assign>
+    <memory size="16">
+     <register name="SP"/>
+    </memory>
+    <register name="PC+"/>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <ref name="nn"/>
+   </assign>
   </effect>
  </fragment>
 
