@@ -429,6 +429,9 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   <phrase>
    <literal>ADD</literal>
   </phrase>
+  <phrase>
+   <literal>A,</literal><ws/>
+  </phrase>
   <effect>
    <assign>
     <register name="A"/>
@@ -448,6 +451,9 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   </pattern>
   <phrase>
    <literal>ADC</literal>
+  </phrase>
+  <phrase>
+   <literal>A,</literal><ws/>
   </phrase>
   <effect>
    <assign>
@@ -470,6 +476,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   <phrase>
    <literal>SUB</literal>
   </phrase>
+  <phrase></phrase>
   <effect>
    <assign>
     <register name="A"/>
@@ -489,6 +496,9 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   </pattern>
   <phrase>
    <literal>SBC</literal>
+  </phrase>
+  <phrase>
+   <literal>A,</literal><ws/>
   </phrase>
   <effect>
    <assign>
@@ -511,6 +521,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   <phrase>
    <literal>AND</literal>
   </phrase>
+  <phrase></phrase>
   <effect>
    <assign>
     <register name="A"/>
@@ -531,6 +542,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   <phrase>
    <literal>XOR</literal>
   </phrase>
+  <phrase></phrase>
   <effect>
    <assign>
     <register name="A"/>
@@ -551,6 +563,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   <phrase>
    <literal>OR</literal>
   </phrase>
+  <phrase></phrase>
   <effect>
    <assign>
     <register name="A"/>
@@ -571,6 +584,7 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   <phrase>
    <literal>CP</literal>
   </phrase>
+  <phrase></phrase>
   <effect>
    <sub>
     <register name="A"/>
@@ -917,33 +931,8 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
   <var name="opcode">
    <ref name="add-instr"/>
    <ref name="adc-instr"/>
-   <ref name="sbc-instr"/>
-  </var>
-  <pattern>
-   <ref name="r"/>
-   <ref name="opcode"/>
-   <const>01</const>
-  </pattern>
-  <phrase>
-   <ref name="opcode"/>
-  </phrase>
-  <phrase>
-   <literal>A,</literal><ws/>
-   <ref name="r"/>
-  </phrase>
-  <effect>
-   <ref name="opcode">
-    <bind name="operand" src="r"/>
-   </ref>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="r">
-   <ref name="reg8"/>
-  </var>
-  <var name="opcode">
    <ref name="sub-instr"/>
+   <ref name="sbc-instr"/>
    <ref name="and-instr"/>
    <ref name="xor-instr"/>
    <ref name="or-instr"/>
@@ -958,11 +947,46 @@ Note: 0x76 currently decodes incorrectly as LD (HL),(HL).
    <ref name="opcode"/>
   </phrase>
   <phrase>
+   <ref name="opcode"/>
    <ref name="r"/>
   </phrase>
   <effect>
    <ref name="opcode">
     <bind name="operand" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="n">
+   <integer size="8" encoding="u"/>
+  </var>
+  <var name="opcode">
+   <ref name="add-instr"/>
+   <ref name="adc-instr"/>
+   <ref name="sub-instr"/>
+   <ref name="sbc-instr"/>
+   <ref name="and-instr"/>
+   <ref name="xor-instr"/>
+   <ref name="or-instr"/>
+   <ref name="cp-instr"/>
+  </var>
+  <pattern>
+   <const>011</const>
+   <ref name="opcode"/>
+   <const>11</const>
+   <ref name="n"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="opcode"/>
+   <ref name="n"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="n"/>
    </ref>
   </effect>
  </fragment>
