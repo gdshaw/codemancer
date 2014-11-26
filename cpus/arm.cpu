@@ -9,6 +9,11 @@ GNU General Public License (version 3 or any later version).
 <style>
  <property name="base" value="16"/>
  <property name="prefix" value="&amp;"/>
+ <select class="shift">
+  <property name="whitespace" value=" "/>
+  <property name="base" value="10"/>
+  <property name="prefix" value=""/>
+ </select>
 </style>
 
 <register name="R0" size="32"/>
@@ -487,6 +492,77 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="shift-opcode">
+ <fragment>
+  <pattern>
+   <const>00</const>
+  </pattern>
+  <phrase>
+   <literal>LSL</literal>
+  </phrase>
+  <effect>
+   <shift width="32" method="logical" carry="C">
+    <ref name="rm"/>
+    <ref name="distance"/>
+   </shift>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10</const>
+  </pattern>
+  <phrase>
+   <literal>LSR</literal>
+  </phrase>
+  <effect>
+   <shift width="32" method="logical" carry="C">
+    <ref name="rm"/>
+    <sub>
+     <const>0</const>
+     <ref name="distance"/>
+    </sub>
+   </shift>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>01</const>
+  </pattern>
+  <phrase>
+   <literal>ASR</literal>
+  </phrase>
+  <effect>
+   <shift width="32" method="arithmetic" carry="C">
+    <ref name="rm"/>
+    <sub>
+     <const>0</const>
+     <ref name="distance"/>
+    </sub>
+   </shift>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <literal>ROR</literal>
+  </phrase>
+  <effect>
+   <shift width="32" method="rotation" carry="C">
+    <ref name="rm"/>
+    <sub>
+     <const>0</const>
+     <ref name="distance"/>
+    </sub>
+   </shift>
+  </effect>
+ </fragment>
+</define>
+
 <define name="s-bit">
  <choice>
   <fragment>
@@ -522,6 +598,153 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <ref name="rm"/>
   </phrase>
+ </fragment>
+
+ <fragment>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>01000000</const>
+  </pattern>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <ref name="rm"/>
+   <literal>,LSR</literal><ws class="shift"/>
+   <literal>#32</literal>
+  </phrase>
+  <effect>
+   <shift width="32" method="logical" carry="C">
+    <ref name="rm"/>
+    <const>-32</const>
+   </shift>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>00100000</const>
+  </pattern>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <ref name="rm"/>
+   <literal>,ASR</literal><ws class="shift"/>
+   <literal>#32</literal>
+  </phrase>
+  <effect>
+   <shift width="32" method="arithmetic" carry="C">
+    <ref name="rm"/>
+    <const>-32</const>
+   </shift>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>01100000</const>
+  </pattern>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <ref name="rm"/>
+   <literal>,RRX</literal>
+  </phrase>
+  <effect>
+   <shift width="32" method="extended" carry="C">
+   <ref name="rm"/>
+    <const>-1</const>
+   </shift>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <var name="shift">
+   <ref name="shift-opcode"/>
+  </var>
+  <var name="distance">
+   <integer size="5" class="shift"/>
+  </var>
+  <where>
+   <not>
+    <equal>
+     <ref name="distance"/>
+     <const>0</const>
+    </equal>
+   </not>
+  </where>
+  <pattern>
+   <ref name="rm"/>
+   <const>0</const>
+   <ref name="shift"/>
+   <ref name="distance"/>
+  </pattern>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <ref name="rm"/>
+   <literal>,</literal>
+   <ref name="shift"/><ws class="shift"/>
+   <literal>#</literal>
+   <ref name="distance"/>
+  </phrase>
+  <effect>
+   <ref name="shift">
+    <bind name="rm" src="rm"/>
+    <bind name="distance" src="distance"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <var name="shift">
+   <ref name="shift-opcode"/>
+  </var>
+  <var name="distance">
+   <ref name="register"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>1</const>
+   <ref name="shift"/>
+   <const>0</const>
+   <ref name="distance"/>
+  </pattern>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <ref name="rm"/>
+   <literal>,</literal>
+   <ref name="shift"/><ws class="shift"/>
+   <ref name="distance"/>
+  </phrase>
+  <effect>
+   <ref name="shift">
+    <bind name="rm" src="rm"/>
+    <bind name="distance" src="distance"/>
+   </ref>
+  </effect>
  </fragment>
 </define>
 
