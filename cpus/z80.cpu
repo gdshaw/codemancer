@@ -964,6 +964,140 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="ld-op">
+ <fragment>
+  <pattern>
+   <const>00</const>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+ </fragment>
+ <effect>
+  <assign>
+   <memory size="8">
+    <register name="DE"/>
+   </memory>
+   <memory size="8">
+    <register name="HL"/>
+   </memory>
+  </assign>
+  <assign>
+   <register name="DE"/>
+   <add>
+    <register name="DE"/>
+    <ref name="step"/>
+   </add>
+  </assign>
+  <assign>
+   <register name="HL"/>
+   <add>
+    <register name="HL"/>
+    <ref name="step"/>
+   </add>
+  </assign>
+  <assign>
+   <register name="BC"/>
+   <sub>
+    <register name="BC"/>
+    <const>1</const>
+   </sub>
+  </assign>
+ </effect>
+</define>
+
+<define name="cp-op">
+ <fragment>
+  <pattern>
+   <const>10</const>
+  </pattern>
+  <phrase>
+   <literal>CP</literal>
+  </phrase>
+ <effect>
+  <sub>
+   <register name="A"/>
+   <memory size="8">
+    <register name="HL"/>
+   </memory>
+  </sub>
+  <assign>
+   <register name="HL"/>
+   <add>
+    <register name="HL"/>
+    <ref name="step"/>
+   </add>
+  </assign>
+  <assign>
+   <register name="BC"/>
+   <sub>
+    <register name="BC"/>
+    <const>1</const>
+   </sub>
+  </assign>
+ </effect>
+ </fragment>
+</define>
+
+<define name="in-op">
+ <fragment>
+  <pattern>
+   <const>01</const>
+  </pattern>
+  <phrase>
+   <literal>IN</literal>
+  </phrase>
+ </fragment>
+</define>
+
+<define name="out-op">
+ <fragment>
+  <pattern>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <literal>OUT</literal>
+  </phrase>
+ </fragment>
+</define>
+
+<define name="ot-op">
+ <fragment>
+  <pattern>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <literal>OT</literal>
+  </phrase>
+ </fragment>
+</define>
+
+<define name="step">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>I</literal>
+  </phrase>
+  <effect>
+   <const>1</const>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>D</literal>
+  </phrase>
+  <effect>
+   <const>-1</const>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="rs">
@@ -2401,6 +2535,60 @@ GNU General Public License (version 3 or any later version).
     </or>
    </assign>
   </effect>
+ </fragment>
+
+ <fragment>
+  <var name="op">
+   <ref name="ld-op"/>
+   <ref name="cp-op"/>
+   <ref name="in-op"/>
+   <ref name="out-op"/>
+  </var>
+  <var name="step">
+   <ref name="step"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <ref name="op"/>
+   <const>0</const>
+   <ref name="step"/>
+   <const>0101</const>
+  </pattern>
+  <phrase>
+   <ref name="op"/>
+   <ref name="step"/>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <ref name="op">
+    <bind name="step" src="step"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="op">
+   <ref name="ld-op"/>
+   <ref name="cp-op"/>
+   <ref name="in-op"/>
+   <ref name="ot-op"/>
+  </var>
+  <var name="step">
+   <ref name="step"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <ref name="op"/>
+   <const>0</const>
+   <ref name="step"/>
+   <const>1101</const>
+  </pattern>
+  <phrase>
+   <ref name="op"/>
+   <ref name="step"/>
+   <literal>R</literal>
+  </phrase>
+  <phrase></phrase>
  </fragment>
 </start>
 </cpudl>
