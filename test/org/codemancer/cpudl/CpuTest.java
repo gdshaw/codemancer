@@ -78,7 +78,7 @@ public class CpuTest {
 		return new Constant(null, Long.parseLong(s, 16));
 	}
 
-	public CpuTest(Architecture arch, String line, String setup, Long pc) throws Exception {
+	public CpuTest(Architecture arch, String line, String setup, Long pc, Integer width) throws Exception {
 		this.arch = arch;
 		this.start = arch.getStart();
 
@@ -92,10 +92,10 @@ public class CpuTest {
 
 		this.code = new ShortBitString();
 		String codeField = this.fields[0];
-		for (int i = 0; i + 1 < codeField.length(); i += 2) {
-			int v = (parseHexValue(codeField.charAt(i)) << 4) |
-				parseHexValue(codeField.charAt(i + 1));
-			code = code.concat(new ShortBitString(v, 8));
+		int mask = (width >> 2) - 1;
+		for (int i = 0; i < codeField.length(); ++i) {
+			int v = parseHexValue(codeField.charAt(i ^ mask));
+			code = code.concat(new ShortBitString(v, 4));
 		}
 
 		this.preconds = (setup.isEmpty()) ? new String[0] : setup.split(",");
@@ -169,6 +169,7 @@ public class CpuTest {
 		Collection<Object[]> params = new ArrayList<Object[]>();
 		String setup = new String();
 		Long pc = new Long(0);
+		Integer width = new Integer(8);
 		File[] testFiles = new File("testdata/cpus").listFiles();
 		for (int i = 0; i != testFiles.length; ++i) {
 			File testFile = testFiles[i];
@@ -187,11 +188,17 @@ public class CpuTest {
 					case '!':
 						setup = line.substring(1, line.length());
 						continue;
+					case '+':
+						width = Integer.parseInt(line.substring(1, line.length()));
+						if ((width & 7) != 0) {
+							throw new IllegalArgumentException("instruction width not a multiple of 8");
+						}
+						continue;
 					case '@':
 						pc = Long.parseLong(line.substring(1, line.length()), 16);
 						continue;
 					default:
-						params.add(new Object[] {arch, line, setup, pc});
+						params.add(new Object[] {arch, line, setup, pc, width});
 					}
 				}
 			}
