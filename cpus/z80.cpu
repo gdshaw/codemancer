@@ -2310,5 +2310,97 @@ GNU General Public License (version 3 or any later version).
    </assign>
   </effect>
  </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10110111</const>
+   <const>00100010</const>
+  </pattern>
+  <phrase>
+   <literal>NEG</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <sub>
+     <const>0</const>
+     <register name="A"/>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10110111</const>
+   <const>11100110</const>
+  </pattern>
+  <phrase>
+   <literal>RRD</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <or>
+     <and>
+      <register name="A"/>
+      <const>0xC0</const>
+     </and>
+     <and>
+      <shift width="8" mode="logical">
+       <register name="A"/>
+       <const>4</const>
+      </shift>
+      <const>0x30</const>
+     </and>
+     <and>
+      <shift width="8" mode="logical">
+       <register name="A"/>
+       <const>-2</const>
+      </shift>
+      <const>0x0F</const>
+     </and>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10110111</const>
+   <const>11110110</const>
+  </pattern>
+  <phrase>
+   <literal>RLD</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <or>
+     <and>
+      <register name="A"/>
+      <const>0xC0</const>
+     </and>
+     <and>
+      <shift width="8" mode="logical">
+       <register name="A"/>
+       <const>2</const>
+      </shift>
+      <const>0x3C</const>
+     </and>
+     <and>
+      <shift width="8" mode="logical">
+       <register name="A"/>
+       <const>-4</const>
+      </shift>
+      <const>0x03</const>
+     </and>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
 </start>
 </cpudl>
