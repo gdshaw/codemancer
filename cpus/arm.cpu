@@ -1,0 +1,498 @@
+<!--
+This file is part of libcpudl.
+Copyright 2013 Graham Shaw
+Redistribution and modification are permitted within the terms of the
+GNU General Public License (version 3 or any later version).
+-->
+
+<cpudl>
+<style>
+ <property name="base" value="16"/>
+ <property name="prefix" value="&amp;"/>
+</style>
+
+<register name="R0" size="32"/>
+<register name="R1" size="32"/>
+<register name="R2" size="32"/>
+<register name="R3" size="32"/>
+<register name="R4" size="32"/>
+<register name="R5" size="32"/>
+<register name="R6" size="32"/>
+<register name="R7" size="32"/>
+<register name="R8" size="32"/>
+<register name="R9" size="32"/>
+<register name="R10" size="32"/>
+<register name="R11" size="32"/>
+<register name="R12" size="32"/>
+<register name="R13" size="32"/>
+<register name="LR" size="32"/>
+<register name="PC" size="32"/>
+
+<register name="V" size="1"/>
+<register name="C" size="1"/>
+<register name="Z" size="1"/>
+<register name="N" size="1"/>
+
+<define name="register">
+ <fragment>
+  <pattern>
+   <const>0000</const>
+  </pattern>
+  <phrase>
+   <literal>R0</literal>
+  </phrase>
+  <effect>
+   <register name="R0"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1000</const>
+  </pattern>
+  <phrase>
+   <literal>R1</literal>
+  </phrase>
+  <effect>
+   <register name="R1"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0100</const>
+  </pattern>
+  <phrase>
+   <literal>R2</literal>
+  </phrase>
+  <effect>
+   <register name="R2"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1100</const>
+  </pattern>
+  <phrase>
+   <literal>R3</literal>
+  </phrase>
+  <effect>
+   <register name="R3"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0010</const>
+  </pattern>
+  <phrase>
+   <literal>R4</literal>
+  </phrase>
+  <effect>
+   <register name="R4"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1010</const>
+  </pattern>
+  <phrase>
+   <literal>R5</literal>
+  </phrase>
+  <effect>
+   <register name="R5"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0110</const>
+  </pattern>
+  <phrase>
+   <literal>R6</literal>
+  </phrase>
+  <effect>
+   <register name="R6"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1110</const>
+  </pattern>
+  <phrase>
+   <literal>R7</literal>
+  </phrase>
+  <effect>
+   <register name="R7"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0001</const>
+  </pattern>
+  <phrase>
+   <literal>R8</literal>
+  </phrase>
+  <effect>
+   <register name="R8"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1001</const>
+  </pattern>
+  <phrase>
+   <literal>R9</literal>
+  </phrase>
+  <effect>
+   <register name="R9"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0101</const>
+  </pattern>
+  <phrase>
+   <literal>R10</literal>
+  </phrase>
+  <effect>
+   <register name="R10"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1101</const>
+  </pattern>
+  <phrase>
+   <literal>R11</literal>
+  </phrase>
+  <effect>
+   <register name="R11"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0011</const>
+  </pattern>
+  <phrase>
+   <literal>R12</literal>
+  </phrase>
+  <effect>
+   <register name="R12"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1011</const>
+  </pattern>
+  <phrase>
+   <literal>R13</literal>
+  </phrase>
+  <effect>
+   <register name="R13"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0111</const>
+  </pattern>
+  <phrase>
+   <literal>LR</literal>
+  </phrase>
+  <effect>
+   <register name="LR"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1111</const>
+  </pattern>
+  <phrase>
+   <literal>PC</literal>
+  </phrase>
+  <effect>
+   <register name="PC"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cc">
+ <fragment>
+  <pattern>
+   <const>0000</const>
+  </pattern>
+  <phrase>
+   <literal>EQ</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="Z"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1000</const>
+  </pattern>
+  <phrase>
+   <literal>NE</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="Z"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0100</const>
+  </pattern>
+  <phrase>
+   <literal>CS</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="C"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1100</const>
+  </pattern>
+  <phrase>
+   <literal>CC</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="C"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0010</const>
+  </pattern>
+  <phrase>
+   <literal>MI</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="N"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1010</const>
+  </pattern>
+  <phrase>
+   <literal>PL</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="N"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0110</const>
+  </pattern>
+  <phrase>
+   <literal>VS</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="V"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1110</const>
+  </pattern>
+  <phrase>
+   <literal>VC</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="V"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0001</const>
+  </pattern>
+  <phrase>
+   <literal>HI</literal>
+  </phrase>
+  <effect>
+   <and>
+    <equals>
+     <register name="Z"/>
+     <const>0</const>
+    </equals>
+    <equals>
+     <register name="C"/>
+     <const>1</const>
+    </equals>
+   </and>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1001</const>
+  </pattern>
+  <phrase>
+   <literal>LS</literal>
+  </phrase>
+  <effect>
+   <and>
+    <equals>
+     <register name="Z"/>
+     <const>1</const>
+    </equals>
+    <equals>
+     <register name="C"/>
+     <const>0</const>
+    </equals>
+   </and>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0101</const>
+  </pattern>
+  <phrase>
+   <literal>GE</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <xor>
+     <register name="N"/>
+     <register name="V"/>
+    </xor>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1101</const>
+  </pattern>
+  <phrase>
+   <literal>LT</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <xor>
+     <register name="N"/>
+     <register name="V"/>
+    </xor>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0011</const>
+  </pattern>
+  <phrase>
+   <literal>GT</literal>
+  </phrase>
+  <effect>
+   <and>
+    <equals>
+     <register name="Z"/>
+     <const>0</const>
+    </equals>
+    <equals>
+     <xor>
+      <register name="N"/>
+      <register name="V"/>
+     </xor>
+     <const>0</const>
+    </equals>
+   </and>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1011</const>
+  </pattern>
+  <phrase>
+   <literal>LE</literal>
+  </phrase>
+  <effect>
+   <or>
+    <equals>
+     <register name="Z"/>
+     <const>1</const>
+    </equals>
+    <equals>
+     <xor>
+      <register name="N"/>
+      <register name="V"/>
+     </xor>
+     <const>1</const>
+    </equals>
+   </or>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0111</const>
+  </pattern>
+  <phrase>
+   <literal></literal>
+  </phrase>
+  <effect>
+   <const>1</const>
+  </effect>
+ </fragment>
+</define>
+
+<start>
+ <fragment>
+  <pattern>
+   <const>11111111111111111111111111111111</const>
+  </pattern>
+  <phrase>DUMMY</phrase>
+ </fragment>
+</start>
+</cpudl>
