@@ -45,6 +45,8 @@ GNU General Public License (version 3 or any later version).
 <register name="ZF" size="1"/>
 <register name="SF" size="1"/>
 
+<register name="I" size="8"/>
+<register name="R" size="8"/>
 <register name="IFF" size="1"/>
 
 <define name="cc2">
@@ -420,6 +422,70 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="addr"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ir">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>I</literal>
+  </phrase>
+  <effect>
+   <register name="I"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>R</literal>
+  </phrase>
+  <effect>
+   <register name="R"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="im">
+ <fragment>
+  <pattern>
+   <const>00</const>
+  </pattern>
+  <phrase>
+   <literal>0</literal>
+  </phrase>
+  <effect>
+   <const>0</const>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>01</const>
+  </pattern>
+  <phrase>
+   <literal>1</literal>
+  </phrase>
+  <effect>
+   <const>1</const>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <literal>2</literal>
+  </phrase>
+  <effect>
+   <const>2</const>
   </effect>
  </fragment>
 </define>
@@ -2119,6 +2185,128 @@ GNU General Public License (version 3 or any later version).
     <memory size="16">
      <ref name="nn"/>
     </memory>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10110111</const>
+   <const>10100010</const>
+  </pattern>
+  <phrase>
+   <literal>RETN</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <memory size="16">
+     <register name="SP"/>
+    </memory>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>2</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10110111</const>
+   <const>10110010</const>
+  </pattern>
+  <phrase>
+   <literal>RETI</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <memory size="16">
+     <register name="SP"/>
+    </memory>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>2</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="im">
+   <ref name="im"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <const>011</const>
+   <ref name="im"/>
+   <const>010</const>
+  </pattern>
+  <phrase>
+   <literal>IM</literal>
+  </phrase>
+  <phrase>
+   <ref name="im"/>
+  </phrase>
+  <effect></effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="ir"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <const>111</const>
+   <ref name="r"/>
+   <const>0010</const>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
+   <literal>A</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="r"/>
+    <register name="A"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="ir"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <const>111</const>
+   <ref name="r"/>
+   <const>1010</const>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <literal>A,</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <ref name="r"/>
    </assign>
   </effect>
  </fragment>
