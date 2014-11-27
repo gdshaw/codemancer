@@ -585,6 +585,54 @@ GNU General Public License (version 3 or any later version).
 
 <define name="alu-operand">
  <fragment>
+  <var name="imm">
+   <integer size="8"/>
+  </var>
+  <var name="rot-imm">
+   <integer size="4"/>
+  </var>
+  <var name="imm2">
+   <integer size="32"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="imm2"/>
+    <shift width="32" method="rotation">
+     <ref name="imm"/>
+     <sub>
+      <const>0</const>
+      <mul>
+       <ref name="rot-imm"/>
+       <const>2</const>
+      </mul>
+     </sub>
+    </shift>
+   </equals>
+  </where>
+  <pattern>
+   <ref name="imm"/>
+   <ref name="rot-imm"/>
+  </pattern>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>#</literal>
+   <ref name="imm2"/>
+  </phrase>
+  <effect>
+   <shift width="32" method="rotation">
+    <ref name="imm"/>
+    <sub>
+     <const>0</const>
+     <ref name="rot-imm"/>
+     <ref name="rot-imm"/>
+    </sub>
+   </shift>
+  </effect>
+ </fragment>
+
+ <fragment>
   <var name="rm">
    <ref name="register"/>
   </var>
