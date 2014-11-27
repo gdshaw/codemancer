@@ -64,6 +64,39 @@ public class Shift extends BinaryExpression {
 		return "<<";
 	}
 
+	public Expression simplify() {
+		Expression simpleLhs = getLhs().simplify();
+		Expression simpleRhs = getRhs().simplify();
+		if ((simpleLhs instanceof Constant) && (simpleRhs instanceof Constant)) {
+			long mask = (1L << width) - 1L;
+			long constLhs = ((Constant)simpleLhs).getValue() & mask;
+			long constRhs = ((Constant)simpleRhs).getValue();
+			long result;
+
+			switch (method) {
+			case LOGICAL:
+				if (constRhs < 0) {
+					return new Constant(getType(), (constLhs >> -constRhs) & mask);
+				} else {
+					return new Constant(getType(), (constLhs << constRhs) & mask);
+				}
+			case ROTATION:
+				long reducedRhs = constRhs % width;
+				if (reducedRhs < 0) reducedRhs += width;
+				return new Constant(getType(),
+					((constLhs << reducedRhs) | (constLhs >> (width - reducedRhs))) & mask);
+			}
+		} else if (simpleLhs instanceof Shift) {
+			Shift shiftLhs = ((Shift)simpleLhs);
+			if ((shiftLhs.width == this.width) && (shiftLhs.method == this.method)) {
+				Expression combinedRhs = new Addition(null, shiftLhs.getRhs(), getRhs());
+				combinedRhs = combinedRhs.simplify();
+				return new Shift(getType(), this.width, this.method, shiftLhs.getLhs(), combinedRhs);
+			}
+		}
+		return partialClone(simpleLhs, simpleRhs);
+	}
+
 	/** Make shift operation from XML element.
 	 * If the element contains two or more subexpressions then the result is
 	 * a shift expression.
