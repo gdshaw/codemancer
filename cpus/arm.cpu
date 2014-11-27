@@ -564,23 +564,41 @@ GNU General Public License (version 3 or any later version).
 </define>
 
 <define name="s-bit">
- <choice>
-  <fragment>
-   <pattern>
-    <const>0</const>
-   </pattern>
-   <phrase></phrase>
-  </fragment>
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase></phrase>
+ </fragment>
 
-  <fragment>
-   <pattern>
-    <const>1</const>
-   </pattern>
-   <phrase>
-    <literal>S</literal>
-   </phrase>
-  </fragment>
- </choice>
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>S</literal>
+  </phrase>
+ </fragment>
+</define>
+
+<define name="p-suffix">
+ <fragment>
+  <pattern>
+   <const>0000</const>
+  </pattern>
+  <phrase>
+   <literal></literal>
+  </phrase>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1111</const>
+  </pattern>
+  <phrase>
+   <literal>P</literal>
+  </phrase>
+ </fragment>
 </define>
 
 <define name="alu-operand">
@@ -1197,6 +1215,9 @@ GNU General Public License (version 3 or any later version).
    <ref name="cmp-instr"/>
    <ref name="cmn-instr"/>
   </var>
+  <var name="p">
+   <ref name="p-suffix"/>
+  </var>
   <var name="rn">
    <ref name="register"/>
   </var>
@@ -1205,7 +1226,7 @@ GNU General Public License (version 3 or any later version).
   </var>
   <pattern>
    <ref name="operand"/>
-   <const>0000</const>
+   <ref name="p"/>
    <ref name="rn"/>
    <const>1</const>
    <ref name="opcode"/>
@@ -1215,7 +1236,9 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <ref name="opcode"/>
   </phrase>
-  <phrase></phrase>
+  <phrase>
+   <ref name="p"/>
+  </phrase>
   <phrase>
    <ref name="rn"/>
    <literal>,</literal><ws/>
