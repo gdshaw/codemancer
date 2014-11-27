@@ -130,7 +130,7 @@ public class FragmentType extends Type {
 		if (name.equals("")) {
 			throw new CpudlParseException(element, "member name not specified");
 		}
-		Type type = ctx.makeChoice(element);
+		Type type = Choice.make(ctx, element);
 		members.put(name, new MemberInfo(type, bufferCount));
 		bufferCount += 1;
 	}

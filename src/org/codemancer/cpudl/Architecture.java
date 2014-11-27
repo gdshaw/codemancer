@@ -49,13 +49,13 @@ public class Architecture {
 					if (start != null) {
 						throw new CpudlParseException(childElement, "multiple <start> elements");
 					}
-					start = ctx.makeChoice(childElement);
+					start = Choice.make(ctx, childElement);
 				} else if (tagName.equals("define")) {
 					String typeName = childElement.getAttribute("name");
 					if (typeName == null) {
 						throw new CpudlParseException(childElement, "missing name attribute in <define> element");
 					}
-					Type type = ctx.makeChoice(childElement);
+					Type type = Choice.make(ctx, childElement);
 					types.put(typeName, type);
 				} else if (tagName.equals("register")) {
 					RegisterDef register = RegisterDef.make(childElement);

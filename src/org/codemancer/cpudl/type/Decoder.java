@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import org.codemancer.cpudl.BitString;
 import org.codemancer.cpudl.BitReader;
+import org.codemancer.cpudl.type.Choice.TypeInfo;
 import org.codemancer.cpudl.expr.Expression;
 
 /** A class for decoding a bit pattern to yield an instruction fragment. */
@@ -95,13 +96,13 @@ public class Decoder {
 	Decoder[] branches = new Decoder[NUM_BRANCHES];
 
 	/** A list of types that cannot be distinguished further using the trie. */
-	ArrayList<Type> types = new ArrayList<Type>();
+	ArrayList<Choice.TypeInfo> types = new ArrayList<Choice.TypeInfo>();
 
 	/** Construct a decoder for a given list of types.
 	 * @param types the list of instruction fragments
 	 * @param chunkCount the number of chunks that the decoder will handle
 	 */
-	Decoder(List<Type> types, int chunkCount) {
+	Decoder(List<Choice.TypeInfo> types, int chunkCount) {
 		if (types.size() == 0) {
 			throw new IllegalArgumentException("cannot decode an empty list of types");
 		}
@@ -119,8 +120,8 @@ public class Decoder {
 			// bits that can be examined at the current level of the trie.
 			// (It does not limit what can be examined at lower levels.)
 			long minFixedWidth = Integer.MAX_VALUE;
-			for (Type type: types) {
-				long fixedWidth = type.getFixedWidth(i);
+			for (Choice.TypeInfo info: types) {
+				long fixedWidth = info.type.getFixedWidth(i);
 				if (fixedWidth < minFixedWidth) {
 					minFixedWidth = fixedWidth;
 				}
@@ -130,8 +131,8 @@ public class Decoder {
 			// of all fragments.
 			for (int j = 0; j != minFixedWidth; ++j) {
 				BitInfo currentBit = new BitInfo(i, j, k++, 0);
-				for (Type type: types) {
-					currentBit.accumulate(type);
+				for (Choice.TypeInfo info: types) {
+					currentBit.accumulate(info.type);
 				}
 				currentBit.complete();
 				if (currentBit.betterThan(bestBit)) {
@@ -148,21 +149,22 @@ public class Decoder {
 
 		if (bestBit.eliminates == 0) {
 			// If inspecting that bit would not eliminate any fragments then make this a leaf node.
-			for (Type type: types) {
-				this.types.add(type);
+			for (Choice.TypeInfo info: types) {
+				this.types.add(info);
 			}
 		} else {
 			// Otherwise, partition the fragment list into three sub-lists:
 			// one for each possible value of the bit, and one for if it could
 			// take either value.
-			ArrayList<ArrayList<Type>> listBranches = new ArrayList<ArrayList<Type>>();
+			ArrayList<ArrayList<Choice.TypeInfo>> listBranches =
+				new ArrayList<ArrayList<Choice.TypeInfo>>();
 			for (int i = 0; i != NUM_BRANCHES; ++i) {
-				listBranches.add(new ArrayList<Type>());
+				listBranches.add(new ArrayList<Choice.TypeInfo>());
 			}
 
-			for (Type type: types) {
-				int value = type.getFixedBit(chunk, cindex);
-				listBranches.get((value < 0) ? EITHER : value).add(type);
+			for (Choice.TypeInfo info: types) {
+				int value = info.type.getFixedBit(chunk, cindex);
+				listBranches.get((value < 0) ? EITHER : value).add(info);
 			}
 
 			// Create decoders for any of the lists that are non-empty.
@@ -186,16 +188,34 @@ public class Decoder {
 			positions[i] = readers.get(i).tell();
 		}
 
-		// If this is a leaf node then try matching each of the listed candidates.
+		// If this is a leaf node then try matching each of the listed candidates,
+		// choosing the one with the highest priority if there are several.
 		if (!types.isEmpty()) {
-			for (Type type: types) {
-				Expression expr = type.decode(readers);
+			TypeInfo bestInfo = null;
+			Expression bestExpr = null;
+			long bestPositions[] = new long[readers.size()];
+			for (Choice.TypeInfo info: types) {
+				Expression expr = info.type.decode(readers);
 				if (expr != null) {
-					return expr;
+					if ((bestInfo == null) || (info.priority > bestInfo.priority)) {
+						bestInfo = info;
+						bestExpr = expr;
+						for (int i = 0; i != readers.size(); ++i) {
+							bestPositions[i] = readers.get(i).tell();
+						}
+					}
 				}
 				for (int i = 0; i != readers.size(); ++i) {
 					readers.get(i).seek(positions[i]);
 				}
+			}
+
+			if (bestInfo != null) {
+				Type type = bestInfo.type;
+				for (int i = 0; i != readers.size(); ++i) {
+					readers.get(i).seek(bestPositions[i]);
+				}
+				return bestExpr;
 			}
 		}
 

@@ -89,34 +89,9 @@ public class Context {
 		} else if (tagName.equals("fragment")) {
 			return new FragmentType(this, element);
 		} else if (tagName.equals("choice")) {
-			return makeChoice(element);
+			return Choice.make(this, element);
 		} else {
 			return null;
-		}
-	}
-
-	/** Make choice of types from children of XML element.
-	 * If only one type is specified then it may be returned directly
-	 * (as opposed to being wrapped within a Choice object).
-	 * @param node the parent of the elements to be interpreted as types
-	 * @return the type or choice of types
-	 */
-	public Type makeChoice(Element element) throws CpudlParseException {
-		ArrayList<Type> types = new ArrayList<Type>();
-		Node child = element.getFirstChild();
-		while (child != null) {
-			Type type = makeType(child);
-			if (type != null) {
-				types.add(type);
-			}
-			child = child.getNextSibling();
-		}
-		if (types.size() == 0) {
-			throw new CpudlParseException(element, "type expected");
-		} else if (types.size() == 1) {
-			return types.get(0);
-		} else {
-			return new Choice(types);
 		}
 	}
 
