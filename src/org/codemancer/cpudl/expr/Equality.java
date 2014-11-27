@@ -34,7 +34,7 @@ public class Equality extends BinaryExpression {
 	}
 
 	public Expression simplify() {
-		Expression diff = new Subtraction(null, getLhs(), getRhs());
+		Expression diff = new Subtraction(getLhs().getType(), getLhs(), getRhs());
 		diff = diff.simplify();
 		if (diff instanceof Constant) {
 			Constant constDiff = (Constant)diff;

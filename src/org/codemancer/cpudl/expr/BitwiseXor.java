@@ -31,6 +31,33 @@ public class BitwiseXor extends BinaryExpression {
 		return "^";
 	}
 
+	public Expression simplify() {
+		// Detect and handle:
+		// x ^ 0 == x
+		// x ^ x == 0
+		// and commuted counterparts.
+                Expression simpleLhs = getLhs().simplify();
+                Expression simpleRhs = getRhs().simplify();
+		if (simpleLhs instanceof Constant) {
+			Constant constLhs = (Constant)simpleLhs;
+			if (constLhs.getValue() == 0) {
+				return simpleRhs;
+			} else if (simpleRhs instanceof Constant) {
+				Constant constRhs = (Constant)simpleRhs;
+				return new Constant(getLhs().getType(),
+					constLhs.getValue() ^ constRhs.getValue());
+			}
+		} else if (simpleRhs instanceof Constant) {
+			Constant constRhs = (Constant)simpleRhs;
+			if (constRhs.getValue() == 0) {
+				return simpleLhs;
+			}
+		} else if (simpleLhs.equals(simpleRhs)) {
+			return new Constant(getType(), 0);
+		}
+		return this;
+	}
+
 	/** Make bitwise XOR operation from XML element.
 	 * If the element contains two or more subexpressions then the result is
 	 * a bitwise XOR expression.
