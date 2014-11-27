@@ -602,6 +602,68 @@ GNU General Public License (version 3 or any later version).
 </define>
 
 <define name="alu-operand">
+ <priority level="1">
+  <fragment>
+   <var name="imm">
+    <integer size="8"/>
+   </var>
+   <var name="rot-imm">
+    <integer size="4"/>
+   </var>
+   <var name="imm2">
+    <integer size="32"/>
+   </var>
+   <where>
+    <equals>
+     <ref name="imm2"/>
+     <shift width="32" method="rotation">
+      <ref name="imm"/>
+      <sub>
+       <const>0</const>
+       <mul>
+        <ref name="rot-imm"/>
+        <const>2</const>
+       </mul>
+      </sub>
+     </shift>
+    </equals>
+   </where>
+   <where>
+    <xor>
+     <equals>
+      <and>
+       <ref name="imm"/>
+       <const>3</const>
+      </and>
+      <const>0</const>
+     </equals>
+     <const>1</const>
+    </xor>
+   </where>
+   <pattern>
+    <ref name="imm"/>
+    <ref name="rot-imm"/>
+   </pattern>
+   <pattern>
+    <const>1</const>
+   </pattern>
+   <phrase>
+    <literal>#</literal>
+    <ref name="imm2"/>
+   </phrase>
+   <effect>
+    <shift width="32" method="rotation">
+     <ref name="imm"/>
+     <sub>
+      <const>0</const>
+      <ref name="rot-imm"/>
+      <ref name="rot-imm"/>
+     </sub>
+    </shift>
+   </effect>
+  </fragment>
+ </priority>
+
  <fragment>
   <var name="imm">
    <integer size="8"/>
@@ -609,22 +671,16 @@ GNU General Public License (version 3 or any later version).
   <var name="rot-imm">
    <integer size="4"/>
   </var>
-  <var name="imm2">
-   <integer size="32"/>
+  <var name="rot-imm2">
+   <integer class="shift" size="5"/>
   </var>
   <where>
    <equals>
-    <ref name="imm2"/>
-    <shift width="32" method="rotation">
-     <ref name="imm"/>
-     <sub>
-      <const>0</const>
-      <mul>
-       <ref name="rot-imm"/>
-       <const>2</const>
-      </mul>
-     </sub>
-    </shift>
+    <ref name="rot-imm2"/>
+    <mul>
+     <ref name="rot-imm"/>
+     <const>2</const>
+    </mul>
    </equals>
   </where>
   <pattern>
@@ -636,7 +692,9 @@ GNU General Public License (version 3 or any later version).
   </pattern>
   <phrase>
    <literal>#</literal>
-   <ref name="imm2"/>
+   <ref name="imm"/>
+   <literal>,</literal><ws class="shift"/>
+   <ref name="rot-imm2"/>
   </phrase>
   <effect>
    <shift width="32" method="rotation">
