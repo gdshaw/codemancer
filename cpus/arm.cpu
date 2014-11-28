@@ -7,10 +7,10 @@ GNU General Public License (version 3 or any later version).
 
 <cpudl>
 <style>
+ <property name="whitespace" value=" "/>
  <property name="base" value="16"/>
  <property name="prefix" value="&amp;"/>
  <select class="shift">
-  <property name="whitespace" value=" "/>
   <property name="base" value="10"/>
   <property name="prefix" value=""/>
  </select>
@@ -737,7 +737,8 @@ GNU General Public License (version 3 or any later version).
   </pattern>
   <phrase>
    <ref name="rm"/>
-   <literal>,LSR</literal><ws class="shift"/>
+   <literal>,</literal><ws/>
+   <literal>LSR</literal><ws class="shift"/>
    <literal>#32</literal>
   </phrase>
   <effect>
@@ -761,7 +762,8 @@ GNU General Public License (version 3 or any later version).
   </pattern>
   <phrase>
    <ref name="rm"/>
-   <literal>,ASR</literal><ws class="shift"/>
+   <literal>,</literal><ws/>
+   <literal>ASR</literal><ws class="shift"/>
    <literal>#32</literal>
   </phrase>
   <effect>
@@ -785,7 +787,8 @@ GNU General Public License (version 3 or any later version).
   </pattern>
   <phrase>
    <ref name="rm"/>
-   <literal>,RRX</literal>
+   <literal>,</literal><ws/>
+   <literal>RRX</literal>
   </phrase>
   <effect>
    <shift width="32" method="extended" carry="C">
@@ -824,7 +827,7 @@ GNU General Public License (version 3 or any later version).
   </pattern>
   <phrase>
    <ref name="rm"/>
-   <literal>,</literal>
+   <literal>,</literal><ws/>
    <ref name="shift"/><ws class="shift"/>
    <literal>#</literal>
    <ref name="distance"/>
@@ -859,7 +862,7 @@ GNU General Public License (version 3 or any later version).
   </pattern>
   <phrase>
    <ref name="rm"/>
-   <literal>,</literal>
+   <literal>,</literal><ws/>
    <ref name="shift"/><ws class="shift"/>
    <ref name="distance"/>
   </phrase>
