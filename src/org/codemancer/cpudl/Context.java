@@ -14,6 +14,7 @@ import org.codemancer.cpudl.type.ConstantType;
 import org.codemancer.cpudl.type.LiteralType;
 import org.codemancer.cpudl.type.Whitespace;
 import org.codemancer.cpudl.type.IntegerType;
+import org.codemancer.cpudl.type.BitmapType;
 import org.codemancer.cpudl.type.FragmentType;
 import org.codemancer.cpudl.type.Choice;
 import org.codemancer.cpudl.expr.Expression;
@@ -86,6 +87,8 @@ public class Context {
 			return new Whitespace(this, element);
 		} else if (tagName.equals("integer")) {
 			return new IntegerType(this, element);
+		} else if (tagName.equals("bitmap")) {
+			return new BitmapType(this, element);
 		} else if (tagName.equals("fragment")) {
 			return new FragmentType(this, element);
 		} else if (tagName.equals("choice")) {
