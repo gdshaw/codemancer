@@ -21,6 +21,9 @@ public class Reference extends Expression {
 	/** The name of this reference. */
 	private final String name;
 
+	/** The name split into components. */
+	private final String[] components;
+
 	/** The arguments to be used when resolving this reference, or null if none. */
 	private final Map<String, Expression> args;
 
@@ -32,6 +35,7 @@ public class Reference extends Expression {
 	public Reference(Type type, String name, Map<String, Expression> args) {
 		super(type);
 		this.name = name;
+		this.components = name.split("[.]");
 		this.args = args;
 	}
 
@@ -46,11 +50,19 @@ public class Reference extends Expression {
 		StringBuilder sb = new StringBuilder();
 		sb.append("%");
 		sb.append(name);
+		if ((args != null) && (!args.isEmpty())) {
+			sb.append("(");
+			for (Map.Entry<String, Expression> entry: this.args.entrySet()) {
+				sb.append(entry.getKey());
+				sb.append("=");
+				sb.append(entry.getValue().unparse(style));
+			}
+			sb.append(")");
+		}
 		return sb.toString();
 	}
 
 	public Expression resolveReferences(Fragment frag, Map<String, Expression> args) {
-
 		// Resolve the supplied argument list, so far as is possible, in the current context.
 		Map<String, Expression> resolvedArgs = new HashMap<String, Expression>();
 		if (this.args != null) {
@@ -59,15 +71,36 @@ public class Reference extends Expression {
 			}
 		}
 
-                // Attempt to resolve the name as an argument.
+		// Attempt to resolve the first component of the name as an argument.
 		Expression result = null;
+		int i = 0;
 		if (args != null) {
-			result = args.get(name);
+			result = args.get(components[i]);
+			if (result != null) {
+				i += 1;
+				if (result instanceof Fragment) {
+					frag = (Fragment)result;
+				} else {
+					frag = null;
+				}
+			}
 		}
 
-		// If unresolved, attempt to resolve the name as a fragment member.
-		if (result == null) {
-			result = frag.get(name);
+		// Attempt to resolve the remaining components as fragment members.
+		// (This will include the first component in the case where it did not resolve
+		// as an argument.)
+		while ((i != components.length) && (frag != null)) {
+			result = frag.get(components[i]);
+			if (result != null) {
+				i += 1;
+				if (result instanceof Fragment) {
+					frag = (Fragment)result;
+				} else {
+					frag = null;
+				}
+			} else {
+				frag = null;
+			}
 		}
 
 		// If the name was resolved then resolve the associated value.
@@ -75,12 +108,11 @@ public class Reference extends Expression {
 			result = result.resolveReferences(frag, resolvedArgs);
 		}
 
-		// If resolution failed then either throw an exception or return
-		// this unresolved reference, as appropriate.
+		// If resolution failed then either throw an exception or return a
+		// partially resolved reference, as appropriate.
 		if (result == null) {
 			result = new Reference(getType(), name, resolvedArgs);
 		}
-
 		return result;
 	}
 
