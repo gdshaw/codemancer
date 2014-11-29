@@ -18,6 +18,7 @@ import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.BitStringReader;
 import org.codemancer.cpudl.ShortBitString;
 import org.codemancer.cpudl.Architecture;
+import org.codemancer.cpudl.FeatureSet;
 import org.codemancer.cpudl.type.Type;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Constant;
@@ -33,6 +34,7 @@ public class Disassemble {
 
 		Architecture arch = Architecture.makeArchitecture(architectureName);
 		Type start = arch.getStart();
+		FeatureSet features = new FeatureSet(arch);
 
 		RandomAccessFile file = new RandomAccessFile(pathname, "r");
 		ByteBuffer image = file.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, file.length());
@@ -48,7 +50,7 @@ public class Disassemble {
 			List<BitReader> codeReaders = new ArrayList<BitReader>();
 			codeReaders.add(codeReader);
 
-			Expression expr = start.decode(codeReaders);
+			Expression expr = start.decode(codeReaders, features);
 			if (codeReader.tell() % 8 != 0) {
 				System.out.printf("Error: instruction not a whole number of bytes\n");
 				expr = null;

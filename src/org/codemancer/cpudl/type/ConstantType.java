@@ -12,6 +12,7 @@ import org.codemancer.cpudl.BitString;
 import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.ShortBitString;
 import org.codemancer.cpudl.Context;
+import org.codemancer.cpudl.FeatureSet;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Constant;
@@ -74,7 +75,7 @@ public class ConstantType extends Type {
 		return content;
 	}
 
-	public final Expression decode(List<BitReader> readers) {
+	public final Expression decode(List<BitReader> readers, FeatureSet features) {
 		if (readers.size() != 1) {
 			throw new IllegalArgumentException("incorrect number of chunks");
 		}

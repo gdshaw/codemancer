@@ -7,6 +7,7 @@ package org.codemancer.cpudl.type;
 
 import java.util.List;
 
+import org.codemancer.cpudl.FeatureSet;
 import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.expr.Expression;
 
@@ -52,9 +53,10 @@ public abstract class Type {
 	 * If decoding is successful then the bit readers are left positioned at the end
 	 * of the respective chunks. If decoding fails then their positions are unspecified.
 	 * @param readers sources of bits, one for each chunk
+	 * @param features the features enabled at the time of decoding
 	 * @return an expression corresponding to the bit sequences, or null if they did not match
 	 */
-	public Expression decode(List<BitReader> readers) {
+	public Expression decode(List<BitReader> readers, FeatureSet features) {
 		return null;
 	}
 

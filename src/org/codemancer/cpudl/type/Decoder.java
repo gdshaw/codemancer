@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import org.codemancer.cpudl.BitString;
 import org.codemancer.cpudl.BitReader;
+import org.codemancer.cpudl.FeatureSet;
 import org.codemancer.cpudl.type.Choice.TypeInfo;
 import org.codemancer.cpudl.expr.Expression;
 
@@ -179,9 +180,10 @@ public class Decoder {
 	/** Attempt to decode a collection of bit sequences.
 	 * This function has the same semantics as Type.decode.
 	 * @param readers sources of bits, one for each chunk
+	 * @param features the features enabled at the time of decoding
 	 * @return an expression corresponding to the bit sequences, or null if they did not match
 	 */
-	Expression decode(List<BitReader> readers) {
+	Expression decode(List<BitReader> readers, FeatureSet features) {
 		// Record the positions of the bit readers to allow them to be reset.
 		long positions[] = new long[readers.size()];
 		for (int i = 0; i != readers.size(); ++i) {
@@ -195,7 +197,8 @@ public class Decoder {
 			Expression bestExpr = null;
 			long bestPositions[] = new long[readers.size()];
 			for (Choice.TypeInfo info: types) {
-				Expression expr = info.type.decode(readers);
+				if (!features.contains(info.features)) continue;
+				Expression expr = info.type.decode(readers, features);
 				if (expr != null) {
 					if ((bestInfo == null) || (info.priority > bestInfo.priority)) {
 						bestInfo = info;
@@ -223,7 +226,7 @@ public class Decoder {
 		// the relevant branch.
 		int bit = readers.get(chunk).peek(cindex);
 		if (branches[bit] != null) {
-			Expression expr = branches[bit].decode(readers);
+			Expression expr = branches[bit].decode(readers, features);
 			if (expr != null) {
 				return expr;
 			}
@@ -235,7 +238,7 @@ public class Decoder {
 		// If nothing was found on the branch above then backtrack and try the
 		// either-value branch instead.
 		if (branches[EITHER] != null) {
-			Expression expr = branches[EITHER].decode(readers);
+			Expression expr = branches[EITHER].decode(readers, features);
 			if (expr != null) {
 				return expr;
 			}

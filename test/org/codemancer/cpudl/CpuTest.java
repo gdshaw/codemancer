@@ -27,6 +27,7 @@ import org.codemancer.cpudl.Architecture;
 import org.codemancer.cpudl.EphemeralState;
 import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.Context;
+import org.codemancer.cpudl.FeatureSet;
 import org.codemancer.cpudl.type.Type;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Constant;
@@ -108,8 +109,10 @@ public class CpuTest {
 		BitReader reader = new BitStringReader(code);
 		List<BitReader> readers = new ArrayList<BitReader>();
 		readers.add(reader);
+		FeatureSet features = new FeatureSet(arch);
+		features.add("v12");
 
-		Expression expr = start.decode(readers);
+		Expression expr = start.decode(readers, features);
 		assertTrue(expr != null);
 		expr = expr.resolveReferences(null, null);
 

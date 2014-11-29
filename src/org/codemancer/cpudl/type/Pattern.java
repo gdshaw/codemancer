@@ -17,6 +17,7 @@ import org.codemancer.cpudl.ShortBitString;
 import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.BitStringReader;
 import org.codemancer.cpudl.Context;
+import org.codemancer.cpudl.FeatureSet;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.type.FragmentType.MemberInfo;
 import org.codemancer.cpudl.expr.Expression;
@@ -161,15 +162,16 @@ public class Pattern {
 	 * If decoding is successful then the bit reader is left positioned at the end of
 	 * the decoded chunk. If decoding fails then its position is undefined.
 	 * @param reader a source of bits
+	 * @param features the features enabled at the time of decoding
 	 * @param buffers an array of assembly buffers
 	 * @param frag a fragment for recording the result
 	 * @return true if the sequence matched, otherwise false
 	 */
-	public boolean decode(BitReader reader, ArrayList<ArrayList<BitReader>> buffers, Fragment frag) {
+	public boolean decode(BitReader reader, FeatureSet features, ArrayList<ArrayList<BitReader>> buffers, Fragment frag) {
 		for (ChunkInfo chunkInfo: chunks) {
 			if (chunkInfo.isFinal) {
 				buffers.get(chunkInfo.buffer).add(reader);
-				Expression expr = chunkInfo.type.decode(buffers.get(chunkInfo.buffer));
+				Expression expr = chunkInfo.type.decode(buffers.get(chunkInfo.buffer), features);
 				if (expr == null) return false;
 				if (chunkInfo.name != null) {
 					frag.put(chunkInfo.name, expr);

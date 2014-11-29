@@ -7,6 +7,7 @@ package org.codemancer.cpudl;
 
 import java.io.FileReader;
 import java.util.HashMap;
+import java.util.ArrayList;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXSource;
@@ -33,6 +34,12 @@ public class Architecture {
 
 	/** The registers defined by this architecture, indexed by name. */
 	private final HashMap<String, Register> registers = new HashMap<String, Register>();
+
+	/** The features defined by this architecture, indexed by name. */
+	private final HashMap<String, Integer> featuresByName = new HashMap<String, Integer>();
+
+	/** The features defined by this architecture, index by ID. */
+	private final ArrayList<String> featuresById = new ArrayList<String>();
 
 	/** The stylesheet for this architecture. */
 	private Stylesheet stylesheet = new Stylesheet();
@@ -113,6 +120,28 @@ public class Architecture {
 	 */
 	public final Register getRegister(String registerName) {
 		return registers.get(registerName);
+	}
+
+	/** Get feature ID given name.
+	 * @param featureName the feature name
+	 * @return the corresponding feature ID
+	 */
+	public final int getFeatureId(String featureName) {
+		Integer id = featuresByName.get(featureName);
+		if (id == null) {
+			featuresByName.put(featureName, featuresById.size());
+			featuresById.add(featureName);
+			id = featuresByName.get(featureName);
+		}
+		return id;
+	}
+
+	/** Get feature name given ID.
+	 * @param featureId the feature ID
+	 * @return the corresponding feature name
+	 */
+	public final String getFeatureName(int featureId) {
+		return featuresById.get(featureId);
 	}
 
 	/** Get stylesheet.

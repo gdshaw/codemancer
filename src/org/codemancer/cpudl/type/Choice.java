@@ -14,12 +14,13 @@ import org.codemancer.cpudl.BitString;
 import org.codemancer.cpudl.ShortBitString;
 import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.Context;
+import org.codemancer.cpudl.FeatureSet;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.expr.Expression;
 
 /** A class to represent a choice from a collection of possible types. */
 public class Choice extends Type {
-	/** A class for associating a type with a priority. */
+	/** A class for associating a type with a priority and a set of features. */
 	public static class TypeInfo {
 		/** The type. */
 		public final Type type;
@@ -27,13 +28,18 @@ public class Choice extends Type {
 		/** The priority associated with the type. */
 		public final int priority;
 
+		/** The features which must be enabled for this type to be available. */
+		public final FeatureSet features;
+
 		/** Construct type information structure.
 		 * @param type the type
 		 * @param priority the priority
+		 * @param features the required feature set
 		 */
-		TypeInfo(Type type, int priority) {
+		TypeInfo(Type type, int priority, FeatureSet features) {
 			this.type = type;
 			this.priority = priority;
+			this.features = new FeatureSet(features);
 		}
 	}
 
@@ -170,8 +176,8 @@ public class Choice extends Type {
 		return patterns.get(chunk).variableWidth;
 	}
 
-	public Expression decode(List<BitReader> readers) {
-		return decoder.decode(readers);
+	public Expression decode(List<BitReader> readers, FeatureSet features) {
+		return decoder.decode(readers, features);
 	}
 
 	public int getPieceCount() {
@@ -186,10 +192,11 @@ public class Choice extends Type {
 	 * @param ctx the context of the element
 	 * @param element the parent of the child elements to be added
 	 * @param priority the priority
+	 * @param features the required feature set
 	 * @param types the list of types to be added to
 	 */
-	private static void addElement(Context ctx, Element element, int priority, List<TypeInfo> types)
-		throws CpudlParseException {
+	private static void addElement(Context ctx, Element element, int priority, FeatureSet features,
+		List<TypeInfo> types) throws CpudlParseException {
 
 		Node child = element.getFirstChild();
 		while (child != null) {
@@ -203,11 +210,20 @@ public class Choice extends Type {
 							"missing level attribute in <priority> element");
 					}
 					int childPriority = Integer.parseInt(childPriorityStr);
-					addElement(ctx, childElement, priority + childPriority, types);
+					addElement(ctx, childElement, priority + childPriority, features, types);
+				} else if (tagName.equals("require")) {
+					String featureName = childElement.getAttribute("name");
+					if (featureName.length() == 0) {
+						throw new CpudlParseException(childElement,
+							"missing name attribute in <require> element");
+					}
+					FeatureSet childFeatures = new FeatureSet(features);
+					childFeatures.add(featureName);
+					addElement(ctx, childElement, priority, childFeatures, types);
 				} else {
 					Type type = ctx.makeType(child);
 					if (type != null) {
-						types.add(new TypeInfo(type, priority));
+						types.add(new TypeInfo(type, priority, features));
 					}
 				}
 			}
@@ -224,7 +240,7 @@ public class Choice extends Type {
 	 */
 	public static Type make(Context ctx, Element element) throws CpudlParseException {
 		List<TypeInfo> types = new ArrayList<TypeInfo>();
-		addElement(ctx, element, 0, types);
+		addElement(ctx, element, 0, new FeatureSet(ctx.getArchitecture()), types);
 		if (types.size() == 0) {
 			throw new CpudlParseException(element, "type expected");
 		} else if (types.size() == 1) {

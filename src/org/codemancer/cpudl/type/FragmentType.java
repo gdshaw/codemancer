@@ -15,6 +15,7 @@ import org.w3c.dom.Element;
 
 import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.Context;
+import org.codemancer.cpudl.FeatureSet;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Reference;
@@ -214,7 +215,7 @@ public class FragmentType extends Type {
 		return patterns.get(chunk).isVariableWidth();
 	}
 
-	public Expression decode(List<BitReader> readers) {
+	public Expression decode(List<BitReader> readers, FeatureSet features) {
 		ArrayList<ArrayList<BitReader>> buffers = new ArrayList<ArrayList<BitReader>>(bufferCount);
 		for (int i = 0; i != bufferCount; ++i) {
 			buffers.add(new ArrayList<BitReader>());
@@ -222,7 +223,7 @@ public class FragmentType extends Type {
 
 		Fragment frag = new Fragment(this);
 		for (int i = 0; i != patterns.size(); ++i) {
-			if (!patterns.get(i).decode(readers.get(i), buffers, frag)) {
+			if (!patterns.get(i).decode(readers.get(i), features, buffers, frag)) {
 				return null;
 			}
 		}

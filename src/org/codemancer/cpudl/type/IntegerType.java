@@ -11,6 +11,7 @@ import org.w3c.dom.Element;
 import org.codemancer.cpudl.BitString;
 import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.Context;
+import org.codemancer.cpudl.FeatureSet;
 import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.expr.Expression;
@@ -118,7 +119,7 @@ public class IntegerType extends Type {
 		return false;
 	}
 
-	public final Expression decode(List<BitReader> readers) {
+	public final Expression decode(List<BitReader> readers, FeatureSet features) {
 		if (readers.size() != 1) {
 			throw new IllegalArgumentException("incorrect number of chunks");
 		}
