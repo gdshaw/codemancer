@@ -24,6 +24,9 @@ GNU General Public License (version 3 or any later version).
  <select class="registers">
   <property name="separator" value=", "/>
  </select>
+ <select class="swi">
+  <property name="width" value="6"/>
+ </select>
 </style>
 
 <register name="R0" size="32"/>
@@ -2141,6 +2144,25 @@ GNU General Public License (version 3 or any later version).
  </effect>
 </define>
 
+<define name="swi-instr">
+ <fragment>
+  <var name="swi">
+   <integer class="swi" size="24" encoding="u"/>
+  </var>
+  <pattern>
+   <ref name="swi"/>
+   <const>1111</const>
+  </pattern>
+  <phrase>
+   <literal>SWI</literal>
+  </phrase>
+  <phrase></phrase>
+  <phrase>
+   <ref name="swi"/>
+  </phrase>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -2148,6 +2170,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="ls-instr"/>
    <ref name="lsm-instr"/>
    <ref name="b-instr"/>
+   <ref name="swi-instr"/>
   </var>
   <var name="cc">
    <ref name="cc"/>
