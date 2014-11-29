@@ -22,6 +22,7 @@ import org.codemancer.cpudl.expr.Reference;
 import org.codemancer.cpudl.expr.Constant;
 import org.codemancer.cpudl.expr.Register;
 import org.codemancer.cpudl.expr.Memory;
+import org.codemancer.cpudl.expr.Extension;
 import org.codemancer.cpudl.expr.Addition;
 import org.codemancer.cpudl.expr.Subtraction;
 import org.codemancer.cpudl.expr.Multiplication;
@@ -116,6 +117,8 @@ public class Context {
 			return Register.make(this, el);
 		} else if (tagName.equals("memory")) {
 			return Memory.make(this, el);
+		} else if (tagName.equals("extend")) {
+			return Extension.make(this, el);
 		} else if (tagName.equals("add")) {
 			return Addition.make(this, el);
 		} else if (tagName.equals("sub")) {

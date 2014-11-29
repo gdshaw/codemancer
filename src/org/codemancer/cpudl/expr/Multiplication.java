@@ -60,7 +60,7 @@ public class Multiplication extends BinaryExpression {
 				if (result == null) {
 					result = operand;
 				} else {
-					result = new Multiplication(null, result, operand);
+					result = new Multiplication(result.getType(), result, operand);
 				}
 			}
 			child = child.getNextSibling();

@@ -82,6 +82,14 @@ public class IntegerType extends Type {
 		return size;
 	}
 
+	public final int getEncoding() {
+		return encoding;
+	}
+
+	public final Style getStyle() {
+		return style;
+	}
+
 	public final int getChunkCount() {
 		return 1;
 	}
