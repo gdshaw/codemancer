@@ -18,6 +18,9 @@ GNU General Public License (version 3 or any later version).
   <property name="base" value="10"/>
   <property name="prefix" value=""/>
  </select>
+ <select class="addr">
+  <property name="width" value="8"/>
+ </select>
  <select class="registers">
   <property name="separator" value=", "/>
  </select>
@@ -760,6 +763,31 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <const>1</const>
+  </effect>
+ </fragment>
+</define>
+
+<define name="l-bit">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase></phrase>
+  <effect></effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>L</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="LR"/>
+    <register name="PC"/>
+   </assign>
   </effect>
  </fragment>
 </define>
@@ -2057,12 +2085,69 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="b-instr">
+ <fragment>
+  <var name="l">
+   <ref name="l-bit"/>
+  </var>
+  <var name="offset">
+   <integer size="24" encoding="2c"/>
+  </var>
+  <var name="addr">
+   <integer class="addr" size="32"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="addr"/>
+    <add>
+     <register name="PC"/>
+     <mul>
+      <extend size="32">
+       <ref name="offset"/>
+      </extend>
+      <const>4</const>
+     </mul>
+     <const>8</const>
+    </add>
+   </equals>
+  </where>
+  <pattern>
+   <ref name="offset"/>
+   <ref name="l"/>
+   <const>101</const>
+  </pattern>
+  <phrase>
+   <literal>B</literal>
+   <ref name="l"/>
+  </phrase>
+  <phrase></phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+ </fragment>
+ <effect>
+  <ref name="l"/>
+  <assign>
+   <register name="PC"/>
+   <add>
+    <register name="PC"/>
+    <mul>
+     <ref name="offset"/>
+     <const>4</const>
+    </mul>
+    <const>8</const>
+   </add>
+  </assign>
+ </effect>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
    <ref name="alu-instr"/>
    <ref name="ls-instr"/>
    <ref name="lsm-instr"/>
+   <ref name="b-instr"/>
   </var>
   <var name="cc">
    <ref name="cc"/>
