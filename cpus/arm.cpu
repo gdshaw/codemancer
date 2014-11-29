@@ -1901,7 +1901,7 @@ GNU General Public License (version 3 or any later version).
    <literal>DA</literal>
   </phrase>
   <effect>
-   <multiply>
+   <mul>
     <sub>
      <add>
       <ref name="i"/>
@@ -1910,7 +1910,7 @@ GNU General Public License (version 3 or any later version).
      <ref name="n"/>
     </sub>
     <const>4</const>
-   </multiply>
+   </mul>
   </effect>
  </fragment>
 
@@ -1922,10 +1922,10 @@ GNU General Public License (version 3 or any later version).
    <literal>IA</literal>
   </phrase>
   <effect>
-   <multiply>
+   <mul>
     <ref name="i"/>
     <const>4</const>
-   </multiply>
+   </mul>
   </effect>
  </fragment>
 
@@ -1937,13 +1937,13 @@ GNU General Public License (version 3 or any later version).
    <literal>DB</literal>
   </phrase>
   <effect>
-   <multiply>
+   <mul>
     <sub>
      <ref name="i"/>
      <ref name="n"/>
     </sub>
     <const>4</const>
-   </multiply>
+   </mul>
   </effect>
  </fragment>
 
@@ -1955,13 +1955,13 @@ GNU General Public License (version 3 or any later version).
    <literal>IB</literal>
   </phrase>
   <effect>
-   <multiply>
+   <mul>
     <add>
      <ref name="i"/>
      <ref name="di"/>
     </add>
     <const>4</const>
-   </multiply>
+   </mul>
   </effect>
  </fragment>
 </define>
