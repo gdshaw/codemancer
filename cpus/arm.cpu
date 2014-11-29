@@ -18,6 +18,9 @@ GNU General Public License (version 3 or any later version).
   <property name="base" value="10"/>
   <property name="prefix" value=""/>
  </select>
+ <select class="registers">
+  <property name="separator" value=", "/>
+ </select>
 </style>
 
 <register name="R0" size="32"/>
@@ -234,6 +237,66 @@ GNU General Public License (version 3 or any later version).
    <register name="PC"/>
   </effect>
  </fragment>
+</define>
+
+<define name="register-list">
+ <bitmap class="registers" count="i" total="n" effect="r">
+  <bit name="R0">
+   <register name="R0"/>
+  </bit>
+  <bit name="R1">
+   <register name="R1"/>
+  </bit>
+  <bit name="R2">
+   <register name="R2"/>
+  </bit>
+  <bit name="R3">
+   <register name="R3"/>
+  </bit>
+  <bit name="R4">
+   <register name="R4"/>
+  </bit>
+  <bit name="R5">
+   <register name="R5"/>
+  </bit>
+  <bit name="R6">
+   <register name="R6"/>
+  </bit>
+  <bit name="R7">
+   <register name="R7"/>
+  </bit>
+  <bit name="R8">
+   <register name="R8"/>
+  </bit>
+  <bit name="R9">
+   <register name="R9"/>
+  </bit>
+  <bit name="R10">
+   <register name="R10"/>
+  </bit>
+  <bit name="R11">
+   <register name="R11"/>
+  </bit>
+  <bit name="R12">
+   <register name="R12"/>
+  </bit>
+  <bit name="R13">
+   <register name="R13"/>
+  </bit>
+  <bit name="LR">
+   <register name="LR"/>
+  </bit>
+  <bit name="PC">
+   <register name="PC"/>
+  </bit>
+  <effect name="foreach">
+   <ref name="foreach">
+    <bind name="r" src="r"/>
+    <bind name="i" src="i"/>
+    <bind name="n" src="n"/>
+   </ref>
+  </effect>
+ </bitmap>
 </define>
 
 <define name="cc">
@@ -1805,11 +1868,201 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="lsm-s-bit">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase></phrase>
+  <effect>
+   <const>0</const>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>^</literal>
+  </phrase>
+  <effect>
+   <const>0</const>
+  </effect>
+ </fragment>
+</define>
+
+<define name="lsm-mode">
+ <fragment>
+  <pattern>
+   <const>00</const>
+  </pattern>
+  <phrase>
+   <literal>DA</literal>
+  </phrase>
+  <effect>
+   <multiply>
+    <sub>
+     <add>
+      <ref name="i"/>
+      <ref name="di"/>
+     </add>
+     <ref name="n"/>
+    </sub>
+    <const>4</const>
+   </multiply>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10</const>
+  </pattern>
+  <phrase>
+   <literal>IA</literal>
+  </phrase>
+  <effect>
+   <multiply>
+    <ref name="i"/>
+    <const>4</const>
+   </multiply>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>01</const>
+  </pattern>
+  <phrase>
+   <literal>DB</literal>
+  </phrase>
+  <effect>
+   <multiply>
+    <sub>
+     <ref name="i"/>
+     <ref name="n"/>
+    </sub>
+    <const>4</const>
+   </multiply>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <literal>IB</literal>
+  </phrase>
+  <effect>
+   <multiply>
+    <add>
+     <ref name="i"/>
+     <ref name="di"/>
+    </add>
+    <const>4</const>
+   </multiply>
+  </effect>
+ </fragment>
+</define>
+
+<define name="lsm-instr">
+ <fragment>
+  <var name="registers">
+   <ref name="register-list"/>
+  </var>
+  <var name="rn">
+   <ref name="register"/>
+  </var>
+  <var name="opcode">
+   <ref name="ls-opcode"/>
+  </var>
+  <var name="w">
+   <ref name="w-bit"/>
+  </var>
+  <var name="s">
+   <ref name="lsm-s-bit"/>
+  </var>
+  <var name="mode">
+   <ref name="lsm-mode"/>
+  </var>
+  <pattern>
+   <ref name="registers"/>
+   <ref name="rn"/>
+   <ref name="opcode"/>
+   <ref name="w"/>
+   <ref name="s"/>
+   <ref name="mode"/>
+   <const>001</const>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+   <literal>M</literal>
+  </phrase>
+  <phrase>
+   <ref name="mode"/>
+  </phrase>
+  <phrase>
+   <ref name="rn"/>
+   <ref name="w"/>
+   <literal>,</literal><ws/>
+   <literal>{</literal>
+   <ref name="registers"/>
+   <literal>}</literal>
+   <ref name="s"/>
+  </phrase>
+  <effect>
+   <ref name="registers">
+    <bind name="foreach">
+     <ref name="opcode">
+      <bind name="rd" src="r"/>
+      <bind name="operand">
+       <memory>
+        <add>
+         <ref name="rn"/>
+         <ref name="mode">
+          <bind name="i" src="i"/>
+          <bind name="n" src="n"/>
+          <bind name="di">
+           <const>1</const>
+          </bind>
+         </ref>
+        </add>
+       </memory>
+      </bind>
+     </ref>
+    </bind>
+   </ref>
+   <ref name="w">
+    <bind name="rn" src="rn"/>
+    <bind name="wrn">
+     <add>
+      <ref name="rn"/>
+      <ref name="mode">
+       <bind name="i" src="registers.n"/>
+       <bind name="n">
+        <add>
+         <ref name="registers.n"/>
+         <ref name="registers.n"/>
+        </add>
+       </bind>
+       <bind name="di">
+        <const>0</const>
+       </bind>
+      </ref>
+     </add>
+    </bind>
+   </ref>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
    <ref name="alu-instr"/>
    <ref name="ls-instr"/>
+   <ref name="lsm-instr"/>
   </var>
   <var name="cc">
    <ref name="cc"/>
