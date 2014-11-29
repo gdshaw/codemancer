@@ -16,6 +16,7 @@ import org.codemancer.cpudl.BitString;
 import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.ShortBitString;
 import org.codemancer.cpudl.Context;
+import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Constant;
@@ -59,9 +60,6 @@ public class BitmapType extends Type {
 	/** The effects associated with this bitmap. */
 	private Map<String, Expression> effects = new HashMap<String, Expression>();
 
-	/** The string to use as a separator between members. */
-	private String separator;
-
 	/** The parameter name to use for recording the bit index, or null if not recorded. */
 	private String indexName;
 
@@ -74,15 +72,14 @@ public class BitmapType extends Type {
 	/** The parameter name to use for recording the effect of a bit, or null if not recorded. */
 	private String effectName;
 
+	/** The style to be used for this integer type. */
+	private final Style style;
+
 	/** Construct bitmap type.
 	 * @param ctx the context of this type
 	 * @param element this type as an XML element
 	 */
 	public BitmapType(Context ctx, Element element) throws CpudlParseException {
-		separator = element.getAttribute("separator");
-		if (separator.length() == 0) {
-			separator = ",";
-		}
 		indexName = element.getAttribute("index");
 		if (indexName.length() == 0) {
 			indexName = null;
@@ -116,6 +113,8 @@ public class BitmapType extends Type {
 		if (!effects.containsKey("foreach")) {
 			throw new CpudlParseException(element, "missing definition of 'foreach' effect");
 		}
+
+		this.style = ctx.getStylesheet().getStyle(element.getAttribute("class"));
 	}
 
 	/** Parse member.
@@ -261,7 +260,7 @@ public class BitmapType extends Type {
 		for (BitInfo member: members) {
 			if ((bitmap & 1) != 0) {
 				if (out.length() != 0) {
-					out.append(",");
+					out.append(style.get("separator", ","));
 				}
 				out.append(member.name);
 			}
