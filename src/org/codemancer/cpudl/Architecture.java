@@ -19,7 +19,9 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import org.codemancer.cpudl.type.Type;
+import org.codemancer.cpudl.type.IntegerType;
 import org.codemancer.cpudl.type.Choice;
+import org.codemancer.cpudl.expr.Register;
 
 /** A class to represent an instruction set architecture. */
 public class Architecture {
@@ -30,7 +32,7 @@ public class Architecture {
 	private final HashMap<String, Type> types = new HashMap<String, Type>();
 
 	/** The registers defined by this architecture, indexed by name. */
-	private final HashMap<String, RegisterDef> registers = new HashMap<String, RegisterDef>();
+	private final HashMap<String, Register> registers = new HashMap<String, Register>();
 
 	/** The stylesheet for this architecture. */
 	private Stylesheet stylesheet = new Stylesheet();
@@ -52,18 +54,13 @@ public class Architecture {
 					start = Choice.make(ctx, childElement);
 				} else if (tagName.equals("define")) {
 					String typeName = childElement.getAttribute("name");
-					if (typeName == null) {
+					if (typeName.length() == 0) {
 						throw new CpudlParseException(childElement, "missing name attribute in <define> element");
 					}
 					Type type = Choice.make(ctx, childElement);
 					types.put(typeName, type);
 				} else if (tagName.equals("register")) {
-					RegisterDef register = RegisterDef.make(childElement);
-					if (registers.get(register.getName()) != null) {
-						throw new CpudlParseException(childElement,
-							"multiple definitions for register '" + register.getName() + "'");
-					}
-					registers.put(register.getName(), register);
+					parseRegisterDefinition(childElement);
 				} else if (tagName.equals("style")) {
 					stylesheet.merge(childElement);
 				}
@@ -74,6 +71,28 @@ public class Architecture {
 			throw new CpudlParseException(element, "missing <start> element");
 		}
 	}
+
+	private void parseRegisterDefinition(Element element) throws CpudlParseException {
+		String name = element.getAttribute("name");
+		if (name.length() == 0) {
+			throw new CpudlParseException(element, "missing name attribute in <register> definition");
+		}
+		if (registers.get(name) != null) {
+			throw new CpudlParseException(element, "multiple definitions for register '" + name + "'");
+		}
+
+		String sizeStr = element.getAttribute("size");
+		if (sizeStr.length() == 0) {
+			throw new CpudlParseException(element, "missing size attribute in <register> definition");
+		}
+		int size = Integer.parseInt(sizeStr);
+
+		String className = element.getAttribute("class");
+		Type type = new IntegerType(size, IntegerType.UNSIGNED, stylesheet.getStyle(className));
+		Register register = new Register(type, name);
+		registers.put(name, register);
+	}
+
 
 	/** Get the start type for this architecture. */
 	public final Type getStart() {
@@ -92,7 +111,7 @@ public class Architecture {
 	 * @param registerName the required register name
 	 * @return the corresponding register, or null if not found
 	 */
-	public final RegisterDef getRegister(String registerName) {
+	public final Register getRegister(String registerName) {
 		return registers.get(registerName);
 	}
 

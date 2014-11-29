@@ -12,7 +12,6 @@ import org.w3c.dom.Element;
 import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.State;
 import org.codemancer.cpudl.Style;
-import org.codemancer.cpudl.RegisterDef;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.type.Type;
 import org.codemancer.cpudl.type.IntegerType;
@@ -26,7 +25,7 @@ public class Register extends Expression {
 	 * @param type the required type of this reference
 	 * @param name the name of the register
 	 */
-	private Register(Type type, String name) {
+	public Register(Type type, String name) {
 		super(type);
 		this.name = name;
 	}
@@ -58,9 +57,6 @@ public class Register extends Expression {
 		return this;
 	}
 
-	/** An index of unique register objects, indexed by name. */
-	private static HashMap<String, Register> registers = new HashMap<String, Register>();
-
 	/** Make register reference from register name.
 	 * References to a given register obtained using this method
 	 * are guaranteed to refer to the same object.
@@ -69,14 +65,9 @@ public class Register extends Expression {
 	 * @return the register reference
 	 */
 	public static Register make(Context ctx, String name) {
-		Register register = registers.get(name);
+		Register register = ctx.getArchitecture().getRegister(name);
 		if (register == null) {
-			RegisterDef def = ctx.getArchitecture().getRegister(name);
-			if (def == null) {
-				throw new IllegalArgumentException("undefined register '" + name + "'");
-			}
-			register = new Register(def.getType(), name);
-			registers.put(name, register);
+			throw new IllegalArgumentException("undefined register '" + name + "'");
 		}
 		return register;
 	}
