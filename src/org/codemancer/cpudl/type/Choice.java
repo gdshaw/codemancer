@@ -204,19 +204,10 @@ public class Choice extends Type {
 				Element childElement = (Element)child;
 				String tagName = childElement.getTagName();
 				if (tagName.equals("priority")) {
-					String childPriorityStr = childElement.getAttribute("level");
-					if (childPriorityStr.isEmpty()) {
-						throw new CpudlParseException(childElement,
-							"missing level attribute in <priority> element");
-					}
-					int childPriority = Integer.parseInt(childPriorityStr);
+					int childPriority = Context.parseIntegerAttribute("level", childElement);
 					addElement(ctx, childElement, priority + childPriority, features, types);
 				} else if (tagName.equals("require")) {
-					String featureName = childElement.getAttribute("name");
-					if (featureName.length() == 0) {
-						throw new CpudlParseException(childElement,
-							"missing name attribute in <require> element");
-					}
+					String featureName = Context.parseStringAttribute("name", childElement);
 					FeatureSet childFeatures = new FeatureSet(features);
 					childFeatures.add(featureName);
 					addElement(ctx, childElement, priority, childFeatures, types);

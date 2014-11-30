@@ -60,10 +60,7 @@ public class Architecture {
 					}
 					start = Choice.make(ctx, childElement);
 				} else if (tagName.equals("define")) {
-					String typeName = childElement.getAttribute("name");
-					if (typeName.length() == 0) {
-						throw new CpudlParseException(childElement, "missing name attribute in <define> element");
-					}
+					String typeName = Context.parseStringAttribute("name", childElement);
 					Type type = Choice.make(ctx, childElement);
 					types.put(typeName, type);
 				} else if (tagName.equals("register")) {
@@ -80,19 +77,11 @@ public class Architecture {
 	}
 
 	private void parseRegisterDefinition(Element element) throws CpudlParseException {
-		String name = element.getAttribute("name");
-		if (name.length() == 0) {
-			throw new CpudlParseException(element, "missing name attribute in <register> definition");
-		}
+		String name = Context.parseStringAttribute("name", element);
 		if (registers.get(name) != null) {
 			throw new CpudlParseException(element, "multiple definitions for register '" + name + "'");
 		}
-
-		String sizeStr = element.getAttribute("size");
-		if (sizeStr.length() == 0) {
-			throw new CpudlParseException(element, "missing size attribute in <register> definition");
-		}
-		int size = Integer.parseInt(sizeStr);
+		int size = Context.parseIntegerAttribute("size", element);
 
 		String className = element.getAttribute("class");
 		Type type = new IntegerType(size, IntegerType.UNSIGNED, stylesheet.getStyle(className));

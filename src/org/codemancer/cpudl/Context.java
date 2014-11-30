@@ -16,6 +16,7 @@ import org.codemancer.cpudl.type.Whitespace;
 import org.codemancer.cpudl.type.IntegerType;
 import org.codemancer.cpudl.type.BitmapType;
 import org.codemancer.cpudl.type.FragmentType;
+import org.codemancer.cpudl.type.PrefixType;
 import org.codemancer.cpudl.type.Choice;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Reference;
@@ -71,10 +72,7 @@ public class Context {
 		Element element = (Element)node;
 		String tagName = element.getTagName();
 		if (tagName.equals("ref")) {
-			String typeName = element.getAttribute("name");
-			if (typeName == null) {
-				throw new CpudlParseException(element, "missing name attribute in <ref> element");
-			}
+			String typeName = parseStringAttribute("name", element);
 			Type type = arch.getType(typeName);
 			if (type == null) {
 				throw new CpudlParseException(element, "type name '" + typeName + "' not found");
@@ -92,6 +90,8 @@ public class Context {
 			return new BitmapType(this, element);
 		} else if (tagName.equals("fragment")) {
 			return new FragmentType(this, element);
+		} else if (tagName.equals("prefix")) {
+			return new PrefixType(this, element);
 		} else if (tagName.equals("choice")) {
 			return Choice.make(this, element);
 		} else {
@@ -141,6 +141,33 @@ public class Context {
 			return Sequence.make(this, el);
 		} else {
 			return null;
+		}
+	}
+
+	public static String parseStringAttribute(String attrName, Element element)
+		throws CpudlParseException {
+
+		String attr = element.getAttribute(attrName);
+		if (attr.length() == 0) {
+			throw new CpudlParseException(element,
+				"missing " + attrName + " attribute in <" + element.getTagName() + "> element");
+		}
+		return attr;
+	}
+
+	public static int parseIntegerAttribute(String attrName, Element element)
+		throws CpudlParseException {
+
+		String attrStr = element.getAttribute(attrName);
+		if (attrStr.length() == 0) {
+			throw new CpudlParseException(element,
+				"missing " + attrName + " attribute in <" + element.getTagName() + "> element");
+		}
+		try {
+			return Integer.parseInt(attrStr);
+		} catch (NumberFormatException ex) {
+			throw new CpudlParseException(element,
+				"invalid " + attrName + " attribute in <" + element.getTagName() + "> element");
 		}
 	}
 }

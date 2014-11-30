@@ -63,10 +63,7 @@ public class Phrase {
 					MemberInfo member = new MemberInfo(type, 0);
 					add(childElement, null, member);
 				} else if (tagName.equals("ref")) {
-					String name = childElement.getAttribute("name");
-					if (name == null) {
-						throw new CpudlParseException(childElement, "missing name attribute in ref element");
-					}
+					String name = Context.parseStringAttribute("name", childElement);
 					MemberInfo member = members.get(name);
 					if (member == null) {
 						throw new CpudlParseException(childElement, "undefined fragment member '" + name + "'");

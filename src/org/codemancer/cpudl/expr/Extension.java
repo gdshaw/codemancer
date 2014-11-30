@@ -75,11 +75,7 @@ public class Extension extends Expression {
 	 * @return the expression as an object
 	 */
 	public static Expression make(Context ctx, Element element) throws CpudlParseException {
-		String sizeStr = element.getAttribute("size");
-		if (sizeStr.length() == 0) {
-			throw new CpudlParseException(element, "missing size attribute in <extend>");
-		}
-		int size = Integer.parseInt(sizeStr);
+		int size = Context.parseIntegerAttribute("size", element);
 		int encoding = IntegerType.UNSIGNED;
 		Style style = null;
 

@@ -129,10 +129,7 @@ public class Reference extends Expression {
 	 * @return the reference as an object
 	 */
 	public static Reference make(Context ctx, Element element) throws CpudlParseException {
-		String name = element.getAttribute("name");
-		if (name == null) {
-			throw new CpudlParseException(element, "missing name attribute in <ref> element");
-		}
+		String name = Context.parseStringAttribute("name", element);
 
 		Map<String, Expression> args = new HashMap<String, Expression>();
 		Node child = element.getFirstChild();
