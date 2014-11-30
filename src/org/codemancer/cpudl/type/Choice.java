@@ -17,6 +17,7 @@ import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.FeatureSet;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.expr.Expression;
+import org.codemancer.cpudl.expr.Prefix;
 
 /** A class to represent a choice from a collection of possible types. */
 public class Choice extends Type {
@@ -73,10 +74,10 @@ public class Choice extends Type {
 	}
 
 	/** The number of chunks for this collection of types. */
-	private int chunkCount = 0;
+	private int chunkCount = -1;
 
 	/** The number of pieces for this collection of types. */
-	private int pieceCount = 0;
+	private int pieceCount = -1;
 
 	/** The types from which the choice can be made. */
 	private final ArrayList<Type> types = new ArrayList<Type>();
@@ -101,9 +102,8 @@ public class Choice extends Type {
 	 * @param info the type to be added
 	 */
 	private void add(TypeInfo info) {
-		if (types.isEmpty()) {
+		if (chunkCount == -1) {
 			chunkCount = info.type.getChunkCount();
-			pieceCount = info.type.getPieceCount();
 			patterns.ensureCapacity(chunkCount);
 			for (int i = 0; i != chunkCount; ++i) {
 				patterns.add(new PatternInfo(info.type.getFixedWidth(i), info.type.isVariableWidth(i)));
@@ -112,8 +112,15 @@ public class Choice extends Type {
 			if (info.type.getChunkCount() != chunkCount) {
 				throw new IllegalArgumentException("chunk count mismatch");
 			}
-			if (info.type.getPieceCount() != pieceCount) {
-				throw new IllegalArgumentException("piece count mismatch");
+		}
+
+		if (!(info.type instanceof PrefixType)) {
+			if (pieceCount == -1) {
+				pieceCount = info.type.getPieceCount();
+			} else {
+				if (info.type.getPieceCount() != pieceCount) {
+					throw new IllegalArgumentException("piece count mismatch");
+				}
 			}
 		}
 		types.add(info.type);
@@ -177,7 +184,14 @@ public class Choice extends Type {
 	}
 
 	public Expression decode(List<BitReader> readers, FeatureSet features) {
-		return decoder.decode(readers, features);
+		Expression expr = decoder.decode(readers, features);
+		if (expr instanceof Prefix) {
+			Prefix prefix = (Prefix)expr;
+			FeatureSet childFeatures = new FeatureSet(features);
+			childFeatures.add(prefix.getFeatureName());
+			expr = decoder.decode(readers, childFeatures);
+		}
+		return expr;
 	}
 
 	public int getPieceCount() {

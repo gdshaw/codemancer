@@ -75,7 +75,7 @@ public class ConstantType extends Type {
 		return content;
 	}
 
-	public final Expression decode(List<BitReader> readers, FeatureSet features) {
+	public Expression decode(List<BitReader> readers, FeatureSet features) {
 		if (readers.size() != 1) {
 			throw new IllegalArgumentException("incorrect number of chunks");
 		}
