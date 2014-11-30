@@ -197,7 +197,8 @@ public class Decoder {
 			Expression bestExpr = null;
 			long bestPositions[] = new long[readers.size()];
 			for (Choice.TypeInfo info: types) {
-				if (!features.contains(info.features)) continue;
+				if (!features.containsAll(info.requiredFeatures)) continue;
+				if (features.containsAny(info.forbiddenFeatures)) continue;
 				Expression expr = info.type.decode(readers, features);
 				if (expr != null) {
 					if ((bestInfo == null) || (info.priority > bestInfo.priority)) {

@@ -46,7 +46,15 @@ public class FeatureSet {
 	 * @param that the feature set to be compared
 	 * @return true if it contains all members, otherwise false
 	 */
-	public final boolean contains(FeatureSet that) {
+	public final boolean containsAll(FeatureSet that) {
 		return (that.features & ~features) == 0;
+	}
+
+	/** Test whether this set contains any members of another set.
+	 * @param that the feature set to be compared
+	 * @return true if it contains any members, otherwise false
+	 */
+	public final boolean containsAny(FeatureSet that) {
+		return (that.features & features) != 0;
 	}
 }

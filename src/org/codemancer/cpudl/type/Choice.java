@@ -30,17 +30,21 @@ public class Choice extends Type {
 		public final int priority;
 
 		/** The features which must be enabled for this type to be available. */
-		public final FeatureSet features;
+		public final FeatureSet requiredFeatures;
+
+		/** The features which must not be enabled for this type to be available. */
+		public final FeatureSet forbiddenFeatures;
 
 		/** Construct type information structure.
 		 * @param type the type
 		 * @param priority the priority
 		 * @param features the required feature set
 		 */
-		TypeInfo(Type type, int priority, FeatureSet features) {
+		TypeInfo(Type type, int priority, FeatureSet requiredFeatures, FeatureSet forbiddenFeatures) {
 			this.type = type;
 			this.priority = priority;
-			this.features = new FeatureSet(features);
+			this.requiredFeatures = new FeatureSet(requiredFeatures);
+			this.forbiddenFeatures = new FeatureSet(forbiddenFeatures);
 		}
 	}
 
@@ -206,10 +210,11 @@ public class Choice extends Type {
 	 * @param ctx the context of the element
 	 * @param element the parent of the child elements to be added
 	 * @param priority the priority
-	 * @param features the required feature set
+	 * @param requiredFeatures the required feature set
+	 * @param forbiddenFeatures the forbidden feature set
 	 * @param types the list of types to be added to
 	 */
-	private static void addElement(Context ctx, Element element, int priority, FeatureSet features,
+	private static void addElement(Context ctx, Element element, int priority, FeatureSet requiredFeatures, FeatureSet forbiddenFeatures,
 		List<TypeInfo> types) throws CpudlParseException {
 
 		Node child = element.getFirstChild();
@@ -219,16 +224,23 @@ public class Choice extends Type {
 				String tagName = childElement.getTagName();
 				if (tagName.equals("priority")) {
 					int childPriority = Context.parseIntegerAttribute("level", childElement);
-					addElement(ctx, childElement, priority + childPriority, features, types);
+					addElement(ctx, childElement, priority + childPriority, requiredFeatures, forbiddenFeatures, types);
 				} else if (tagName.equals("require")) {
 					String featureName = Context.parseStringAttribute("name", childElement);
-					FeatureSet childFeatures = new FeatureSet(features);
-					childFeatures.add(featureName);
-					addElement(ctx, childElement, priority, childFeatures, types);
+					if (featureName.charAt(0) == '!') {
+						featureName = featureName.substring(1);
+						FeatureSet childForbiddenFeatures = new FeatureSet(forbiddenFeatures);
+						childForbiddenFeatures.add(featureName);
+						addElement(ctx, childElement, priority, requiredFeatures, childForbiddenFeatures, types);
+					} else {
+						FeatureSet childRequiredFeatures = new FeatureSet(requiredFeatures);
+						childRequiredFeatures.add(featureName);
+						addElement(ctx, childElement, priority, childRequiredFeatures, forbiddenFeatures, types);
+					}
 				} else {
 					Type type = ctx.makeType(child);
 					if (type != null) {
-						types.add(new TypeInfo(type, priority, features));
+						types.add(new TypeInfo(type, priority, requiredFeatures, forbiddenFeatures));
 					}
 				}
 			}
@@ -245,7 +257,7 @@ public class Choice extends Type {
 	 */
 	public static Type make(Context ctx, Element element) throws CpudlParseException {
 		List<TypeInfo> types = new ArrayList<TypeInfo>();
-		addElement(ctx, element, 0, new FeatureSet(ctx.getArchitecture()), types);
+		addElement(ctx, element, 0, new FeatureSet(ctx.getArchitecture()), new FeatureSet(ctx.getArchitecture()), types);
 		if (types.size() == 0) {
 			throw new CpudlParseException(element, "type expected");
 		} else if (types.size() == 1) {
