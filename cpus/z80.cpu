@@ -34,6 +34,8 @@ GNU General Public License (version 3 or any later version).
 <register name="DE" size="16"/>
 <register name="HL" size="16"/>
 <register name="AF" size="16"/>
+<register name="IX" size="16"/>
+<register name="IY" size="16"/>
 <register name="SP" size="16"/>
 <register name="PC" size="16"/>
 <register name="PC+" size="16"/>
@@ -238,6 +240,7 @@ GNU General Public License (version 3 or any later version).
   <pattern>
    <const>000</const>
   </pattern>
+  <pattern></pattern>
   <phrase>
    <literal>B</literal>
   </phrase>
@@ -250,6 +253,7 @@ GNU General Public License (version 3 or any later version).
   <pattern>
    <const>100</const>
   </pattern>
+  <pattern></pattern>
   <phrase>
    <literal>C</literal>
   </phrase>
@@ -262,6 +266,7 @@ GNU General Public License (version 3 or any later version).
   <pattern>
    <const>010</const>
   </pattern>
+  <pattern></pattern>
   <phrase>
    <literal>D</literal>
   </phrase>
@@ -274,6 +279,7 @@ GNU General Public License (version 3 or any later version).
   <pattern>
    <const>110</const>
   </pattern>
+  <pattern></pattern>
   <phrase>
    <literal>E</literal>
   </phrase>
@@ -286,6 +292,7 @@ GNU General Public License (version 3 or any later version).
   <pattern>
    <const>001</const>
   </pattern>
+  <pattern></pattern>
   <phrase>
    <literal>H</literal>
   </phrase>
@@ -298,6 +305,7 @@ GNU General Public License (version 3 or any later version).
   <pattern>
    <const>101</const>
   </pattern>
+  <pattern></pattern>
   <phrase>
    <literal>L</literal>
   </phrase>
@@ -310,6 +318,7 @@ GNU General Public License (version 3 or any later version).
   <pattern>
    <const>111</const>
   </pattern>
+  <pattern></pattern>
   <phrase>
    <literal>A</literal>
   </phrase>
@@ -320,22 +329,75 @@ GNU General Public License (version 3 or any later version).
 </define>
 
 <define name="ind8">
- <fragment>
-  <pattern>
-   <const>011</const>
-  </pattern>
-  <phrase>
-   <literal>(HL)</literal>
-  </phrase>
-  <effect>
-   <memory>
-    <register name="HL"/>
-   </memory>
-  </effect>
- </fragment>
+ <require name="!ix">
+  <require name="!iy">
+   <fragment>
+    <pattern>
+     <const>011</const>
+    </pattern>
+    <pattern></pattern>
+    <phrase>
+     <literal>(HL)</literal>
+    </phrase>
+    <effect>
+     <memory>
+      <register name="HL"/>
+     </memory>
+    </effect>
+   </fragment>
+  </require>
+ </require>
+
+ <require name="ix">
+  <fragment>
+   <var name="disp">
+    <integer size="8" encoding="2c"/>
+   </var>
+   <pattern>
+    <const>011</const>
+   </pattern>
+   <pattern>
+    <ref name="disp"/>
+   </pattern>
+   <phrase>
+    <literal>(IX+</literal>
+    <ref name="disp"/>
+    <literal>)</literal>
+   </phrase>
+   <effect>
+    <memory>
+     <register name="IX"/>
+    </memory>
+   </effect>
+  </fragment>
+ </require>
+
+ <require name="iy">
+  <fragment>
+   <var name="disp">
+    <integer size="8" encoding="2c"/>
+   </var>
+   <pattern>
+    <const>011</const>
+   </pattern>
+   <pattern>
+    <ref name="disp"/>
+   </pattern>
+   <phrase>
+    <literal>(IY+</literal>
+    <ref name="disp"/>
+    <literal>)</literal>
+   </phrase>
+   <effect>
+    <memory>
+     <register name="IY"/>
+    </memory>
+   </effect>
+  </fragment>
+ </require>
 </define>
 
-<define name="reg16">
+<define name="bc16">
  <fragment>
   <pattern>
    <const>00</const>
@@ -348,7 +410,9 @@ GNU General Public License (version 3 or any later version).
    <register name="BC"/>
   </effect>
  </fragment>
+</define>
 
+<define name="de16">
  <fragment>
   <pattern>
    <const>10</const>
@@ -361,19 +425,55 @@ GNU General Public License (version 3 or any later version).
    <register name="DE"/>
   </effect>
  </fragment>
+</define>
 
- <fragment>
-  <pattern>
-   <const>01</const>
-  </pattern>
-  <pattern></pattern>
-  <phrase>
-   <literal>HL</literal>
-  </phrase>
-  <effect>
-   <register name="HL"/>
-  </effect>
- </fragment>
+<define name="hl16">
+ <require name="!ix">
+  <require name="!iy">
+   <fragment>
+    <pattern>
+     <const>01</const>
+    </pattern>
+    <pattern></pattern>
+    <phrase>
+     <literal>HL</literal>
+    </phrase>
+    <effect>
+     <register name="HL"/>
+    </effect>
+   </fragment>
+  </require>
+ </require>
+
+ <require name="ix">
+  <fragment>
+   <pattern>
+    <const>01</const>
+   </pattern>
+   <pattern></pattern>
+   <phrase>
+    <literal>IX</literal>
+   </phrase>
+   <effect>
+    <register name="IX"/>
+   </effect>
+  </fragment>
+ </require>
+
+ <require name="iy">
+  <fragment>
+   <pattern>
+    <const>01</const>
+   </pattern>
+   <pattern></pattern>
+   <phrase>
+    <literal>IY</literal>
+   </phrase>
+   <effect>
+    <register name="IY"/>
+   </effect>
+  </fragment>
+ </require>
 </define>
 
 <define name="sp16">
@@ -1099,6 +1199,9 @@ GNU General Public License (version 3 or any later version).
 </define>
 
 <start>
+ <prefix name="ix">10111011</prefix>
+ <prefix name="iy">10111111</prefix>
+
  <fragment>
   <var name="rs">
    <ref name="reg8"/>
@@ -1111,6 +1214,8 @@ GNU General Public License (version 3 or any later version).
    <ref name="rs"/>
    <ref name="rd"/>
    <const>10</const>
+   <ref name="rs"/>
+   <ref name="rd"/>
   </pattern>
   <phrase>
    <literal>LD</literal>
@@ -1139,6 +1244,8 @@ GNU General Public License (version 3 or any later version).
    <ref name="rs"/>
    <ref name="rd"/>
    <const>10</const>
+   <ref name="rs"/>
+   <ref name="rd"/>
   </pattern>
   <phrase>
    <literal>LD</literal>
@@ -1175,6 +1282,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="r"/>
    <ref name="opcode"/>
    <const>01</const>
+   <ref name="r"/>
   </pattern>
   <phrase>
    <ref name="opcode"/>
@@ -1238,6 +1346,7 @@ GNU General Public License (version 3 or any later version).
    <const>01</const>
    <ref name="r"/>
    <const>00</const>
+   <ref name="r"/>
   </pattern>
   <phrase>
    <ref name="opcode"/>
@@ -1264,6 +1373,7 @@ GNU General Public License (version 3 or any later version).
    <const>011</const>
    <ref name="r"/>
    <const>00</const>
+   <ref name="r"/>
    <ref name="imm"/>
   </pattern>
   <phrase>
@@ -1310,7 +1420,9 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="dd">
-   <ref name="reg16"/>
+   <ref name="bc16"/>
+   <ref name="de16"/>
+   <ref name="hl16"/>
    <ref name="sp16"/>
   </var>
   <var name="imm">
@@ -1341,7 +1453,8 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="dd">
-   <ref name="reg16"/>
+   <ref name="bc16"/>
+   <ref name="de16"/>
    <ref name="addr16"/>
   </var>
   <pattern>
@@ -1371,7 +1484,8 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="dd">
-   <ref name="reg16"/>
+   <ref name="bc16"/>
+   <ref name="de16"/>
    <ref name="addr16"/>
   </var>
   <pattern>
@@ -1401,6 +1515,57 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 
  <fragment>
+  <var name="dd">
+   <ref name="hl16"/>
+  </var>
+  <var name="addr">
+   <integer class="addr" size="16" encoding="u"/>
+  </var>
+  <pattern>
+   <const>0100</const>
+   <ref name="dd"/>
+   <const>00</const>
+   <ref name="dd"/>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <literal>(</literal>
+   <ref name="addr"/>
+   <literal>),</literal><ws/>
+   <ref name="dd"/>
+  </phrase>
+ </fragment>
+
+ <fragment>
+  <var name="dd">
+   <ref name="hl16"/>
+  </var>
+  <var name="addr">
+   <integer class="addr" size="16" encoding="u"/>
+  </var>
+  <pattern>
+   <const>0101</const>
+   <ref name="dd"/>
+   <const>00</const>
+   <ref name="dd"/>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <ref name="dd"/>
+   <literal>,</literal><ws/>
+   <literal>(</literal>
+   <ref name="addr"/>
+   <literal>)</literal>
+  </phrase>
+ </fragment>
+
+ <fragment>
   <pattern>
    <const>10011111</const>
   </pattern>
@@ -1421,7 +1586,9 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="dd">
-   <ref name="reg16"/>
+   <ref name="bc16"/>
+   <ref name="de16"/>
+   <ref name="hl16"/>
    <ref name="sp16"/>
   </var>
   <pattern>
@@ -1450,7 +1617,9 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="dd">
-   <ref name="reg16"/>
+   <ref name="bc16"/>
+   <ref name="de16"/>
+   <ref name="hl16"/>
    <ref name="sp16"/>
   </var>
   <var name="opcode">
@@ -1479,7 +1648,9 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="dd">
-   <ref name="reg16"/>
+   <ref name="bc16"/>
+   <ref name="de16"/>
+   <ref name="hl16"/>
    <ref name="af16"/>
   </var>
   <var name="opcode">
@@ -1810,20 +1981,28 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 
  <fragment>
+  <var name="dd">
+   <ref name="hl16"/>
+  </var>
   <pattern>
-   <const>10010111</const>
+   <const>1001</const>
+   <ref name="dd"/>
+   <const>11</const>
+   <ref name="dd"/>
   </pattern>
   <phrase>
    <literal>JP</literal>
   </phrase>
   <phrase>
-   <literal>(HL)</literal>
+   <literal>(</literal>
+   <ref name="dd"/>
+   <literal>)</literal>
   </phrase>
   <effect>
    <assign>
     <register name="PC"/>
     <memory size="16">
-     <register name="HL"/>
+     <ref name="dd"/>
     </memory>
    </assign>
   </effect>
@@ -2102,6 +2281,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="r"/>
    <ref name="opcode"/>
    <const>00</const>
+   <ref name="r"/>
   </pattern>
   <phrase>
    <ref name="opcode"/>
@@ -2134,6 +2314,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="r"/>
    <ref name="bit"/>
    <ref name="opcode"/>
+   <ref name="r"/>
   </pattern>
   <phrase>
    <ref name="opcode"/>
@@ -2160,6 +2341,7 @@ GNU General Public License (version 3 or any later version).
    <const>000</const>
    <ref name="r"/>
    <const>10</const>
+   <ref name="r"/>
   </pattern>
   <phrase>
    <literal>IN</literal>
@@ -2180,6 +2362,7 @@ GNU General Public License (version 3 or any later version).
    <const>100</const>
    <ref name="r"/>
    <const>10</const>
+   <ref name="r"/>
   </pattern>
   <phrase>
    <literal>OUT</literal>
@@ -2192,7 +2375,9 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="ss">
-   <ref name="reg16"/>
+   <ref name="bc16"/>
+   <ref name="de16"/>
+   <ref name="hl16"/>
    <ref name="sp16"/>
   </var>
   <pattern>
@@ -2223,7 +2408,9 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="ss">
-   <ref name="reg16"/>
+   <ref name="bc16"/>
+   <ref name="de16"/>
+   <ref name="hl16"/>
    <ref name="sp16"/>
   </var>
   <pattern>
@@ -2254,7 +2441,9 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="ss">
-   <ref name="reg16"/>
+   <ref name="bc16"/>
+   <ref name="de16"/>
+   <ref name="hl16"/>
    <ref name="sp16"/>
   </var>
   <var name="nn">
@@ -2289,7 +2478,9 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="ss">
-   <ref name="reg16"/>
+   <ref name="bc16"/>
+   <ref name="de16"/>
+   <ref name="hl16"/>
    <ref name="sp16"/>
   </var>
   <var name="nn">
