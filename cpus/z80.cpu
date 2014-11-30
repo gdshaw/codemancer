@@ -51,6 +51,8 @@ GNU General Public License (version 3 or any later version).
 <register name="R" size="8"/>
 <register name="IFF" size="1"/>
 
+<register name="temp" size="8"/>
+
 <define name="cc2">
  <fragment>
   <pattern>
@@ -2667,27 +2669,46 @@ GNU General Public License (version 3 or any later version).
   <phrase></phrase>
   <effect>
    <assign>
-    <register name="A"/>
+    <register name="temp"/>
     <or>
      <and>
       <register name="A"/>
-      <const>0xC0</const>
+      <const>0xF0</const>
      </and>
      <and>
-      <shift width="8" mode="logical">
-       <register name="A"/>
-       <const>4</const>
-      </shift>
-      <const>0x30</const>
-     </and>
-     <and>
-      <shift width="8" mode="logical">
-       <register name="A"/>
-       <const>-2</const>
-      </shift>
+      <memory size="8">
+       <register name="HL"/>
+      </memory>
       <const>0x0F</const>
      </and>
     </or>
+   </assign>
+   <assign>
+    <memory size="8">
+     <register name="HL"/>
+    </memory>
+    <or>
+     <and>
+      <shift width="8" method="logical">
+       <register name="A"/>
+       <const>4</const>
+      </shift>
+      <const>0xF0</const>
+     </and> 
+     <and>
+      <shift width="8" method="logical">
+       <memory size="8">
+        <register name="HL"/>
+       </memory>
+       <const>-4</const>
+      </shift>
+      <const>0x0F</const>
+     </and> 
+    </or>
+   </assign>
+   <assign>
+    <register name="A"/>
+    <register name="temp"/>
    </assign>
   </effect>
  </fragment>
@@ -2703,27 +2724,46 @@ GNU General Public License (version 3 or any later version).
   <phrase></phrase>
   <effect>
    <assign>
-    <register name="A"/>
+    <register name="temp"/>
     <or>
      <and>
       <register name="A"/>
-      <const>0xC0</const>
+      <const>0xF0</const>
      </and>
      <and>
-      <shift width="8" mode="logical">
-       <register name="A"/>
-       <const>2</const>
-      </shift>
-      <const>0x3C</const>
-     </and>
-     <and>
-      <shift width="8" mode="logical">
-       <register name="A"/>
+      <shift width="8" method="logical">
+       <memory size="8">
+        <register name="HL"/>
+       </memory>
        <const>-4</const>
       </shift>
-      <const>0x03</const>
+      <const>0x0F</const>
+     </and> 
+    </or>
+   </assign>
+   <assign>
+    <memory size="8">
+     <register name="HL"/>
+    </memory>
+    <or>
+     <and>
+      <shift width="8" method="logical">
+       <memory size="8">
+        <register name="HL"/>
+       </memory>
+       <const>4</const>
+      </shift>
+      <const>0xF0</const>
+     </and>
+     <and>
+      <register name="A"/>
+      <const>0x0F</const>
      </and>
     </or>
+   </assign>
+   <assign>
+    <register name="A"/>
+    <register name="temp"/>
    </assign>
   </effect>
  </fragment>
