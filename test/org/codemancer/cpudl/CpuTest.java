@@ -110,7 +110,7 @@ public class CpuTest {
 		List<BitReader> readers = new ArrayList<BitReader>();
 		readers.add(reader);
 		FeatureSet features = new FeatureSet(arch);
-		features.add("v12");
+		features.add("armv2");
 
 		Expression expr = start.decode(readers, features);
 		assertTrue(expr != null);

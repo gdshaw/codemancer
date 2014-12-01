@@ -2163,6 +2163,108 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="mul-instr">
+ <fragment>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <var name="rs">
+   <ref name="register"/>
+  </var>
+  <var name="rd">
+   <ref name="register"/>
+  </var>
+  <var name="s">
+   <ref name="s-bit"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>1001</const>
+   <ref name="rs"/>
+   <const>0000</const>
+   <ref name="rd"/>
+   <ref name="s"/>
+   <const>0000000</const>
+  </pattern>
+  <phrase>
+   <literal>MUL</literal>
+  </phrase>
+  <phrase>
+   <ref name="s"/>
+  </phrase>
+  <phrase>
+   <ref name="rd"/>
+   <literal>,</literal><ws/>
+   <ref name="rm"/>
+   <literal>,</literal><ws/>
+   <ref name="rs"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="rd"/>
+    <mul>
+     <ref name="rm"/>
+     <ref name="rs"/>
+    </mul>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <var name="rs">
+   <ref name="register"/>
+  </var>
+  <var name="rn">
+   <ref name="register"/>
+  </var>
+  <var name="rd">
+   <ref name="register"/>
+  </var>
+  <var name="s">
+   <ref name="s-bit"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>1001</const>
+   <ref name="rs"/>
+   <ref name="rn"/>
+   <ref name="rd"/>
+   <ref name="s"/>
+   <const>1000000</const>
+  </pattern>
+  <phrase>
+   <literal>MLA</literal>
+  </phrase>
+  <phrase>
+   <ref name="s"/>
+  </phrase>
+  <phrase>
+   <ref name="rd"/>
+   <literal>,</literal><ws/>
+   <ref name="rm"/>
+   <literal>,</literal><ws/>
+   <ref name="rs"/>
+   <literal>,</literal><ws/>
+   <ref name="rn"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="rd"/>
+    <add>
+     <mul>
+      <ref name="rm"/>
+      <ref name="rs"/>
+     </mul>
+     <ref name="rn"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -2171,6 +2273,9 @@ GNU General Public License (version 3 or any later version).
    <ref name="lsm-instr"/>
    <ref name="b-instr"/>
    <ref name="swi-instr"/>
+   <require name="armv2">
+    <ref name="mul-instr"/>
+   </require>
   </var>
   <var name="cc">
    <ref name="cc"/>
