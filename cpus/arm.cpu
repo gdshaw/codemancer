@@ -27,6 +27,14 @@ GNU General Public License (version 3 or any later version).
  <select class="swi">
   <property name="width" value="6"/>
  </select>
+ <select class="cp">
+  <property name="base" value="10"/>
+  <property name="prefix" value=""/>
+ </select>
+ <select class="cp-opcode">
+  <property name="base" value="10"/>
+  <property name="prefix" value=""/>
+ </select>
 </style>
 
 <register name="R0" size="32"/>
@@ -45,6 +53,23 @@ GNU General Public License (version 3 or any later version).
 <register name="R13" size="32"/>
 <register name="LR" size="32"/>
 <register name="PC" size="32"/>
+
+<register name="CR0" size="32"/>
+<register name="CR1" size="32"/>
+<register name="CR2" size="32"/>
+<register name="CR3" size="32"/>
+<register name="CR4" size="32"/>
+<register name="CR5" size="32"/>
+<register name="CR6" size="32"/>
+<register name="CR7" size="32"/>
+<register name="CR8" size="32"/>
+<register name="CR9" size="32"/>
+<register name="CR10" size="32"/>
+<register name="CR11" size="32"/>
+<register name="CR12" size="32"/>
+<register name="CR13" size="32"/>
+<register name="CR14" size="32"/>
+<register name="CR15" size="32"/>
 
 <register name="V" size="1"/>
 <register name="C" size="1"/>
@@ -241,6 +266,200 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <register name="PC"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cp-register">
+ <fragment>
+  <pattern>
+   <const>0000</const>
+  </pattern>
+  <phrase>
+   <literal>CR0</literal>
+  </phrase>
+  <effect>
+   <register name="CR0"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1000</const>
+  </pattern>
+  <phrase>
+   <literal>CR1</literal>
+  </phrase>
+  <effect>
+   <register name="CR1"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0100</const>
+  </pattern>
+  <phrase>
+   <literal>CR2</literal>
+  </phrase>
+  <effect>
+   <register name="CR2"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1100</const>
+  </pattern>
+  <phrase>
+   <literal>CR3</literal>
+  </phrase>
+  <effect>
+   <register name="CR3"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0010</const>
+  </pattern>
+  <phrase>
+   <literal>CR4</literal>
+  </phrase>
+  <effect>
+   <register name="CR4"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1010</const>
+  </pattern>
+  <phrase>
+   <literal>CR5</literal>
+  </phrase>
+  <effect>
+   <register name="CR5"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0110</const>
+  </pattern>
+  <phrase>
+   <literal>CR6</literal>
+  </phrase>
+  <effect>
+   <register name="CR6"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1110</const>
+  </pattern>
+  <phrase>
+   <literal>CR7</literal>
+  </phrase>
+  <effect>
+   <register name="CR7"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0001</const>
+  </pattern>
+  <phrase>
+   <literal>CR8</literal>
+  </phrase>
+  <effect>
+   <register name="CR8"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1001</const>
+  </pattern>
+  <phrase>
+   <literal>CR9</literal>
+  </phrase>
+  <effect>
+   <register name="CR9"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0101</const>
+  </pattern>
+  <phrase>
+   <literal>CR10</literal>
+  </phrase>
+  <effect>
+   <register name="CR10"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1101</const>
+  </pattern>
+  <phrase>
+   <literal>CR11</literal>
+  </phrase>
+  <effect>
+   <register name="CR11"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0011</const>
+  </pattern>
+  <phrase>
+   <literal>CR12</literal>
+  </phrase>
+  <effect>
+   <register name="CR12"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1011</const>
+  </pattern>
+  <phrase>
+   <literal>CR13</literal>
+  </phrase>
+  <effect>
+   <register name="CR13"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0111</const>
+  </pattern>
+  <phrase>
+   <literal>CR14</literal>
+  </phrase>
+  <effect>
+   <register name="CR14"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1111</const>
+  </pattern>
+  <phrase>
+   <literal>CR15</literal>
+  </phrase>
+  <effect>
+   <register name="CR15"/>
   </effect>
  </fragment>
 </define>
@@ -668,6 +887,28 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="cpm-opcode">
+ <choice>
+  <fragment>
+   <pattern>
+    <const>0</const>
+   </pattern>
+   <phrase>
+    <literal>CR</literal>
+   </phrase>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>1</const>
+   </pattern>
+   <phrase>
+    <literal>RC</literal>
+   </phrase>
+  </fragment>
+ </choice>
+</define>
+
 <define name="s-bit">
  <fragment>
   <pattern>
@@ -793,6 +1034,28 @@ GNU General Public License (version 3 or any later version).
    </assign>
   </effect>
  </fragment>
+</define>
+
+<define name="n-bit">
+ <choice>
+  <fragment>
+   <pattern>
+    <const>0</const>
+   </pattern>
+   <phrase>
+    <literal></literal>
+   </phrase>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>1</const>
+   </pattern>
+   <phrase>
+    <literal>L</literal>
+   </phrase>
+  </fragment>
+ </choice>
 </define>
 
 <define name="p-suffix">
@@ -1372,24 +1635,28 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="and-instr">
+<define name="cp-opcode2">
  <fragment>
+  <var name="opcode">
+   <integer class="cp-opcode" size="3" encoding="u"/>
+  </var>
   <pattern>
-   <const>0000</const>
+   <ref name="opcode"/>
   </pattern>
   <phrase>
-   <literal>AND</literal>
+   <literal>,</literal><ws/>
+   <ref name="opcode"/>
   </phrase>
-  <effect>
-   <assign>
-    <ref name="rd"/>
-    <and>
-     <ref name="rn"/>
-     <ref name="operand"/>
-    </and>
-   </assign>
-  </effect>
  </fragment>
+
+ <priority level="1">
+  <fragment>
+   <pattern>
+    <const>000</const>
+   </pattern>
+   <phrase></phrase>
+  </fragment>
+ </priority>
 </define>
 
 <define name="and-instr">
@@ -2163,6 +2430,248 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="cp-instr">
+ <fragment>
+  <var name="crm">
+   <ref name="cp-register"/>
+  </var>
+  <var name="opcode2">
+   <ref name="cp-opcode2"/>
+  </var>
+  <var name="cp">
+   <integer class="cp" size="4"/>
+  </var>
+  <var name="crd">
+   <ref name="cp-register"/>
+  </var>
+  <var name="crn">
+   <ref name="cp-register"/>
+  </var>
+  <var name="opcode1">
+   <integer class="cp-opcode" size="4"/>
+  </var>
+  <pattern>
+   <ref name="crm"/>
+   <const>0</const>
+   <ref name="opcode2"/>
+   <ref name="cp"/>
+   <ref name="crd"/>
+   <ref name="crn"/>
+   <ref name="opcode1"/>
+   <const>0111</const>
+  </pattern>
+  <phrase>
+   <literal>CDP</literal>
+  </phrase>
+  <phrase></phrase>
+  <phrase>
+   <literal>p</literal>
+   <ref name="cp"/>
+   <literal>,</literal><ws/>
+   <ref name="opcode1"/>
+   <literal>,</literal><ws/>
+   <ref name="crd"/>
+   <literal>,</literal><ws/>
+   <ref name="crn"/>
+   <literal>,</literal><ws/>
+   <ref name="crm"/>
+   <ref name="opcode2"/>
+  </phrase>
+ </fragment>
+
+ <fragment>
+  <var name="crm">
+   <ref name="cp-register"/>
+  </var>
+  <var name="opcode2">
+   <ref name="cp-opcode2"/>
+  </var>
+  <var name="cp">
+   <integer class="cp" size="4"/>
+  </var>
+  <var name="rd">
+   <ref name="register"/>
+  </var>
+  <var name="crn">
+   <ref name="cp-register"/>
+  </var>
+  <var name="opcode">
+   <ref name="cpm-opcode"/>
+  </var>
+  <var name="opcode1">
+   <integer class="cp-opcode" size="3"/>
+  </var>
+  <pattern>
+   <ref name="crm"/>
+   <const>1</const>
+   <ref name="opcode2"/>
+   <ref name="cp"/>
+   <ref name="rd"/>
+   <ref name="crn"/>
+   <ref name="opcode"/>
+   <ref name="opcode1"/>
+   <const>0111</const>
+  </pattern>
+  <phrase>
+   <literal>M</literal>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase></phrase>
+  <phrase>
+   <literal>p</literal>
+   <ref name="cp"/>
+   <literal>,</literal><ws/>
+   <ref name="opcode1"/>
+   <literal>,</literal><ws/>
+   <ref name="rd"/>
+   <literal>,</literal><ws/>
+   <ref name="crn"/>
+   <literal>,</literal><ws/>
+   <ref name="crm"/>
+   <ref name="opcode2"/>
+  </phrase>
+ </fragment>
+
+ <fragment>
+  <var name="word-offset">
+   <integer size="8" encoding="u"/>
+  </var>
+  <var name="byte-offset">
+   <integer class="offset" size="32"/>
+  </var>
+  <var name="cp">
+   <integer class="cp" size="4"/>
+  </var>
+  <var name="crd">
+   <ref name="cp-register"/>
+  </var>
+  <var name="rn">
+   <ref name="register"/>
+  </var>
+  <var name="opcode">
+   <ref name="ls-opcode"/>
+  </var>
+  <var name="w">
+   <ref name="w-bit"/>
+  </var>
+  <var name="n">
+   <ref name="n-bit"/>
+  </var>
+  <var name="u">
+   <ref name="u-bit"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="byte-offset"/>
+    <mul>
+     <ref name="word-offset"/>
+     <const>4</const>
+    </mul>
+   </equals>
+  </where>
+  <pattern>
+   <ref name="word-offset"/>
+   <ref name="cp"/>
+   <ref name="crd"/>
+   <ref name="rn"/>
+   <ref name="opcode"/>
+   <ref name="w"/>
+   <ref name="n"/>
+   <ref name="u"/>
+   <const>1011</const>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+   <literal>C</literal>
+  </phrase>
+  <phrase>
+   <ref name="n"/>
+  </phrase>
+  <phrase>
+   <literal>p</literal>
+   <ref name="cp"/>
+   <literal>,</literal><ws/>
+   <ref name="crd"/>
+   <literal>,</literal><ws/>
+   <literal>[</literal>
+   <ref name="rn"/>
+   <literal>,</literal><ws/>
+   <literal>#</literal>
+   <ref name="u"/>
+   <ref name="byte-offset"/>
+   <literal>]</literal>
+   <ref name="w"/>
+  </phrase>
+ </fragment>
+
+ <fragment>
+  <var name="word-offset">
+   <integer size="8"/>
+  </var>
+  <var name="byte-offset">
+   <integer class="offset" size="32"/>
+  </var>
+  <var name="cp">
+   <integer class="cp" size="4"/>
+  </var>
+  <var name="crd">
+   <ref name="cp-register"/>
+  </var>
+  <var name="rn">
+   <ref name="register"/>
+  </var>
+  <var name="opcode">
+   <ref name="ls-opcode"/>
+  </var>
+  <var name="n">
+   <ref name="n-bit"/>
+  </var>
+  <var name="u">
+   <ref name="u-bit"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="byte-offset"/>
+    <mul>
+     <ref name="word-offset"/>
+     <const>4</const>
+    </mul>
+   </equals>
+  </where>
+  <pattern>
+   <ref name="word-offset"/>
+   <ref name="cp"/>
+   <ref name="crd"/>
+   <ref name="rn"/>
+   <ref name="opcode"/>
+   <const>1</const>
+   <ref name="n"/>
+   <ref name="u"/>
+   <const>0011</const>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+   <literal>C</literal>
+  </phrase>
+  <phrase>
+   <ref name="n"/>
+  </phrase>
+  <phrase>
+   <literal>p</literal>
+   <ref name="cp"/>
+   <literal>,</literal><ws/>
+   <ref name="crd"/>
+   <literal>,</literal><ws/>
+   <literal>[</literal>
+   <ref name="rn"/>
+   <literal>],</literal><ws/>
+   <literal>#</literal>
+   <ref name="u"/>
+   <ref name="byte-offset"/>
+  </phrase>
+ </fragment>
+</define>
+
 <define name="mul-instr">
  <fragment>
   <var name="rm">
@@ -2275,6 +2784,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="swi-instr"/>
    <require name="armv2">
     <ref name="mul-instr"/>
+    <ref name="cp-instr"/>
    </require>
   </var>
   <var name="cc">
