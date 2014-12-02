@@ -31,17 +31,22 @@ public class IntegerType extends Type {
 	/** The encoding method used to represent this integer type. */
 	private final int encoding;
 
+	/** True for big-endian encoding, false for little-endian encoding. */
+	private final boolean bigEndian;
+
 	/** The style to be used for this integer type. */
 	private final Style style;
 
 	/** Construct integer type from attributes.
 	 * @param size the required size, in bits
 	 * @param sign the required encoding method
+	 * @param bigEndian true for big-endian, false for little-endian
 	 * @param style the required style
 	 */
-	public IntegerType(int size, int encoding, Style style) {
+	public IntegerType(int size, int encoding, boolean bigEndian, Style style) {
 		this.size = size;
 		this.encoding = encoding;
+		this.bigEndian = bigEndian;
 		this.style = style;
 	}
 
@@ -76,6 +81,7 @@ public class IntegerType extends Type {
 			throw new CpudlParseException(element, "invalid integer encoding attribute");
 		}
 
+		this.bigEndian = ctx.getArchitecture().isBigEndian();
 		this.style = ctx.getStylesheet().getStyle(element.getAttribute("class"));
 	}
 
@@ -85,6 +91,10 @@ public class IntegerType extends Type {
 
 	public final int getEncoding() {
 		return encoding;
+	}
+
+	public final boolean isBigEndian() {
+		return bigEndian;
 	}
 
 	public final Style getStyle() {
@@ -124,7 +134,7 @@ public class IntegerType extends Type {
 			throw new IllegalArgumentException("incorrect number of chunks");
 		}
 		BitString bits = readers.get(0).read(size);
-		long value = bits.getBits(0, size);
+		long value = bits.getBits(0, size, bigEndian);
 		switch (encoding) {
 		case UNSIGNED:
 			break;

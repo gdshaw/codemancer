@@ -27,9 +27,10 @@ public abstract class BitString {
 	 * index < 0 or index + length > this.length().
 	 * @param index the index of the first bit to be inspected
 	 * @param length the number of bits to be inspected
+	 * @param bigEndian true to return big-endian, false for little-endian
 	 * @return the bits, as a little-endian long integer
 	 */
-	public abstract long getBits(long index, long length);
+	public abstract long getBits(long index, long length, boolean bigEndian);
 
 	/** Set a bit within this bitstring.
 	 * @param index the index of the bit to be set
@@ -44,24 +45,24 @@ public abstract class BitString {
 		long newLength = length();
 		if (newLength <= 64) {
 			long mask = 1L << index;
-			long oldContent = getBits(0, newLength);
+			long oldContent = getBits(0, newLength, false);
 			long newContent = ((value & 1) != 0) ?
 				(oldContent | mask) :
 				(oldContent & ~mask);
-			return new ShortBitString(newContent, newLength);
+			return new ShortBitString(newContent, newLength, false);
 		} else {
 			long newContent[] = new long[(int)((newLength + 63) / 64)];
 			int newIndex = 0;
 			long oldOffset = 0;
 			long oldRemaining = newLength;
 			while (oldRemaining >= 64) {
-				newContent[newIndex] = getBits(oldOffset, 64);
+				newContent[newIndex] = getBits(oldOffset, 64, false);
 				newIndex += 1;
 				oldOffset += 64;
 				oldRemaining -= 64;
 			}
 			if (oldRemaining > 0) {
-				newContent[newIndex] = getBits(oldOffset, oldRemaining);
+				newContent[newIndex] = getBits(oldOffset, oldRemaining, false);
 			}
 
 			long mask = 1L << (index & 63);
@@ -92,11 +93,11 @@ public abstract class BitString {
 		long oldLength = length();
 		long newLength = oldLength + 1;
 		if (newLength <= 64) {
-			long oldContent = getBits(0, oldLength);
+			long oldContent = getBits(0, oldLength, false);
 			long newContent = oldContent | ((bit & 1L) << oldLength);
-			return new ShortBitString(newContent, newLength);
+			return new ShortBitString(newContent, newLength, false);
 		} else {
-			return concat(new ShortBitString(bit, 1));
+			return concat(new ShortBitString(bit, 1, false));
 		}
 	}
 
@@ -113,9 +114,9 @@ public abstract class BitString {
 			// This test is required because it is assumed below that addLength != 0.
 			return this;
 		} else if (newLength <= 64) {
-			long oldContent = getBits(0, oldLength);
-			long newContent = oldContent | (bits.getBits(0, addLength) << oldLength);
-			return new ShortBitString(newContent, newLength);
+			long oldContent = getBits(0, oldLength, false);
+			long newContent = oldContent | (bits.getBits(0, addLength, false) << oldLength);
+			return new ShortBitString(newContent, newLength, false);
 		} else {
 			long newContent[] = new long[(int)((newLength + 63) / 64)];
 			int index = 0;
@@ -124,7 +125,7 @@ public abstract class BitString {
 			long oldOffset = 0;
 			long oldRemaining = oldLength;
 			while (oldRemaining >= 64) {
-				newContent[index] = getBits(oldOffset, 64);
+				newContent[index] = getBits(oldOffset, 64, false);
 				index += 1;
 				oldOffset += 64;
 				oldRemaining -= 64;
@@ -134,14 +135,14 @@ public abstract class BitString {
 			// right hand side to make this (as nearly as possible) into a complete word.
 			long addRemaining = addLength;
 			long addOffset = Math.min(addRemaining, (64 - oldRemaining));
-			newContent[index] = getBits(oldOffset, oldRemaining) |
-				(bits.getBits(0, addOffset) << oldRemaining);
+			newContent[index] = getBits(oldOffset, oldRemaining, false) |
+				(bits.getBits(0, addOffset, false) << oldRemaining);
 			index += 1;
 			addRemaining -= addOffset;
 
 			// Append any remaining complete words from the right hand side.
 			while (addRemaining >= 64) {
-				newContent[index] = bits.getBits(addOffset, 64);
+				newContent[index] = bits.getBits(addOffset, 64, false);
 				index += 1;
 				addOffset += 64;
 				addRemaining -= 64;
@@ -149,7 +150,7 @@ public abstract class BitString {
 
 			// Append any remaining bits from the right hand side.
 			if (addRemaining > 0) {
-				newContent[index] = bits.getBits(addOffset, addRemaining);
+				newContent[index] = bits.getBits(addOffset, addRemaining, false);
 			}
 
 			return new LongBitString(newContent, newLength);
@@ -166,10 +167,10 @@ public abstract class BitString {
 
 		long offset = 0;
 		while (offset + 64 <= length) {
-			if (bits.getBits(offset, 64) != getBits(offset, 64)) return false;
+			if (bits.getBits(offset, 64, false) != getBits(offset, 64, false)) return false;
 			offset += 64;
 		}
-		if (bits.getBits(offset, length - offset) != getBits(offset, length - offset)) return false;
+		if (bits.getBits(offset, length - offset, false) != getBits(offset, length - offset, false)) return false;
 		return true;
 	}
 
@@ -178,10 +179,10 @@ public abstract class BitString {
 		long offset = 0;
 		long length = this.length();
 		while (offset + 32 <= length) {
-			hash += getBits(offset, 32);
+			hash += getBits(offset, 32, false);
 			offset += 32;
 		}
-		hash += getBits(offset, length - offset);
+		hash += getBits(offset, length - offset, false);
 		return hash;
 	}
 }

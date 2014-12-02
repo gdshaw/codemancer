@@ -31,10 +31,20 @@ public class LongBitString extends BitString {
 	public final int getBit(long index) {
 		int wordIndex = (int)(index >> 6);
 		int bitIndex = (int)(index & 63);
-		return (int)((content[wordIndex] >> bitIndex) & 1);
+		return (int)((content[wordIndex] >>> bitIndex) & 1);
 	}
 
-	public final long getBits(long index, long length) {
+	public final long getBits(long index, long length, boolean bigEndian) {
+		if (index < 0) {
+			throw new IllegalArgumentException("index into bitstring must be non-negative");
+		}
+		if (index > this.size) {
+			index = this.size;
+		}
+		if (index + length > this.size) {
+			length = this.size - index;
+		}
+
 		// Decompose the given index to determine which word
 		// and which bit within that word contains the first
 		// bit of the result.
@@ -56,7 +66,24 @@ public class LongBitString extends BitString {
 		// Mask the fetched word or words to return the required
 		// number of bits.
 		long mask = (length < 64) ? ((1L << length) - 1) : -1;
-		return word & mask;
+		long bits = word & mask;
+
+		if (bigEndian) {
+			bits <<= 64 - length;
+			bits = ((bits & 0x5555555555555555L) << 1) |
+				((bits & 0xAAAAAAAAAAAAAAAAL) >>> 1);
+			bits = ((bits & 0x3333333333333333L) << 2) |
+				((bits & 0xCCCCCCCCCCCCCCCCL) >>> 2);
+			bits = ((bits & 0x0F0F0F0F0F0F0F0FL) << 4) |
+				((bits & 0xF0F0F0F0F0F0F0F0L) >>> 4);
+			bits = ((bits & 0x00FF00FF00FF00FFL) << 8) |
+				((bits & 0xFF00FF00FF00FF00L) >>> 8);
+			bits = ((bits & 0x0000FFFF0000FFFFL) << 16) |
+				((bits & 0xFFFF0000FFFF0000L) >>> 16);
+			bits = ((bits & 0x00000000FFFFFFFFL) << 32) |
+				((bits & 0xFFFFFFFF00000000L) >>> 32);
+		}
+		return bits;
 	}
 
 	public final long length() {

@@ -42,11 +42,11 @@ public class SubBitString extends BitString {
 		return parent.getBit(offset + index);
 	}
 
-	public final long getBits(long index, long length) {
+	public final long getBits(long index, long length, boolean bigEndian) {
 		if ((index < 0) || (index + length > size)) {
 			throw new IllegalArgumentException("bitstring index out of range");
 		}
-		return parent.getBits(offset + index, length);
+		return parent.getBits(offset + index, length, bigEndian);
 	}
 
 	public final long length() {

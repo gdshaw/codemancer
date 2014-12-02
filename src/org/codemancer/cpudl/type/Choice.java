@@ -71,8 +71,8 @@ public class Choice extends Type {
 		 */
 		PatternInfo(long fixedWidth, boolean variableWidth) {
 			this.fixedWidth = fixedWidth;
-			this.couldBeZero = new ShortBitString(0, fixedWidth);
-			this.couldBeOne = new ShortBitString(0, fixedWidth);
+			this.couldBeZero = new ShortBitString(0, fixedWidth, false);
+			this.couldBeOne = new ShortBitString(0, fixedWidth, false);
 			this.variableWidth = variableWidth;
 		}
 	}

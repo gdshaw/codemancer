@@ -95,10 +95,10 @@ public class CpuTest {
 
 		this.code = new ShortBitString();
 		String codeField = this.fields[0];
-		int mask = (width >> 2) - 1;
+		int mask = (arch.isBigEndian()) ? 0 : ((width >> 2) - 1);
 		for (int i = 0; i < codeField.length(); ++i) {
 			int v = parseHexValue(codeField.charAt(i ^ mask));
-			code = code.concat(new ShortBitString(v, 4));
+			code = code.concat(new ShortBitString(v, 4, arch.isBigEndian()));
 		}
 
 		this.preconds = (setup.isEmpty()) ? new String[0] : setup.split(",");

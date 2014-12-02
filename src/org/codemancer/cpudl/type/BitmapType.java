@@ -183,7 +183,7 @@ public class BitmapType extends Type {
 		}
 		Constant constExpr = (Constant)expr;
 		long value = constExpr.getValue();
-		return new ShortBitString(value, members.size());
+		return new ShortBitString(value, members.size(), false);
 	}
 
 	public final Expression decode(List<BitReader> readers, FeatureSet features) {
@@ -191,7 +191,7 @@ public class BitmapType extends Type {
 			throw new IllegalArgumentException("incorrect number of chunks");
 		}
 		BitString bits = readers.get(0).read(members.size());
-		long bitmap = bits.getBits(0, members.size());
+		long bitmap = bits.getBits(0, members.size(), false);
 		Fragment frag = new Fragment(this);
 		frag.put("_bitmap", new Constant(null, bitmap));
 

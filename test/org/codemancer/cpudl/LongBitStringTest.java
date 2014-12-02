@@ -42,16 +42,27 @@ public class LongBitStringTest {
 
 	@Test
 	public void testGetBits() {
-		assertEquals(0, new LongBitString(content, 256).getBits(0, 0));
-		assertEquals(1, new LongBitString(content, 256).getBits(0, 1));
-		assertEquals(0xD3, new LongBitString(content, 256).getBits(0, 8));
-		assertEquals(0x308D3, new LongBitString(content, 256).getBits(0, 20));
-		assertEquals(0x243F6A8885A308D3L, new LongBitString(content, 256).getBits(0, 64));
-		assertEquals(0, new LongBitString(content, 256).getBits(20, 0));
-		assertEquals(0, new LongBitString(content, 256).getBits(20, 1));
-		assertEquals(0x5A, new LongBitString(content, 256).getBits(20, 8));
-		assertEquals(0x8885A, new LongBitString(content, 256).getBits(20, 20));
-		assertEquals(0x07344243F6A8885AL, new LongBitString(content, 256).getBits(20, 64));
+		assertEquals(0, new LongBitString(content, 256).getBits(0, 0, false));
+		assertEquals(1, new LongBitString(content, 256).getBits(0, 1, false));
+		assertEquals(0xD3, new LongBitString(content, 256).getBits(0, 8, false));
+		assertEquals(0x308D3, new LongBitString(content, 256).getBits(0, 20, false));
+		assertEquals(0x243F6A8885A308D3L, new LongBitString(content, 256).getBits(0, 64, false));
+		assertEquals(0, new LongBitString(content, 256).getBits(20, 0, false));
+		assertEquals(0, new LongBitString(content, 256).getBits(20, 1, false));
+		assertEquals(0x5A, new LongBitString(content, 256).getBits(20, 8, false));
+		assertEquals(0x8885A, new LongBitString(content, 256).getBits(20, 20, false));
+		assertEquals(0x07344243F6A8885AL, new LongBitString(content, 256).getBits(20, 64, false));
+
+		assertEquals(0, new LongBitString(content, 256).getBits(0, 0, true));
+		assertEquals(1, new LongBitString(content, 256).getBits(0, 1, true));
+		assertEquals(0xCB, new LongBitString(content, 256).getBits(0, 8, true));
+		assertEquals(0xCB10C, new LongBitString(content, 256).getBits(0, 20, true));
+		assertEquals(0xCB10C5A11156FC24L, new LongBitString(content, 256).getBits(0, 64, true));
+		assertEquals(0, new LongBitString(content, 256).getBits(20, 0, true));
+		assertEquals(0, new LongBitString(content, 256).getBits(20, 1, true));
+		assertEquals(0x5A, new LongBitString(content, 256).getBits(20, 8, true));
+		assertEquals(0x5A111, new LongBitString(content, 256).getBits(20, 20, true));
+		assertEquals(0x5A11156FC2422CE0L, new LongBitString(content, 256).getBits(20, 64, true));
 	}
 
 	@Test
@@ -80,11 +91,11 @@ public class LongBitStringTest {
 	public void testSubstring() {
 		assertEquals(new ShortBitString(), new LongBitString(content, 256).substring(0, 0));
 		assertEquals(new ShortBitString(), new LongBitString(content, 256).substring(256, 256));
-		assertEquals(new ShortBitString(1, 1), new LongBitString(content, 256).substring(0, 1));
-		assertEquals(new ShortBitString(0xD3, 8), new LongBitString(content, 256).substring(0, 8));
-		assertEquals(0x243F6A8885A308D3L, new LongBitString(content, 256).substring(0, 64).getBits(0, 64));
-		assertEquals(0x07344243F6A8885AL, new LongBitString(content, 256).substring(20, 84).getBits(0, 64));
-		assertEquals(0x082EFA98EC4E6C89L, new LongBitString(content, 256).substring(192, 256).getBits(0, 64));
+		assertEquals(new ShortBitString(1, 1, false), new LongBitString(content, 256).substring(0, 1));
+		assertEquals(new ShortBitString(0xD3, 8, false), new LongBitString(content, 256).substring(0, 8));
+		assertEquals(0x243F6A8885A308D3L, new LongBitString(content, 256).substring(0, 64).getBits(0, 64, false));
+		assertEquals(0x07344243F6A8885AL, new LongBitString(content, 256).substring(20, 84).getBits(0, 64, false));
+		assertEquals(0x082EFA98EC4E6C89L, new LongBitString(content, 256).substring(192, 256).getBits(0, 64, false));
 	}
 
 	@Test

@@ -3,6 +3,7 @@
 ; Distribution and modification are permitted within the terms of the
 ; GNU General Public License (version 3 or any later version).
 
+@0000
 00	BRK
 0112	ORA	($12, X)
 0512	ORA	$12

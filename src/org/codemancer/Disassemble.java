@@ -44,7 +44,7 @@ public class Disassemble {
 			int j = addr + 8;
 			if (j > image.limit()) j = image.limit();
 			for (int i = addr; i < j; ++i) {
-				code = code.concat(new ShortBitString(image.get(i), 8));
+				code = code.concat(new ShortBitString(image.get(i), 8, arch.isBigEndian()));
 			}
 			BitReader codeReader = new BitStringReader(code);
 			List<BitReader> codeReaders = new ArrayList<BitReader>();

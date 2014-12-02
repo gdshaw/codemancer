@@ -5,7 +5,7 @@ Distribution and modification are permitted within the terms of the
 GNU General Public License (version 3 or any later version).
 -->
 
-<cpudl>
+<cpudl endian="little">
 <style>
  <property name="base" value="16"/>
  <property name="prefix" value="$"/>

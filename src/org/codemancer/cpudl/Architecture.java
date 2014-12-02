@@ -26,6 +26,9 @@ import org.codemancer.cpudl.expr.Register;
 
 /** A class to represent an instruction set architecture. */
 public class Architecture {
+	/** True if the default byte order is big-endian, false if little-endian. */
+	private final boolean bigEndian;
+
 	/** A type which describes any instruction of this architecture. */
 	private Type start = null;
 
@@ -48,6 +51,15 @@ public class Architecture {
 	 * @param element the required content as an XML element
 	 */
 	public Architecture(Element element) throws CpudlParseException {
+		String endian = Context.parseStringAttribute("endian", element);
+		if (endian.equals("big")) {
+			bigEndian = true;
+		} else if (endian.equals("little")) {
+			bigEndian = false;
+		} else {
+			throw new CpudlParseException(element, "invalid endian attribute in <cpudl> element");
+		}
+
 		Context ctx = new Context(this);
 		Node child = element.getFirstChild();
 		while (child != null) {
@@ -84,11 +96,17 @@ public class Architecture {
 		int size = Context.parseIntegerAttribute("size", element);
 
 		String className = element.getAttribute("class");
-		Type type = new IntegerType(size, IntegerType.UNSIGNED, stylesheet.getStyle(className));
+		Type type = new IntegerType(size, IntegerType.UNSIGNED, isBigEndian(), stylesheet.getStyle(className));
 		Register register = new Register(type, name);
 		registers.put(name, register);
 	}
 
+	/** Test whether the default bit order is big-endian.
+	 * @return true if big-endian, false if little-endian
+	 */
+	public final boolean isBigEndian() {
+		return bigEndian;
+	}
 
 	/** Get the start type for this architecture. */
 	public final Type getStart() {

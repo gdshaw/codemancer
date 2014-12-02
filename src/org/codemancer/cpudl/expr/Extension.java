@@ -77,15 +77,17 @@ public class Extension extends Expression {
 	public static Expression make(Context ctx, Element element) throws CpudlParseException {
 		int size = Context.parseIntegerAttribute("size", element);
 		int encoding = IntegerType.UNSIGNED;
+		boolean bigEndian = ctx.getArchitecture().isBigEndian();
 		Style style = null;
 
 		Expression arg = Sequence.make(ctx, element);
 		if (arg.getType() instanceof IntegerType) {
 			IntegerType argType = (IntegerType)arg.getType();
 			encoding = argType.getEncoding();
+			bigEndian = argType.isBigEndian();
 			style = argType.getStyle();
 		}
 
-		return new Extension(new IntegerType(size, encoding, style), arg);
+		return new Extension(new IntegerType(size, encoding, bigEndian, style), arg);
 	}
 }
