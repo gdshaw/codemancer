@@ -24,6 +24,9 @@ GNU General Public License (version 3 or any later version).
  <select class="registers">
   <property name="separator" value=", "/>
  </select>
+ <select class="field-mask">
+  <property name="separator" value=""/>
+ </select>
  <select class="swi">
   <property name="width" value="6"/>
  </select>
@@ -71,6 +74,8 @@ GNU General Public License (version 3 or any later version).
 <register name="CR14" size="32"/>
 <register name="CR15" size="32"/>
 
+<register name="CPSR" size="32"/>
+<register name="SPSR" size="32"/>
 <register name="V" size="1"/>
 <register name="C" size="1"/>
 <register name="Z" size="1"/>
@@ -520,6 +525,41 @@ GNU General Public License (version 3 or any later version).
     <bind name="i" src="i"/>
     <bind name="n" src="n"/>
    </ref>
+  </effect>
+ </bitmap>
+</define>
+
+<define name="field-mask">
+ <bitmap class="field-mask" effect="mask">
+  <bit name="c">
+   <const>0x000000ff</const>
+  </bit>
+  <bit name="x">
+   <const>0x0000ff00</const>
+  </bit>
+  <bit name="s">
+   <const>0x00ff0000</const>
+  </bit>
+  <bit name="f">
+   <const>0xff000000</const>
+  </bit>
+  <effect name="foreach">
+   <assign>
+    <ref name="rd"/>
+    <or>
+     <and>
+      <ref name="rd"/>
+      <xor>
+       <ref name="rd"/>
+       <const>0xffffffff</const>
+      </xor>
+     </and>
+     <and>
+      <ref name="psr"/>
+      <ref name="mask"/>
+     </and>
+    </or>
+   </assign>
   </effect>
  </bitmap>
 </define>
@@ -1056,6 +1096,32 @@ GNU General Public License (version 3 or any later version).
    </phrase>
   </fragment>
  </choice>
+</define>
+
+<define name="psr">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>CPSR</literal>
+  </phrase>
+  <effect>
+   <register name="CPSR"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>SPSR</literal>
+  </phrase>
+ </fragment>
+ <effect>
+  <register name="SPSR"/>
+ </effect>
 </define>
 
 <define name="p-suffix">
@@ -2774,6 +2840,136 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="status-instr">
+ <fragment>
+  <var name="rd">
+   <ref name="register"/>
+  </var>
+  <var name="psr">
+   <ref name="psr"/>
+  </var>
+  <pattern>
+   <const>000000000000</const>
+   <ref name="rd"/>
+   <const>111100</const>
+   <ref name="psr"/>
+   <const>01000</const>
+  </pattern>
+  <phrase>
+   <literal>MRS</literal>
+  </phrase>
+  <phrase></phrase>
+  <phrase>
+   <ref name="rd"/>
+   <literal>,</literal><ws/>
+   <ref name="psr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="rd"/>
+    <ref name="psr"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="imm">
+   <integer size="8"/>
+  </var>
+  <var name="rot-imm">
+   <integer size="4"/>
+  </var>
+  <var name="imm2">
+   <integer size="32"/>
+  </var>
+  <var name="fields">
+   <ref name="field-mask"/>
+  </var>
+  <var name="psr">
+   <ref name="psr"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="imm2"/>
+    <shift width="32" method="rotation">
+     <ref name="imm"/>
+     <sub>
+      <const>0</const>
+      <mul>
+       <ref name="rot-imm"/>
+       <const>2</const>
+      </mul>
+     </sub>
+    </shift>
+   </equals>
+  </where>
+  <pattern>
+   <ref name="imm"/>
+   <ref name="rot-imm"/>
+   <const>1111</const>
+   <ref name="fields"/>
+   <const>01</const>
+   <ref name="psr"/>
+   <const>01100</const>
+  </pattern>
+  <phrase>
+   <literal>MSR</literal>
+  </phrase>
+  <phrase></phrase>
+  <phrase>
+   <ref name="psr"/>
+   <literal>_</literal>
+   <ref name="fields"/>
+   <literal>,</literal><ws/>
+   <literal>#</literal>
+   <ref name="imm2"/>
+  </phrase>
+  <effect>
+   <ref name="fields">
+    <bind name="rm" src="rm"/>
+    <bind name="psr" src="psr"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <var name="fields">
+   <ref name="field-mask"/>
+  </var>
+  <var name="psr">
+   <ref name="psr"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>000000001111</const>
+   <ref name="fields"/>
+   <const>01</const>
+   <ref name="psr"/>
+   <const>01000</const>
+  </pattern>
+  <phrase>
+   <literal>MSR</literal>
+  </phrase>
+  <phrase></phrase>
+  <phrase>
+   <ref name="psr"/>
+   <literal>_</literal>
+   <ref name="fields"/>
+   <literal>,</literal><ws/>
+   <ref name="rm"/>
+  </phrase>
+  <effect>
+   <ref name="fields">
+    <bind name="rm" src="rm"/>
+    <bind name="psr" src="psr"/>
+   </ref>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -2785,6 +2981,9 @@ GNU General Public License (version 3 or any later version).
    <require name="armv2">
     <ref name="mul-instr"/>
     <ref name="cp-instr"/>
+   </require>
+   <require name="armv3">
+    <ref name="status-instr"/>
    </require>
   </var>
   <var name="cc">

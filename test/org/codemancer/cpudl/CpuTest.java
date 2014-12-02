@@ -40,6 +40,7 @@ public class CpuTest {
 	Architecture arch;
 	Type start;
 	BitString code;
+	String line;
 	String[] fields;
 	String[] preconds;
 	String[] postconds;
@@ -84,6 +85,7 @@ public class CpuTest {
 		this.start = arch.getStart();
 
 		this.postconds = new String[0];
+		this.line = line;
 		int f = line.indexOf("\t?");
 		if (f != -1) {
 			this.postconds = line.substring(f + 2, line.length()).split(",");
@@ -111,8 +113,12 @@ public class CpuTest {
 		readers.add(reader);
 		FeatureSet features = new FeatureSet(arch);
 		features.add("armv2");
+		features.add("armv3");
 
 		Expression expr = start.decode(readers, features);
+		if (expr == null) {
+			System.err.println(line);
+		}
 		assertTrue(expr != null);
 		expr = expr.resolveReferences(null, null);
 
