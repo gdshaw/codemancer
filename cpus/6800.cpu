@@ -144,6 +144,36 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="impa-mode">
+ <fragment>
+  <pattern>
+   <const>00</const>
+  </pattern>
+  <pattern></pattern>
+  <phrase>
+   <literal>A</literal>
+  </phrase>
+  <effect>
+   <register name="ACCA"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="impb-mode">
+ <fragment>
+  <pattern>
+   <const>01</const>
+  </pattern>
+  <pattern></pattern>
+  <phrase>
+   <literal>B</literal>
+  </phrase>
+  <effect>
+   <register name="ACCB"/>
+  </effect>
+ </fragment>
+</define>
+
 <define name="sub-instr">
  <fragment>
   <pattern>
@@ -337,6 +367,217 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="neg-instr">
+ <fragment>
+  <pattern>
+   <const>0000</const>
+  </pattern>
+  <phrase>
+   <literal>NEG</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <sub>
+     <const>0</const>
+     <ref name="operand"/>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="com-instr">
+ <fragment>
+  <pattern>
+   <const>0011</const>
+  </pattern>
+  <phrase>
+   <literal>COM</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <xor>
+     <ref name="operand"/>
+     <const>0xff</const>
+    </xor>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="lsr-instr">
+ <fragment>
+  <pattern>
+   <const>0100</const>
+  </pattern>
+  <phrase>
+   <literal>LSR</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="logical" carry="C">
+     <ref name="operand"/>
+     <const>-1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ror-instr">
+ <fragment>
+  <pattern>
+   <const>0110</const>
+  </pattern>
+  <phrase>
+   <literal>ROR</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="rotation">
+     <ref name="operand"/>
+     <const>-1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="asr-instr">
+ <fragment>
+  <pattern>
+   <const>0111</const>
+  </pattern>
+  <phrase>
+   <literal>ASR</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="arithmetic" carry="C">
+     <ref name="operand"/>
+     <const>-1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="asl-instr">
+ <fragment>
+  <pattern>
+   <const>1000</const>
+  </pattern>
+  <phrase>
+   <literal>ASL</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="arithmetic" carry="C">
+     <ref name="operand"/>
+     <const>1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="rol-instr">
+ <fragment>
+  <pattern>
+   <const>1001</const>
+  </pattern>
+  <phrase>
+   <literal>ROL</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <shift width="8" method="rotation">
+     <ref name="operand"/>
+     <const>1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="dec-instr">
+ <fragment>
+  <pattern>
+   <const>1010</const>
+  </pattern>
+  <phrase>
+   <literal>DEC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <sub>
+     <ref name="operand"/>
+     <const>1</const>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="inc-instr">
+ <fragment>
+  <pattern>
+   <const>1100</const>
+  </pattern>
+  <phrase>
+   <literal>INC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <add>
+     <ref name="operand"/>
+     <const>1</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tst-instr">
+ <fragment>
+  <pattern>
+   <const>1101</const>
+  </pattern>
+  <phrase>
+   <literal>TST</literal>
+  </phrase>
+  <effect>
+   <ref name="operand"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="clr-instr">
+ <fragment>
+  <pattern>
+   <const>1111</const>
+  </pattern>
+  <phrase>
+   <literal>CLR</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <const>0</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -378,6 +619,45 @@ GNU General Public License (version 3 or any later version).
    <ref name="opcode">
     <bind name="operand" src="operand"/>
     <bind name="accumulator" src="accumulator"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="com-instr"/>
+   <ref name="neg-instr"/>
+   <ref name="lsr-instr"/>
+   <ref name="ror-instr"/>
+   <ref name="asr-instr"/>
+   <ref name="asl-instr"/>
+   <ref name="rol-instr"/>
+   <ref name="dec-instr"/>
+   <ref name="inc-instr"/>
+   <ref name="tst-instr"/>
+   <ref name="clr-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="impa-mode"/>
+   <ref name="impb-mode"/>
+   <ref name="ind-mode"/>
+   <ref name="ext-mode"/>
+  </var>
+  <pattern>
+   <const>01</const>
+   <ref name="operand"/>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="operand"/>
    </ref>
   </effect>
  </fragment>
