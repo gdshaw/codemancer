@@ -18,6 +18,7 @@ GNU General Public License (version 3 or any later version).
 <register name="IX" size="16"/>
 <register name="PC" size="16"/>
 <register name="SP" size="16"/>
+<register name="SR" size="8"/>
 
 <register name="C" size="1"/>
 <register name="O" size="1"/>
@@ -826,6 +827,222 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="tap-instr">
+ <fragment>
+  <pattern>
+   <const>00000110</const>
+  </pattern>
+  <phrase>
+   <literal>TAP</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="ACCA"/>
+    <register name="SR"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tpa-instr">
+ <fragment>
+  <pattern>
+   <const>00000111</const>
+  </pattern>
+  <phrase>
+   <literal>TPA</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="SR"/>
+    <register name="ACCA"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="clv-instr">
+ <fragment>
+  <pattern>
+   <const>00001010</const>
+  </pattern>
+  <phrase>
+   <literal>CLV</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="O"/>
+    <const>0</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sev-instr">
+ <fragment>
+  <pattern>
+   <const>00001011</const>
+  </pattern>
+  <phrase>
+   <literal>SEV</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="O"/>
+    <const>1</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="clc-instr">
+ <fragment>
+  <pattern>
+   <const>00001100</const>
+  </pattern>
+  <phrase>
+   <literal>CLC</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="C"/>
+    <const>0</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sec-instr">
+ <fragment>
+  <pattern>
+   <const>00001101</const>
+  </pattern>
+  <phrase>
+   <literal>SEC</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="C"/>
+    <const>1</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cli-instr">
+ <fragment>
+  <pattern>
+   <const>00001110</const>
+  </pattern>
+  <phrase>
+   <literal>CLI</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="I"/>
+    <const>0</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sei-instr">
+ <fragment>
+  <pattern>
+   <const>00001111</const>
+  </pattern>
+  <phrase>
+   <literal>SEI</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="I"/>
+    <const>1</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tab-instr">
+ <fragment>
+  <pattern>
+   <const>00010110</const>
+  </pattern>
+  <phrase>
+   <literal>TAB</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="ACCB"/>
+    <register name="ACCA"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tba-instr">
+ <fragment>
+  <pattern>
+   <const>00010111</const>
+  </pattern>
+  <phrase>
+   <literal>TBA</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="ACCA"/>
+    <register name="ACCB"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tsx-instr">
+ <fragment>
+  <pattern>
+   <const>00110000</const>
+  </pattern>
+  <phrase>
+   <literal>TSX</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="SP"/>
+    <register name="IX"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="txs-instr">
+ <fragment>
+  <pattern>
+   <const>00110101</const>
+  </pattern>
+  <phrase>
+   <literal>TXS</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="IX"/>
+    <register name="SP"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -949,5 +1166,18 @@ GNU General Public License (version 3 or any later version).
    </assign>
   </effect>
  </fragment>
+
+ <ref name="tap-instr"/>
+ <ref name="tpa-instr"/>
+ <ref name="clv-instr"/>
+ <ref name="sev-instr"/>
+ <ref name="clc-instr"/>
+ <ref name="sec-instr"/>
+ <ref name="cli-instr"/>
+ <ref name="sei-instr"/>
+ <ref name="tab-instr"/>
+ <ref name="tba-instr"/>
+ <ref name="tsx-instr"/>
+ <ref name="txs-instr"/>
 </start>
 </cpudl>
