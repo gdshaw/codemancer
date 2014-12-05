@@ -401,6 +401,15 @@ GNU General Public License (version 3 or any later version).
  </require>
 </define>
 
+<define name="regind8">
+ <require name="!ix">
+  <require name="!iy">
+   <ref name="reg8"/>
+  </require>
+ </require>
+ <ref name="ind8"/>
+</define>
+
 <define name="bc16">
  <fragment>
   <pattern>
@@ -528,6 +537,38 @@ GNU General Public License (version 3 or any later version).
    <ref name="addr"/>
   </effect>
  </fragment>
+</define>
+
+<define name="bc-de-hl-sp16">
+ <require name="!ix">
+  <require name="!iy">
+   <ref name="bc16"/>
+   <ref name="de16"/>
+   <ref name="sp16"/>
+  </require>
+ </require>
+ <ref name="hl16"/>
+</define>
+
+<define name="bc-de-hl-af16">
+ <require name="!ix">
+  <require name="!iy">
+   <ref name="bc16"/>
+   <ref name="de16"/>
+   <ref name="af16"/>
+  </require>
+ </require>
+ <ref name="hl16"/>
+</define>
+
+<define name="bc-de-addr16">
+ <require name="!ix">
+  <require name="!iy">
+   <ref name="bc16"/>
+   <ref name="de16"/>
+   <ref name="addr16"/>
+  </require>
+ </require>
 </define>
 
 <define name="ir">
@@ -999,7 +1040,7 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="bit-instr">
+<define name="bit-opcode">
  <fragment>
   <pattern>
    <const>10</const>
@@ -1019,7 +1060,7 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="res-instr">
+<define name="res-opcode">
  <fragment>
   <pattern>
    <const>01</const>
@@ -1045,7 +1086,7 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="set-instr">
+<define name="set-opcode">
  <fragment>
   <pattern>
    <const>11</const>
@@ -1202,17 +1243,13 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<start>
- <prefix name="ix">10111011</prefix>
- <prefix name="iy">10111111</prefix>
-
+<define name="ld8-instr">
  <fragment>
   <var name="rs">
    <ref name="reg8"/>
-   <ref name="ind8"/>
   </var>
   <var name="rd">
-   <ref name="reg8"/>
+   <ref name="regind8"/>
   </var>
   <pattern>
    <ref name="rs"/>
@@ -1239,10 +1276,10 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="rs">
-   <ref name="reg8"/>
+   <ref name="ind8"/>
   </var>
   <var name="rd">
-   <ref name="ind8"/>
+   <ref name="reg8"/>
   </var>
   <pattern>
    <ref name="rs"/>
@@ -1269,8 +1306,322 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="r">
-   <ref name="reg8"/>
-   <ref name="ind8"/>
+   <ref name="regind8"/>
+  </var>
+  <var name="imm">
+   <integer size="8"/>
+  </var>
+  <pattern>
+   <const>011</const>
+   <ref name="r"/>
+   <const>00</const>
+   <ref name="r"/>
+   <ref name="imm"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="r"/>
+    <ref name="imm"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="ir"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <const>111</const>
+   <ref name="r"/>
+   <const>0010</const>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
+   <literal>A</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="r"/>
+    <register name="A"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="ir"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <const>111</const>
+   <ref name="r"/>
+   <const>1010</const>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <literal>A,</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <ref name="r"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ld16-instr">
+ <fragment>
+  <var name="dd">
+   <ref name="bc-de-hl-sp16"/>
+  </var>
+  <var name="imm">
+   <integer size="16"/>
+  </var>
+  <pattern>
+   <const>1000</const>
+   <ref name="dd"/>
+   <const>00</const>
+   <ref name="imm"/>
+   <ref name="dd"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <ref name="dd"/>
+   <literal>,</literal><ws/>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dd"/>
+    <ref name="imm"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="dd">
+   <ref name="bc-de-addr16"/>
+  </var>
+  <pattern>
+   <const>0100</const>
+   <ref name="dd"/>
+   <const>00</const>
+   <ref name="dd"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <literal>(</literal>
+   <ref name="dd"/>
+   <literal>),</literal><ws/>
+   <literal>A</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <ref name="dd"/>
+    </memory>
+    <register name="A"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="dd">
+   <ref name="bc-de-addr16"/>
+  </var>
+  <pattern>
+   <const>0101</const>
+   <ref name="dd"/>
+   <const>00</const>
+   <ref name="dd"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <literal>A</literal>
+   <literal>,</literal><ws/>
+   <literal>(</literal>
+   <ref name="dd"/>
+   <literal>)</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <memory size="8">
+     <ref name="dd"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="dd">
+   <ref name="hl16"/>
+  </var>
+  <var name="addr">
+   <integer class="addr" size="16" encoding="u"/>
+  </var>
+  <pattern>
+   <const>0100</const>
+   <ref name="dd"/>
+   <const>00</const>
+   <ref name="dd"/>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <literal>(</literal>
+   <ref name="addr"/>
+   <literal>),</literal><ws/>
+   <ref name="dd"/>
+  </phrase>
+ </fragment>
+
+ <fragment>
+  <var name="dd">
+   <ref name="hl16"/>
+  </var>
+  <var name="addr">
+   <integer class="addr" size="16" encoding="u"/>
+  </var>
+  <pattern>
+   <const>0101</const>
+   <ref name="dd"/>
+   <const>00</const>
+   <ref name="dd"/>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <ref name="dd"/>
+   <literal>,</literal><ws/>
+   <literal>(</literal>
+   <ref name="addr"/>
+   <literal>)</literal>
+  </phrase>
+ </fragment>
+
+ <fragment>
+  <var name="ss">
+   <ref name="bc-de-hl-sp16"/>
+  </var>
+  <var name="nn">
+   <integer class="addr" size="16"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <const>1100</const>
+   <ref name="ss"/>
+   <const>10</const>
+   <ref name="ss"/>
+   <ref name="nn"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <literal>(</literal>
+   <ref name="nn"/>
+   <literal>),</literal><ws/>
+   <ref name="ss"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="16">
+     <ref name="nn"/>
+    </memory>
+    <ref name="ss"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="ss">
+   <ref name="bc-de-hl-sp16"/>
+  </var>
+  <var name="nn">
+   <integer class="addr" size="16"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <const>1101</const>
+   <ref name="ss"/>
+   <const>10</const>
+   <ref name="ss"/>
+   <ref name="nn"/>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <ref name="ss"/>
+   <literal>,</literal><ws/>
+   <literal>(</literal>
+   <ref name="nn"/>
+   <literal>)</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="ss"/>
+    <memory size="16">
+     <ref name="nn"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ld16-sp-hl-instr">
+ <fragment>
+  <pattern>
+   <const>10011111</const>
+  </pattern>
+  <phrase>
+   <literal>LD</literal>
+  </phrase>
+  <phrase>
+   <literal>SP,</literal><ws/>
+   <literal>HL</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="SP"/>
+    <register name="HL"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="alu8-instr">
+ <fragment>
+  <var name="r">
+   <ref name="regind8"/>
   </var>
   <var name="opcode">
    <ref name="add-instr"/>
@@ -1302,6 +1653,36 @@ GNU General Public License (version 3 or any later version).
   </effect>
  </fragment>
 
+ <fragment>
+  <var name="r">
+   <ref name="regind8"/>
+  </var>
+  <var name="opcode">
+   <ref name="inc-instr"/>
+   <ref name="dec-instr"/>
+  </var>
+  <pattern>
+   <ref name="opcode"/>
+   <const>01</const>
+   <ref name="r"/>
+   <const>00</const>
+   <ref name="r"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+</define>
+
+<define name="alu8-imm-instr">
  <fragment>
   <var name="n">
    <integer size="8" encoding="u"/>
@@ -1335,20 +1716,48 @@ GNU General Public License (version 3 or any later version).
    </ref>
   </effect>
  </fragment>
+</define>
 
+<define name="alu8-acc-instr">
+ <fragment>
+  <pattern>
+   <const>10110111</const>
+   <const>00100010</const>
+  </pattern>
+  <phrase>
+   <literal>NEG</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <sub>
+     <const>0</const>
+     <register name="A"/>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="shift-instr">
  <fragment>
   <var name="r">
-   <ref name="reg8"/>
-   <ref name="ind8"/>
+   <ref name="regind8"/>
   </var>
   <var name="opcode">
-   <ref name="inc-instr"/>
-   <ref name="dec-instr"/>
+   <ref name="rlc-instr"/>
+   <ref name="rrc-instr"/>
+   <ref name="rl-instr"/>
+   <ref name="rr-instr"/>
+   <ref name="sla-instr"/>
+   <ref name="sra-instr"/>
+   <ref name="srl-instr"/>
   </var>
   <pattern>
-   <ref name="opcode"/>
-   <const>01</const>
+   <const>11010011</const>
    <ref name="r"/>
+   <ref name="opcode"/>
    <const>00</const>
    <ref name="r"/>
   </pattern>
@@ -1364,38 +1773,9 @@ GNU General Public License (version 3 or any later version).
    </ref>
   </effect>
  </fragment>
+</define>
 
- <fragment>
-  <var name="r">
-   <ref name="reg8"/>
-   <ref name="ind8"/>
-  </var>
-  <var name="imm">
-   <integer size="8"/>
-  </var>
-  <pattern>
-   <const>011</const>
-   <ref name="r"/>
-   <const>00</const>
-   <ref name="r"/>
-   <ref name="imm"/>
-  </pattern>
-  <phrase>
-   <literal>LD</literal>
-  </phrase>
-  <phrase>
-   <ref name="r"/>
-   <literal>,</literal><ws/>
-   <ref name="imm"/>
-  </phrase>
-  <effect>
-   <assign>
-    <ref name="r"/>
-    <ref name="imm"/>
-   </assign>
-  </effect>
- </fragment>
-
+<define name="shift-acc-instr">
  <fragment>
   <var name="opcode">
    <ref name="rlc-instr"/>
@@ -1423,177 +1803,115 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 
  <fragment>
-  <var name="dd">
-   <ref name="bc16"/>
-   <ref name="de16"/>
-   <ref name="hl16"/>
-   <ref name="sp16"/>
-  </var>
-  <var name="imm">
-   <integer size="16"/>
-  </var>
   <pattern>
-   <const>1000</const>
-   <ref name="dd"/>
-   <const>00</const>
-   <ref name="imm"/>
-   <ref name="dd"/>
+   <const>10110111</const>
+   <const>11100110</const>
   </pattern>
   <phrase>
-   <literal>LD</literal>
+   <literal>RRD</literal>
   </phrase>
-  <phrase>
-   <ref name="dd"/>
-   <literal>,</literal><ws/>
-   <ref name="imm"/>
-  </phrase>
+  <phrase></phrase>
   <effect>
-   <assign>
-    <ref name="dd"/>
-    <ref name="imm"/>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="dd">
-   <ref name="bc16"/>
-   <ref name="de16"/>
-   <ref name="addr16"/>
-  </var>
-  <pattern>
-   <const>0100</const>
-   <ref name="dd"/>
-   <const>00</const>
-   <ref name="dd"/>
-  </pattern>
-  <phrase>
-   <literal>LD</literal>
-  </phrase>
-  <phrase>
-   <literal>(</literal>
-   <ref name="dd"/>
-   <literal>),</literal><ws/>
-   <literal>A</literal>
-  </phrase>
-  <effect>
-   <assign>
-    <memory size="8">
-     <ref name="dd"/>
-    </memory>
+   <temp name="A">
     <register name="A"/>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="dd">
-   <ref name="bc16"/>
-   <ref name="de16"/>
-   <ref name="addr16"/>
-  </var>
-  <pattern>
-   <const>0101</const>
-   <ref name="dd"/>
-   <const>00</const>
-   <ref name="dd"/>
-  </pattern>
-  <phrase>
-   <literal>LD</literal>
-  </phrase>
-  <phrase>
-   <literal>A</literal>
-   <literal>,</literal><ws/>
-   <literal>(</literal>
-   <ref name="dd"/>
-   <literal>)</literal>
-  </phrase>
-  <effect>
+   </temp>
    <assign>
     <register name="A"/>
-    <memory size="8">
-     <ref name="dd"/>
-    </memory>
+    <or>
+     <and>
+      <temp name="A"/>
+      <const>0xF0</const>
+     </and>
+     <and>
+      <memory size="8">
+       <register name="HL"/>
+      </memory>
+      <const>0x0F</const>
+     </and>
+    </or>
    </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="dd">
-   <ref name="hl16"/>
-  </var>
-  <var name="addr">
-   <integer class="addr" size="16" encoding="u"/>
-  </var>
-  <pattern>
-   <const>0100</const>
-   <ref name="dd"/>
-   <const>00</const>
-   <ref name="dd"/>
-   <ref name="addr"/>
-  </pattern>
-  <phrase>
-   <literal>LD</literal>
-  </phrase>
-  <phrase>
-   <literal>(</literal>
-   <ref name="addr"/>
-   <literal>),</literal><ws/>
-   <ref name="dd"/>
-  </phrase>
- </fragment>
-
- <fragment>
-  <var name="dd">
-   <ref name="hl16"/>
-  </var>
-  <var name="addr">
-   <integer class="addr" size="16" encoding="u"/>
-  </var>
-  <pattern>
-   <const>0101</const>
-   <ref name="dd"/>
-   <const>00</const>
-   <ref name="dd"/>
-   <ref name="addr"/>
-  </pattern>
-  <phrase>
-   <literal>LD</literal>
-  </phrase>
-  <phrase>
-   <ref name="dd"/>
-   <literal>,</literal><ws/>
-   <literal>(</literal>
-   <ref name="addr"/>
-   <literal>)</literal>
-  </phrase>
- </fragment>
-
- <fragment>
-  <var name="dd">
-   <ref name="hl16"/>
-  </var>
-  <pattern>
-   <const>10</const>
-   <ref name="dd"/>
-   <const>1111</const>
-   <ref name="dd"/>
-  </pattern>
-  <phrase>
-   <literal>LD</literal>
-  </phrase>
-  <phrase>
-   <literal>SP,</literal><ws/>
-   <ref name="dd"/>
-  </phrase>
-  <effect>
    <assign>
-    <register name="SP"/>
-    <ref name="dd"/>
+    <memory size="8">
+     <register name="HL"/>
+    </memory>
+    <or>
+     <and>
+      <shift width="8" method="logical">
+       <temp name="A"/>
+       <const>4</const>
+      </shift>
+      <const>0xF0</const>
+     </and> 
+     <and>
+      <shift width="8" method="logical">
+       <memory size="8">
+        <register name="HL"/>
+       </memory>
+       <const>-4</const>
+      </shift>
+      <const>0x0F</const>
+     </and> 
+    </or>
    </assign>
   </effect>
  </fragment>
 
+ <fragment>
+  <pattern>
+   <const>10110111</const>
+   <const>11110110</const>
+  </pattern>
+  <phrase>
+   <literal>RLD</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <temp name="A">
+    <register name="A"/>
+   </temp>
+   <assign>
+    <register name="A"/>
+    <or>
+     <and>
+      <temp name="A"/>
+      <const>0xF0</const>
+     </and>
+     <and>
+      <shift width="8" method="logical">
+       <memory size="8">
+        <register name="HL"/>
+       </memory>
+       <const>-4</const>
+      </shift>
+      <const>0x0F</const>
+     </and> 
+    </or>
+   </assign>
+   <assign>
+    <memory size="8">
+     <register name="HL"/>
+    </memory>
+    <or>
+     <and>
+      <shift width="8" method="logical">
+       <memory size="8">
+        <register name="HL"/>
+       </memory>
+       <const>4</const>
+      </shift>
+      <const>0xF0</const>
+     </and>
+     <and>
+      <temp name="A"/>
+      <const>0x0F</const>
+     </and>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="alu16-instr">
  <fragment>
   <var name="dd">
    <ref name="hl16"/>
@@ -1633,10 +1951,7 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="dd">
-   <ref name="bc16"/>
-   <ref name="de16"/>
-   <ref name="hl16"/>
-   <ref name="sp16"/>
+   <ref name="bc-de-hl-sp16"/>
   </var>
   <var name="opcode">
    <ref name="inc-instr"/>
@@ -1663,11 +1978,76 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 
  <fragment>
-  <var name="dd">
+  <var name="ss">
    <ref name="bc16"/>
    <ref name="de16"/>
    <ref name="hl16"/>
-   <ref name="af16"/>
+   <ref name="sp16"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <const>0100</const>
+   <ref name="ss"/>
+   <const>10</const>
+   <ref name="ss"/>
+  </pattern>
+  <phrase>
+   <literal>SBC</literal>
+  </phrase>
+  <phrase>
+   <literal>HL,</literal><ws/>
+   <ref name="ss"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="HL"/>
+    <sub>
+     <register name="HL"/>
+     <ref name="ss"/>
+     <register name="CF"/>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="ss">
+   <ref name="bc16"/>
+   <ref name="de16"/>
+   <ref name="hl16"/>
+   <ref name="sp16"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <const>0101</const>
+   <ref name="ss"/>
+   <const>10</const>
+   <ref name="ss"/>
+  </pattern>
+  <phrase>
+   <literal>ADC</literal>
+  </phrase>
+  <phrase>
+   <literal>HL,</literal><ws/>
+   <ref name="ss"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="HL"/>
+    <add>
+     <register name="HL"/>
+     <ref name="ss"/>
+     <register name="CF"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="stack-instr">
+ <fragment>
+  <var name="dd">
+   <ref name="bc-de-hl-af16"/>
   </var>
   <var name="opcode">
    <ref name="pop-instr"/>
@@ -1693,7 +2073,9 @@ GNU General Public License (version 3 or any later version).
    </ref>
   </effect>
  </fragment>
+</define>
 
+<define name="nop-instr">
  <fragment>
   <pattern>
    <const>00000000</const>
@@ -1704,7 +2086,9 @@ GNU General Public License (version 3 or any later version).
   <phrase></phrase>
   <effect></effect>
  </fragment>
+</define>
 
+<define name="daa-instr">
  <fragment>
   <pattern>
    <const>11100100</const>
@@ -1714,7 +2098,9 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <phrase></phrase>
  </fragment>
+</define>
 
+<define name="cpl-instr">
  <fragment>
   <pattern>
    <const>11110100</const>
@@ -1733,7 +2119,9 @@ GNU General Public License (version 3 or any later version).
    </assign>
   </effect>
  </fragment>
+</define>
 
+<define name="carry-instr">
  <fragment>
   <pattern>
    <const>11101100</const>
@@ -1768,7 +2156,9 @@ GNU General Public License (version 3 or any later version).
    </assign>
   </effect>
  </fragment>
+</define>
 
+<define name="jr-instr">
  <fragment>
   <var name="offset">
    <integer size="8" encoding="2c"/>
@@ -1887,7 +2277,9 @@ GNU General Public License (version 3 or any later version).
    </assign>
   </effect>
  </fragment>
+</define>
 
+<define name="ret-instr">
  <fragment>
   <pattern>
    <const>10010011</const>
@@ -1944,7 +2336,9 @@ GNU General Public License (version 3 or any later version).
    </assign>
   </effect>
  </fragment>
+</define>
 
+<define name="jp-abs-instr">
  <fragment>
   <var name="nn">
    <integer size="16"/>
@@ -1995,7 +2389,9 @@ GNU General Public License (version 3 or any later version).
    </assign>
   </effect>
  </fragment>
+</define>
 
+<define name="jp-ind-instr">
  <fragment>
   <var name="dd">
    <ref name="hl16"/>
@@ -2023,7 +2419,9 @@ GNU General Public License (version 3 or any later version).
    </assign>
   </effect>
  </fragment>
+</define>
 
+<define name="call-instr">
  <fragment>
   <var name="nn">
    <integer size="16"/>
@@ -2151,6 +2549,60 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <pattern>
+   <const>10110111</const>
+   <const>10100010</const>
+  </pattern>
+  <phrase>
+   <literal>RETN</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <memory size="16">
+     <register name="SP"/>
+    </memory>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>2</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10110111</const>
+   <const>10110010</const>
+  </pattern>
+  <phrase>
+   <literal>RETI</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <memory size="16">
+     <register name="SP"/>
+    </memory>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>2</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="halt-instr">
+ <fragment>
+  <pattern>
    <const>01101110</const>
   </pattern>
   <phrase>
@@ -2158,7 +2610,9 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <phrase></phrase>
  </fragment>
+</define>
 
+<define name="ex-reg16-instr">
  <fragment>
   <pattern>
    <const>00010000</const>
@@ -2231,6 +2685,34 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 
  <fragment>
+  <pattern>
+   <const>11010111</const>
+  </pattern>
+  <phrase>
+   <literal>EX</literal>
+  </phrase>
+  <phrase>
+   <literal>DE,</literal><ws/>
+   <literal>HL</literal>
+  </phrase>
+  <effect>
+   <temp name="HL">
+    <register name="HL"/>
+   </temp>
+   <assign>
+    <register name="HL"/>
+    <register name="DE"/>
+   </assign>
+   <assign>
+    <register name="DE"/>
+    <temp name="HL"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ex-ind16-instr">
+ <fragment>
   <var name="dd">
    <ref name="hl16"/>
   </var>
@@ -2265,173 +2747,9 @@ GNU General Public License (version 3 or any later version).
    </assign>
   </effect>
  </fragment>
+</define>
 
- <fragment>
-  <pattern>
-   <const>11010111</const>
-  </pattern>
-  <phrase>
-   <literal>EX</literal>
-  </phrase>
-  <phrase>
-   <literal>DE,</literal><ws/>
-   <literal>HL</literal>
-  </phrase>
-  <effect>
-   <temp name="HL">
-    <register name="HL"/>
-   </temp>
-   <assign>
-    <register name="HL"/>
-    <register name="DE"/>
-   </assign>
-   <assign>
-    <register name="DE"/>
-    <temp name="HL"/>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="n">
-   <integer size="8"/>
-  </var>
-  <pattern>
-   <const>11001011</const>
-   <ref name="n"/>
-  </pattern>
-  <phrase>
-   <literal>OUT</literal>
-  </phrase>
-  <phrase>
-   <literal>(</literal>
-   <ref name="n"/>
-   <literal>),</literal><ws/>
-   <literal>A</literal>
-  </phrase>
- </fragment>
-
- <fragment>
-  <var name="n">
-   <integer size="8"/>
-  </var>
-  <pattern>
-   <const>11011011</const>
-   <ref name="n"/>
-  </pattern>
-  <phrase>
-   <literal>IN</literal>
-  </phrase>
-  <phrase>
-   <literal>A,</literal><ws/>
-   <literal>(</literal>
-   <ref name="n"/>
-   <literal>)</literal>
-  </phrase>
- </fragment>
-
- <fragment>
-  <pattern>
-   <const>11001111</const>
-  </pattern>
-  <phrase>
-   <literal>DI</literal>
-  </phrase>
-  <phrase></phrase>
-  <effect>
-   <assign>
-    <register name="IFF"/>
-    <const>0</const>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <pattern>
-   <const>11011111</const>
-  </pattern>
-  <phrase>
-   <literal>EI</literal>
-  </phrase>
-  <phrase></phrase>
-  <effect>
-   <assign>
-    <register name="IFF"/>
-    <const>1</const>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="r">
-   <ref name="reg8"/>
-   <ref name="ind8"/>
-  </var>
-  <var name="opcode">
-   <ref name="rlc-instr"/>
-   <ref name="rrc-instr"/>
-   <ref name="rl-instr"/>
-   <ref name="rr-instr"/>
-   <ref name="sla-instr"/>
-   <ref name="sra-instr"/>
-   <ref name="srl-instr"/>
-  </var>
-  <pattern>
-   <const>11010011</const>
-   <ref name="r"/>
-   <ref name="opcode"/>
-   <const>00</const>
-   <ref name="r"/>
-  </pattern>
-  <phrase>
-   <ref name="opcode"/>
-  </phrase>
-  <phrase>
-   <ref name="r"/>
-  </phrase>
-  <effect>
-   <ref name="opcode">
-    <bind name="operand" src="r"/>
-   </ref>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="bit">
-   <integer class="bit" size="3"/>
-  </var>
-  <var name="r">
-   <ref name="reg8"/>
-   <ref name="ind8"/>
-  </var>
-  <var name="opcode">
-   <ref name="bit-instr"/>
-   <ref name="res-instr"/>
-   <ref name="set-instr"/>
-  </var>
-  <pattern>
-   <const>11010011</const>
-   <ref name="r"/>
-   <ref name="bit"/>
-   <ref name="opcode"/>
-   <ref name="r"/>
-  </pattern>
-  <phrase>
-   <ref name="opcode"/>
-  </phrase>
-  <phrase>
-   <ref name="bit"/>
-   <literal>,</literal><ws/>
-   <ref name="r"/>
-  </phrase>
-  <effect>
-   <ref name="opcode">
-    <bind name="bit" src="bit"/>
-    <bind name="operand" src="r"/>
-   </ref>
-  </effect>
- </fragment>
-
+<define name="io-instr">
  <fragment>
   <var name="r">
    <ref name="reg8"/>
@@ -2472,196 +2790,77 @@ GNU General Public License (version 3 or any later version).
    <ref name="r"/>
   </phrase>
  </fragment>
+</define>
 
+<define name="io-imm-instr">
  <fragment>
-  <var name="ss">
-   <ref name="bc16"/>
-   <ref name="de16"/>
-   <ref name="hl16"/>
-   <ref name="sp16"/>
+  <var name="n">
+   <integer size="8"/>
   </var>
   <pattern>
-   <const>10110111</const>
-   <const>0100</const>
-   <ref name="ss"/>
-   <const>10</const>
-   <ref name="ss"/>
+   <const>11001011</const>
+   <ref name="n"/>
   </pattern>
   <phrase>
-   <literal>SBC</literal>
-  </phrase>
-  <phrase>
-   <literal>HL,</literal><ws/>
-   <ref name="ss"/>
-  </phrase>
-  <effect>
-   <assign>
-    <register name="HL"/>
-    <sub>
-     <register name="HL"/>
-     <ref name="ss"/>
-     <register name="CF"/>
-    </sub>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="ss">
-   <ref name="bc16"/>
-   <ref name="de16"/>
-   <ref name="hl16"/>
-   <ref name="sp16"/>
-  </var>
-  <pattern>
-   <const>10110111</const>
-   <const>0101</const>
-   <ref name="ss"/>
-   <const>10</const>
-   <ref name="ss"/>
-  </pattern>
-  <phrase>
-   <literal>ADC</literal>
-  </phrase>
-  <phrase>
-   <literal>HL,</literal><ws/>
-   <ref name="ss"/>
-  </phrase>
-  <effect>
-   <assign>
-    <register name="HL"/>
-    <add>
-     <register name="HL"/>
-     <ref name="ss"/>
-     <register name="CF"/>
-    </add>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="ss">
-   <ref name="bc16"/>
-   <ref name="de16"/>
-   <ref name="hl16"/>
-   <ref name="sp16"/>
-  </var>
-  <var name="nn">
-   <integer class="addr" size="16"/>
-  </var>
-  <pattern>
-   <const>10110111</const>
-   <const>1100</const>
-   <ref name="ss"/>
-   <const>10</const>
-   <ref name="ss"/>
-   <ref name="nn"/>
-  </pattern>
-  <phrase>
-   <literal>LD</literal>
+   <literal>OUT</literal>
   </phrase>
   <phrase>
    <literal>(</literal>
-   <ref name="nn"/>
+   <ref name="n"/>
    <literal>),</literal><ws/>
-   <ref name="ss"/>
+   <literal>A</literal>
   </phrase>
-  <effect>
-   <assign>
-    <memory size="16">
-     <ref name="nn"/>
-    </memory>
-    <ref name="ss"/>
-   </assign>
-  </effect>
  </fragment>
 
  <fragment>
-  <var name="ss">
-   <ref name="bc16"/>
-   <ref name="de16"/>
-   <ref name="hl16"/>
-   <ref name="sp16"/>
-  </var>
-  <var name="nn">
-   <integer class="addr" size="16"/>
+  <var name="n">
+   <integer size="8"/>
   </var>
   <pattern>
-   <const>10110111</const>
-   <const>1101</const>
-   <ref name="ss"/>
-   <const>10</const>
-   <ref name="ss"/>
-   <ref name="nn"/>
+   <const>11011011</const>
+   <ref name="n"/>
   </pattern>
   <phrase>
-   <literal>LD</literal>
+   <literal>IN</literal>
   </phrase>
   <phrase>
-   <ref name="ss"/>
-   <literal>,</literal><ws/>
+   <literal>A,</literal><ws/>
    <literal>(</literal>
-   <ref name="nn"/>
+   <ref name="n"/>
    <literal>)</literal>
   </phrase>
+ </fragment>
+</define>
+
+<define name="irq-instr">
+ <fragment>
+  <pattern>
+   <const>11001111</const>
+  </pattern>
+  <phrase>
+   <literal>DI</literal>
+  </phrase>
+  <phrase></phrase>
   <effect>
    <assign>
-    <ref name="ss"/>
-    <memory size="16">
-     <ref name="nn"/>
-    </memory>
+    <register name="IFF"/>
+    <const>0</const>
    </assign>
   </effect>
  </fragment>
 
  <fragment>
   <pattern>
-   <const>10110111</const>
-   <const>10100010</const>
+   <const>11011111</const>
   </pattern>
   <phrase>
-   <literal>RETN</literal>
+   <literal>EI</literal>
   </phrase>
   <phrase></phrase>
   <effect>
    <assign>
-    <register name="PC"/>
-    <memory size="16">
-     <register name="SP"/>
-    </memory>
-   </assign>
-   <assign>
-    <register name="SP"/>
-    <add>
-     <register name="SP"/>
-     <const>2</const>
-    </add>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <pattern>
-   <const>10110111</const>
-   <const>10110010</const>
-  </pattern>
-  <phrase>
-   <literal>RETI</literal>
-  </phrase>
-  <phrase></phrase>
-  <effect>
-   <assign>
-    <register name="PC"/>
-    <memory size="16">
-     <register name="SP"/>
-    </memory>
-   </assign>
-   <assign>
-    <register name="SP"/>
-    <add>
-     <register name="SP"/>
-     <const>2</const>
-    </add>
+    <register name="IFF"/>
+    <const>1</const>
    </assign>
   </effect>
  </fragment>
@@ -2684,186 +2883,46 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect></effect>
  </fragment>
+</define>
 
+<define name="bit-instr">
  <fragment>
+  <var name="bit">
+   <integer class="bit" size="3"/>
+  </var>
   <var name="r">
-   <ref name="ir"/>
+   <ref name="regind8"/>
+  </var>
+  <var name="opcode">
+   <ref name="bit-opcode"/>
+   <ref name="res-opcode"/>
+   <ref name="set-opcode"/>
   </var>
   <pattern>
-   <const>10110111</const>
-   <const>111</const>
+   <const>11010011</const>
    <ref name="r"/>
-   <const>0010</const>
+   <ref name="bit"/>
+   <ref name="opcode"/>
+   <ref name="r"/>
   </pattern>
   <phrase>
-   <literal>LD</literal>
+   <ref name="opcode"/>
   </phrase>
   <phrase>
-   <ref name="r"/>
+   <ref name="bit"/>
    <literal>,</literal><ws/>
-   <literal>A</literal>
-  </phrase>
-  <effect>
-   <assign>
-    <ref name="r"/>
-    <register name="A"/>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="r">
-   <ref name="ir"/>
-  </var>
-  <pattern>
-   <const>10110111</const>
-   <const>111</const>
-   <ref name="r"/>
-   <const>1010</const>
-  </pattern>
-  <phrase>
-   <literal>LD</literal>
-  </phrase>
-  <phrase>
-   <literal>A,</literal><ws/>
    <ref name="r"/>
   </phrase>
   <effect>
-   <assign>
-    <register name="A"/>
-    <ref name="r"/>
-   </assign>
+   <ref name="opcode">
+    <bind name="bit" src="bit"/>
+    <bind name="operand" src="r"/>
+   </ref>
   </effect>
  </fragment>
+</define>
 
- <fragment>
-  <pattern>
-   <const>10110111</const>
-   <const>00100010</const>
-  </pattern>
-  <phrase>
-   <literal>NEG</literal>
-  </phrase>
-  <phrase></phrase>
-  <effect>
-   <assign>
-    <register name="A"/>
-    <sub>
-     <const>0</const>
-     <register name="A"/>
-    </sub>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <pattern>
-   <const>10110111</const>
-   <const>11100110</const>
-  </pattern>
-  <phrase>
-   <literal>RRD</literal>
-  </phrase>
-  <phrase></phrase>
-  <effect>
-   <temp name="A">
-    <register name="A"/>
-   </temp>
-   <assign>
-    <register name="A"/>
-    <or>
-     <and>
-      <temp name="A"/>
-      <const>0xF0</const>
-     </and>
-     <and>
-      <memory size="8">
-       <register name="HL"/>
-      </memory>
-      <const>0x0F</const>
-     </and>
-    </or>
-   </assign>
-   <assign>
-    <memory size="8">
-     <register name="HL"/>
-    </memory>
-    <or>
-     <and>
-      <shift width="8" method="logical">
-       <temp name="A"/>
-       <const>4</const>
-      </shift>
-      <const>0xF0</const>
-     </and> 
-     <and>
-      <shift width="8" method="logical">
-       <memory size="8">
-        <register name="HL"/>
-       </memory>
-       <const>-4</const>
-      </shift>
-      <const>0x0F</const>
-     </and> 
-    </or>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <pattern>
-   <const>10110111</const>
-   <const>11110110</const>
-  </pattern>
-  <phrase>
-   <literal>RLD</literal>
-  </phrase>
-  <phrase></phrase>
-  <effect>
-   <temp name="A">
-    <register name="A"/>
-   </temp>
-   <assign>
-    <register name="A"/>
-    <or>
-     <and>
-      <temp name="A"/>
-      <const>0xF0</const>
-     </and>
-     <and>
-      <shift width="8" method="logical">
-       <memory size="8">
-        <register name="HL"/>
-       </memory>
-       <const>-4</const>
-      </shift>
-      <const>0x0F</const>
-     </and> 
-    </or>
-   </assign>
-   <assign>
-    <memory size="8">
-     <register name="HL"/>
-    </memory>
-    <or>
-     <and>
-      <shift width="8" method="logical">
-       <memory size="8">
-        <register name="HL"/>
-       </memory>
-       <const>4</const>
-      </shift>
-      <const>0xF0</const>
-     </and>
-     <and>
-      <temp name="A"/>
-      <const>0x0F</const>
-     </and>
-    </or>
-   </assign>
-  </effect>
- </fragment>
-
+<define name="repeated-instr">
  <fragment>
   <var name="op">
    <ref name="ld-op"/>
@@ -2917,5 +2976,43 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <phrase></phrase>
  </fragment>
+</define>
+
+<start>
+ <prefix name="ix">10111011</prefix>
+ <prefix name="iy">10111111</prefix>
+
+ <ref name="ld8-instr"/>
+ <ref name="ld16-instr"/>
+ <ref name="ex-ind16-instr"/>
+ <ref name="alu8-instr"/>
+ <ref name="shift-instr"/>
+ <ref name="alu16-instr"/>
+ <ref name="stack-instr"/>
+ <ref name="jp-ind-instr"/>
+ <ref name="io-instr"/>
+ <ref name="bit-instr"/>
+
+ <require name="!ix">
+  <require name="!iy">
+   <ref name="ld16-sp-hl-instr"/>
+   <ref name="ex-reg16-instr"/>
+   <ref name="alu8-imm-instr"/>
+   <ref name="alu8-acc-instr"/>
+   <ref name="shift-acc-instr"/>
+   <ref name="nop-instr"/>
+   <ref name="daa-instr"/>
+   <ref name="cpl-instr"/>
+   <ref name="halt-instr"/>
+   <ref name="carry-instr"/>
+   <ref name="jr-instr"/>
+   <ref name="jp-abs-instr"/>
+   <ref name="ret-instr"/>
+   <ref name="call-instr"/>
+   <ref name="irq-instr"/>
+   <ref name="io-imm-instr"/>
+   <ref name="repeated-instr"/>
+  </require>
+ </require>
 </start>
 </cpudl>
