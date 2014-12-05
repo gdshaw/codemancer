@@ -34,6 +34,10 @@ GNU General Public License (version 3 or any later version).
 <register name="DE" size="16"/>
 <register name="HL" size="16"/>
 <register name="AF" size="16"/>
+<register name="BC'" size="16"/>
+<register name="DE'" size="16"/>
+<register name="HL'" size="16"/>
+<register name="AF'" size="16"/>
 <register name="IX" size="16"/>
 <register name="IY" size="16"/>
 <register name="SP" size="16"/>
@@ -50,8 +54,6 @@ GNU General Public License (version 3 or any later version).
 <register name="I" size="8"/>
 <register name="R" size="8"/>
 <register name="IFF" size="1"/>
-
-<register name="temp" size="8"/>
 
 <define name="cc2">
  <fragment>
@@ -2156,6 +2158,19 @@ GNU General Public License (version 3 or any later version).
    <literal>AF,</literal><ws/>
    <literal>AF'</literal>
   </phrase>
+  <effect>
+   <temp name="AF">
+    <register name="AF"/>
+   </temp>
+   <assign>
+    <register name="AF"/>
+    <register name="AF'"/>
+   </assign>
+   <assign>
+    <register name="AF'"/>
+    <temp name="AF"/>
+   </assign>
+  </effect>
  </fragment>
 
  <fragment>
@@ -2166,6 +2181,41 @@ GNU General Public License (version 3 or any later version).
    <literal>EXX</literal>
   </phrase>
   <phrase></phrase>
+  <effect>
+   <temp name="BC">
+    <register name="BC"/>
+   </temp>
+   <assign>
+    <register name="BC"/>
+    <register name="BC'"/>
+   </assign>
+   <assign>
+    <register name="BC'"/>
+    <temp name="BC"/>
+   </assign>
+   <temp name="DE">
+    <register name="DE"/>
+   </temp>
+   <assign>
+    <register name="DE"/>
+    <register name="DE'"/>
+   </assign>
+   <assign>
+    <register name="DE'"/>
+    <temp name="DE"/>
+   </assign>
+   <temp name="HL">
+    <register name="HL"/>
+   </temp>
+   <assign>
+    <register name="HL"/>
+    <register name="HL'"/>
+   </assign>
+   <assign>
+    <register name="HL'"/>
+    <temp name="HL"/>
+   </assign>
+  </effect>
  </fragment>
 
  <fragment>
@@ -2179,6 +2229,23 @@ GNU General Public License (version 3 or any later version).
    <literal>(SP),</literal><ws/>
    <literal>HL</literal>
   </phrase>
+  <effect>
+   <temp name="HL">
+    <register name="HL"/>
+   </temp>
+   <assign>
+    <register name="HL"/>
+    <memory size="16">
+     <register name="SP"/>
+    </memory>
+   </assign>
+   <assign>
+    <memory size="16">
+     <register name="SP"/>
+    </memory>
+    <temp name="HL"/>
+   </assign>
+  </effect>
  </fragment>
 
  <fragment>
@@ -2192,6 +2259,19 @@ GNU General Public License (version 3 or any later version).
    <literal>DE,</literal><ws/>
    <literal>HL</literal>
   </phrase>
+  <effect>
+   <temp name="HL">
+    <register name="HL"/>
+   </temp>
+   <assign>
+    <register name="HL"/>
+    <register name="DE"/>
+   </assign>
+   <assign>
+    <register name="DE"/>
+    <temp name="HL"/>
+   </assign>
+  </effect>
  </fragment>
 
  <fragment>
@@ -2668,11 +2748,14 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <phrase></phrase>
   <effect>
+   <temp name="A">
+    <register name="A"/>
+   </temp>
    <assign>
-    <register name="temp"/>
+    <register name="A"/>
     <or>
      <and>
-      <register name="A"/>
+      <temp name="A"/>
       <const>0xF0</const>
      </and>
      <and>
@@ -2690,7 +2773,7 @@ GNU General Public License (version 3 or any later version).
     <or>
      <and>
       <shift width="8" method="logical">
-       <register name="A"/>
+       <temp name="A"/>
        <const>4</const>
       </shift>
       <const>0xF0</const>
@@ -2706,10 +2789,6 @@ GNU General Public License (version 3 or any later version).
      </and> 
     </or>
    </assign>
-   <assign>
-    <register name="A"/>
-    <register name="temp"/>
-   </assign>
   </effect>
  </fragment>
 
@@ -2723,11 +2802,14 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <phrase></phrase>
   <effect>
+   <temp name="A">
+    <register name="A"/>
+   </temp>
    <assign>
-    <register name="temp"/>
+    <register name="A"/>
     <or>
      <and>
-      <register name="A"/>
+      <temp name="A"/>
       <const>0xF0</const>
      </and>
      <and>
@@ -2756,14 +2838,10 @@ GNU General Public License (version 3 or any later version).
       <const>0xF0</const>
      </and>
      <and>
-      <register name="A"/>
+      <temp name="A"/>
       <const>0x0F</const>
      </and>
     </or>
-   </assign>
-   <assign>
-    <register name="A"/>
-    <register name="temp"/>
    </assign>
   </effect>
  </fragment>
