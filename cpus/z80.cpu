@@ -1570,50 +1570,62 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 
  <fragment>
+  <var name="dd">
+   <ref name="hl16"/>
+  </var>
   <pattern>
-   <const>10011111</const>
+   <const>10</const>
+   <ref name="dd"/>
+   <const>1111</const>
+   <ref name="dd"/>
   </pattern>
   <phrase>
    <literal>LD</literal>
   </phrase>
   <phrase>
    <literal>SP,</literal><ws/>
-   <literal>HL</literal>
+   <ref name="dd"/>
   </phrase>
   <effect>
    <assign>
     <register name="SP"/>
-    <register name="HL"/>
+    <ref name="dd"/>
    </assign>
   </effect>
  </fragment>
 
  <fragment>
   <var name="dd">
+   <ref name="hl16"/>
+  </var>
+  <var name="ss">
    <ref name="bc16"/>
    <ref name="de16"/>
    <ref name="hl16"/>
    <ref name="sp16"/>
   </var>
   <pattern>
-   <const>1001</const>
+   <const>10</const>
    <ref name="dd"/>
+   <ref name="ss"/>
    <const>00</const>
    <ref name="dd"/>
+   <ref name="ss"/>
   </pattern>
   <phrase>
    <literal>ADD</literal>
   </phrase>
   <phrase>
-   <literal>HL,</literal><ws/>
    <ref name="dd"/>
+   <literal>,</literal><ws/>
+   <ref name="ss"/>
   </phrase>
   <effect>
    <assign>
-    <register name="HL"/>
+    <ref name="dd"/>
     <add>
-     <register name="HL"/>
      <ref name="dd"/>
+     <ref name="ss"/>
     </add>
    </assign>
   </effect>
@@ -2219,22 +2231,28 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 
  <fragment>
+  <var name="dd">
+   <ref name="hl16"/>
+  </var>
   <pattern>
-   <const>11000111</const>
+   <const>1100</const>
+   <ref name="dd"/>
+   <const>11</const>
+   <ref name="dd"/>
   </pattern>
   <phrase>
    <literal>EX</literal>
   </phrase>
   <phrase>
    <literal>(SP),</literal><ws/>
-   <literal>HL</literal>
+   <ref name="dd"/>
   </phrase>
   <effect>
-   <temp name="HL">
-    <register name="HL"/>
+   <temp name="dd">
+    <ref name="dd"/>
    </temp>
    <assign>
-    <register name="HL"/>
+    <ref name="dd"/>
     <memory size="16">
      <register name="SP"/>
     </memory>
@@ -2243,7 +2261,7 @@ GNU General Public License (version 3 or any later version).
     <memory size="16">
      <register name="SP"/>
     </memory>
-    <temp name="HL"/>
+    <temp name="dd"/>
    </assign>
   </effect>
  </fragment>
