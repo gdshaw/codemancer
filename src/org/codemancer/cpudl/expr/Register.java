@@ -14,7 +14,6 @@ import org.codemancer.cpudl.State;
 import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.type.Type;
-import org.codemancer.cpudl.type.IntegerType;
 
 /** An expression class to represent a reference to a register. */
 public class Register extends Expression {

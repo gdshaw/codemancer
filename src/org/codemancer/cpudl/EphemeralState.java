@@ -13,6 +13,7 @@ import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Constant;
 import org.codemancer.cpudl.expr.Register;
 import org.codemancer.cpudl.expr.Memory;
+import org.codemancer.cpudl.expr.Temporary;
 
 /** A class to represent the state of the machine at a single point in the program.
  * Information about prior state is discarded once it has been superseded.
@@ -23,6 +24,9 @@ public class EphemeralState implements State {
 
 	/** The current state of memory. */
 	private TreeMap<Long, Expression> locations = new TreeMap<Long, Expression>();
+
+	/** The current state of temporary values. */
+	private TreeMap<Long, Expression> temporaries = new TreeMap<Long, Expression>();
 
 	public final Expression get(Register register) {
 		return registers.get(register.getName());
@@ -48,6 +52,14 @@ public class EphemeralState implements State {
 		}
 		Constant constAddress = (Constant)address;
 		locations.put(constAddress.getValue(), value);
+	}
+
+	public final Expression get(Temporary temp) {
+		return temporaries.get(temp.getId());
+	}
+
+	public final void put(Temporary temp, Expression value) {
+		temporaries.put(temp.getId(), value);
 	}
 
 	/** Dump the machine state to a given stream in human-readable form.

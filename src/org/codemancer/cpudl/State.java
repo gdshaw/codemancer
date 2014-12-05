@@ -8,6 +8,7 @@ package org.codemancer.cpudl;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Register;
 import org.codemancer.cpudl.expr.Memory;
+import org.codemancer.cpudl.expr.Temporary;
 
 /** An interface to represent the state of the machine.
  * The purpose of this interface is to allow instructions to access and
@@ -40,4 +41,16 @@ public interface State {
 	 * @param value the value to be placed in that location
 	 */
 	void put(Memory memory, Expression value);
+
+	/** Get the value of a temporary.
+	 * @param temp the temporary value to be inspected
+	 * @return the value of that temporary
+	 */
+	Expression get(Temporary temp);
+
+	/** Put a value into a temporary.
+	 * @param temporary the temporary to be altered
+	 * @param value the value to be placed in that temporary
+	 */
+	void put(Temporary temp, Expression value);
 }

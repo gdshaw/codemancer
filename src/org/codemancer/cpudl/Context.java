@@ -6,6 +6,7 @@
 package org.codemancer.cpudl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
@@ -22,6 +23,7 @@ import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Reference;
 import org.codemancer.cpudl.expr.Constant;
 import org.codemancer.cpudl.expr.Register;
+import org.codemancer.cpudl.expr.Temporary;
 import org.codemancer.cpudl.expr.Memory;
 import org.codemancer.cpudl.expr.Extension;
 import org.codemancer.cpudl.expr.Addition;
@@ -40,11 +42,21 @@ public class Context {
 	/** The architecture. */
 	private final Architecture arch;
 
+	/** The temporary values in scope for this context, indexed by name. */
+	private final HashMap<String, Temporary> temporaries = new HashMap<String, Temporary>();
+
 	/** Construct CPUDL context.
 	 * @param arch the architecture
 	 */
 	public Context(Architecture arch) {
 		this.arch = arch;
+	}
+
+	/** Construct context based on an existing context.
+	 * @param ctx the existing context
+	 */
+	public Context(Context ctx) {
+		this.arch = ctx.arch;
 	}
 
 	/** Get the architecture.
@@ -59,6 +71,21 @@ public class Context {
 	 */
 	public final Stylesheet getStylesheet() {
 		return arch.getStylesheet();
+	}
+
+	/** Register temporary value.
+	 * @param temp the temporary to be registered.
+	 */
+	public final void registerTemporary(Temporary temp) {
+		temporaries.put(temp.getName(), temp);
+	}
+
+	/** Get temporary value.
+	 * @param name the name of the temporary value
+	 * @return the temporary value, or null if not found
+	 */
+	public final Temporary getTemporary(String name) {
+		return temporaries.get(name);
 	}
 
 	/** Make type from XML node.
@@ -87,9 +114,9 @@ public class Context {
 		} else if (tagName.equals("integer")) {
 			return new IntegerType(this, element);
 		} else if (tagName.equals("bitmap")) {
-			return new BitmapType(this, element);
+			return new BitmapType(new Context(this), element);
 		} else if (tagName.equals("fragment")) {
-			return new FragmentType(this, element);
+			return new FragmentType(new Context(this), element);
 		} else if (tagName.equals("prefix")) {
 			return new PrefixType(this, element);
 		} else if (tagName.equals("choice")) {
@@ -117,6 +144,8 @@ public class Context {
 			return Register.make(this, el);
 		} else if (tagName.equals("memory")) {
 			return Memory.make(this, el);
+		} else if (tagName.equals("temp")) {
+			return Temporary.make(this, el);
 		} else if (tagName.equals("extend")) {
 			return Extension.make(this, el);
 		} else if (tagName.equals("add")) {
