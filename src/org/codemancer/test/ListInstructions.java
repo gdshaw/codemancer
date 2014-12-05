@@ -19,6 +19,7 @@ import org.codemancer.cpudl.FeatureSet;
 import org.codemancer.cpudl.type.Type;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Constant;
+import org.codemancer.cpudl.expr.Prefix;
 
 public class ListInstructions {
 	/** List instructions.
@@ -44,14 +45,16 @@ public class ListInstructions {
 			bitReaders.add(bitReader);
 
 			Expression expr = start.decode(bitReaders, features);
-			if (expr != null) {
+			if (expr == null) {
+				System.out.printf("%X\t(null)\n", opcode);
+			} else if (expr instanceof Prefix) {
+				System.out.printf("%X\t(prefix)\n", opcode);
+			} else {
 				Map<String, Expression> registers = new HashMap<String, Expression>();
 				registers.put("PC", new Constant(null, 0));
 				expr = expr.resolveReferences(null, null);
 				expr = expr.resolveRegisters(registers).simplify();
 				System.out.printf("%X\t%s\t%s\n", opcode, start.unparse(0, expr), start.unparse(1, expr));
-			} else {
-				System.out.printf("%X\t(null)\n", opcode);
 			}
 			opcode += step;
 			count -= 1;
