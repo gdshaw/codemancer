@@ -1333,7 +1333,9 @@ GNU General Public License (version 3 or any later version).
    </assign>
   </effect>
  </fragment>
+</define>
 
+<define name="ld8-ir-instr">
  <fragment>
   <var name="r">
    <ref name="ir"/>
@@ -1475,7 +1477,9 @@ GNU General Public License (version 3 or any later version).
    </assign>
   </effect>
  </fragment>
+</define>
 
+<define name="ld16-ind-xy-instr">
  <fragment>
   <var name="dd">
    <ref name="hl16"/>
@@ -1526,7 +1530,9 @@ GNU General Public License (version 3 or any later version).
    <literal>)</literal>
   </phrase>
  </fragment>
+</define>
 
+<define name="ld16-ind-noxy-instr">
  <fragment>
   <var name="ss">
    <ref name="bc-de-hl-sp16"/>
@@ -1976,13 +1982,12 @@ GNU General Public License (version 3 or any later version).
    </ref>
   </effect>
  </fragment>
+</define>
 
+<define name="alu16-noxy-instr">
  <fragment>
   <var name="ss">
-   <ref name="bc16"/>
-   <ref name="de16"/>
-   <ref name="hl16"/>
-   <ref name="sp16"/>
+   <ref name="bc-de-hl-sp16"/>
   </var>
   <pattern>
    <const>10110111</const>
@@ -2012,10 +2017,7 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="ss">
-   <ref name="bc16"/>
-   <ref name="de16"/>
-   <ref name="hl16"/>
-   <ref name="sp16"/>
+   <ref name="bc-de-hl-sp16"/>
   </var>
   <pattern>
    <const>10110111</const>
@@ -2612,7 +2614,7 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="ex-reg16-instr">
+<define name="ex16-reg-instr">
  <fragment>
   <pattern>
    <const>00010000</const>
@@ -2711,7 +2713,7 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="ex-ind16-instr">
+<define name="ex16-ind-instr">
  <fragment>
   <var name="dd">
    <ref name="hl16"/>
@@ -2790,9 +2792,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="r"/>
   </phrase>
  </fragment>
-</define>
 
-<define name="io-imm-instr">
  <fragment>
   <var name="n">
    <integer size="8"/>
@@ -2984,21 +2984,24 @@ GNU General Public License (version 3 or any later version).
 
  <ref name="ld8-instr"/>
  <ref name="ld16-instr"/>
- <ref name="ex-ind16-instr"/>
+ <ref name="ld16-ind-xy-instr"/>
+ <ref name="ex16-ind-instr"/>
  <ref name="alu8-instr"/>
  <ref name="shift-instr"/>
  <ref name="alu16-instr"/>
  <ref name="stack-instr"/>
  <ref name="jp-ind-instr"/>
- <ref name="io-instr"/>
  <ref name="bit-instr"/>
 
  <require name="!ix">
   <require name="!iy">
+   <ref name="ld8-ir-instr"/>
    <ref name="ld16-sp-hl-instr"/>
-   <ref name="ex-reg16-instr"/>
+   <ref name="ld16-ind-noxy-instr"/>
+   <ref name="ex16-reg-instr"/>
    <ref name="alu8-imm-instr"/>
    <ref name="alu8-acc-instr"/>
+   <ref name="alu16-noxy-instr"/>
    <ref name="shift-acc-instr"/>
    <ref name="nop-instr"/>
    <ref name="daa-instr"/>
@@ -3010,7 +3013,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="ret-instr"/>
    <ref name="call-instr"/>
    <ref name="irq-instr"/>
-   <ref name="io-imm-instr"/>
+   <ref name="io-instr"/>
    <ref name="repeated-instr"/>
   </require>
  </require>
