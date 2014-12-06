@@ -44,6 +44,9 @@ public class Architecture {
 	/** The features defined by this architecture, index by ID. */
 	private final ArrayList<String> featuresById = new ArrayList<String>();
 
+	/** The CPU types defined by this architecture, indexed by name. */
+	private final HashMap<String, FeatureSet> cpus = new HashMap<String, FeatureSet>();
+
 	/** The stylesheet for this architecture. */
 	private Stylesheet stylesheet = new Stylesheet();
 
@@ -79,6 +82,8 @@ public class Architecture {
 					parseRegisterDefinition(childElement);
 				} else if (tagName.equals("style")) {
 					stylesheet.merge(childElement);
+				} else if (tagName.equals("cpu")) {
+					parseCpuDefinition(childElement);
 				}
 			}
 			child = child.getNextSibling();
@@ -99,6 +104,36 @@ public class Architecture {
 		Type type = new IntegerType(size, IntegerType.UNSIGNED, isBigEndian(), stylesheet.getStyle(className));
 		Register register = new Register(type, name);
 		registers.put(name, register);
+	}
+
+	private void parseCpuDefinition(Element element) throws CpudlParseException {
+		String name = Context.parseStringAttribute("name", element);
+		if (cpus.get(name) != null) {
+			throw new CpudlParseException(element, "multiple definitions for cpu '" + name + "'");
+		}
+
+		String extendsName = element.getAttribute("extends");
+		FeatureSet features = (extendsName.length() != 0) ?
+			new FeatureSet(cpus.get(extendsName)):
+			new FeatureSet(this);
+		if (features == null) {
+			throw new CpudlParseException(element, "cpu definition for '" + name + "' not found");
+		}
+
+		Node child = element.getFirstChild();
+		while (child != null) {
+			if (child instanceof Element) {
+				Element childElement = (Element)child;
+				String tagName = childElement.getTagName();
+				if (tagName.equals("feature")) {
+					String featureName = Context.parseStringAttribute("name", childElement);
+					features.add(featureName);
+				}
+			}
+			child = child.getNextSibling();
+		}
+
+		cpus.put(name, features);
 	}
 
 	/** Test whether the default bit order is big-endian.
@@ -149,6 +184,16 @@ public class Architecture {
 	 */
 	public final String getFeatureName(int featureId) {
 		return featuresById.get(featureId);
+	}
+
+	/** Get the feature set required for a given CPU.
+	 * @param cpuName the name of the CPU
+	 * @return the corresponding feature set, or null if not found
+	 */
+	public final FeatureSet getFeatureSet(String cpuName) {
+		FeatureSet features = cpus.get(cpuName);
+		if (features != null) features = new FeatureSet(features);
+		return features;
 	}
 
 	/** Get stylesheet.

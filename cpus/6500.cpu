@@ -6,6 +6,8 @@ GNU General Public License (version 3 or any later version).
 -->
 
 <cpudl endian="little">
+<cpu name="6500"/>
+
 <style>
  <property name="base" value="16"/>
  <property name="prefix" value="$"/>

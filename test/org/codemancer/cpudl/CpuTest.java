@@ -39,6 +39,7 @@ import org.codemancer.cpudl.expr.Prefix;
 @RunWith(Parameterized.class)
 public class CpuTest {
 	Architecture arch;
+	String cpuName;
 	Type start;
 	BitString code;
 	String line;
@@ -81,8 +82,9 @@ public class CpuTest {
 		return new Constant(null, Long.parseLong(s, 16));
 	}
 
-	public CpuTest(Architecture arch, String line, String setup, Long pc, Integer width) throws Exception {
+	public CpuTest(Architecture arch, String cpuName, String line, String setup, Long pc, Integer width) throws Exception {
 		this.arch = arch;
+		this.cpuName = cpuName;
 		this.start = arch.getStart();
 
 		this.postconds = new String[0];
@@ -101,6 +103,7 @@ public class CpuTest {
 			int v = parseHexValue(codeField.charAt(i ^ mask));
 			code = code.concat(new ShortBitString(v, 4, arch.isBigEndian()));
 		}
+		code = code.concat(new ShortBitString(0, 64, false));
 
 		this.preconds = (setup.isEmpty()) ? new String[0] : setup.split(",");
 		this.pc = pc;
@@ -112,13 +115,15 @@ public class CpuTest {
 		BitReader reader = new BitStringReader(code);
 		List<BitReader> readers = new ArrayList<BitReader>();
 		readers.add(reader);
-		FeatureSet features = new FeatureSet(arch);
-		features.add("armv2");
-		features.add("armv3");
+		FeatureSet features = arch.getFeatureSet(cpuName);
+		assertTrue(features != null);
 
 		Expression expr;
 		try {
 			expr = start.decode(readers, features);
+			if (expr != null) {
+				expr = expr.resolveReferences(null, null);
+			}
 		} catch (Exception ex) {
 			System.err.printf("!%s (%s)\n", line, ex.getMessage());
 			throw ex;
@@ -135,7 +140,7 @@ public class CpuTest {
 				try {
 					System.err.printf("+%s", line);
 					for (int i = 0; i != start.getPieceCount(); ++i) {
-						System.err.printf("\t!%s", start.unparse(i, expr));
+						System.err.printf("\t%s", start.unparse(i, expr));
 					}
 				} catch (Exception ex) {
 					System.err.printf("(exception caught)");
@@ -145,7 +150,6 @@ public class CpuTest {
 		}
 		assertTrue(didDecode == shouldDecode);
 		if (!shouldDecode) return;
-		expr = expr.resolveReferences(null, null);
 
 		Map<String, Expression> registers = new HashMap<String, Expression>();
 		registers.put("PC", new Constant(null, pc));
@@ -209,9 +213,9 @@ public class CpuTest {
 			File testFile = testFiles[i];
 			String fileName = testFile.getName();
 			if (fileName.endsWith(".test")) {
-				String architectureName = fileName.substring(0, fileName.length() - 5);
-				Architecture arch = Architecture.makeArchitecture(architectureName);
-				String testDataPath = "testdata/cpus/" + architectureName + ".test";
+				String cpuName = fileName.substring(0, fileName.length() - 5);
+				Architecture arch = Architecture.makeArchitecture(cpuName);
+				String testDataPath = "testdata/cpus/" + cpuName + ".test";
 				BufferedReader reader = new BufferedReader(new FileReader(testDataPath));
 				String line = null;
 				while ((line = reader.readLine()) != null) {
@@ -232,7 +236,7 @@ public class CpuTest {
 						pc = Long.parseLong(line.substring(1, line.length()), 16);
 						continue;
 					default:
-						params.add(new Object[] {arch, line, setup, pc, width});
+						params.add(new Object[] {arch, cpuName, line, setup, pc, width});
 					}
 				}
 			}

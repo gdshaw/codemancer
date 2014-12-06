@@ -6,6 +6,18 @@ GNU General Public License (version 3 or any later version).
 -->
 
 <cpudl endian="little">
+<cpu name="armv1">
+ <feature name="armv1"/>
+</cpu>
+<cpu name="armv2" extends="armv1">
+ <feature name="armv2"/>
+</cpu>
+<cpu name="armv3" extends="armv2">
+ <feature name="armv3"/>
+</cpu>
+<cpu name="arm" extends="armv3">
+</cpu>
+
 <style>
  <property name="whitespace" value=" "/>
  <property name="base" value="16"/>
