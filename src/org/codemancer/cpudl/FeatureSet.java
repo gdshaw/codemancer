@@ -42,6 +42,13 @@ public class FeatureSet {
 		features |= (1L << id);
 	}
 
+	/** Test whether this set is empty.
+	 * @return true if empty, otherwise false
+	 */
+	public final boolean isEmpty() {
+		return (features == 0);
+	}
+
 	/** Test whether this set contains all members of another set.
 	 * @param that the feature set to be compared
 	 * @return true if it contains all members, otherwise false

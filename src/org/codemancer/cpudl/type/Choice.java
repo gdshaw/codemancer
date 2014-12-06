@@ -46,6 +46,13 @@ public class Choice extends Type {
 			this.requiredFeatures = new FeatureSet(requiredFeatures);
 			this.forbiddenFeatures = new FeatureSet(forbiddenFeatures);
 		}
+
+		/** Test whether this can be simplified to a plain type without loss of information.
+		 * @return true if can be simplified, otherwise false
+		 */
+		public final boolean isPlainType() {
+			return (priority == 0) && requiredFeatures.isEmpty() && forbiddenFeatures.isEmpty();
+		}
 	}
 
 	/** A structure for recording aggregate information about the patterns
@@ -260,7 +267,7 @@ public class Choice extends Type {
 		addElement(ctx, element, 0, new FeatureSet(ctx.getArchitecture()), new FeatureSet(ctx.getArchitecture()), types);
 		if (types.size() == 0) {
 			throw new CpudlParseException(element, "type expected");
-		} else if (types.size() == 1) {
+		} else if ((types.size() == 1) && types.get(0).isPlainType()) {
 			return types.get(0).type;
 		} else {
 			return new Choice(types);
