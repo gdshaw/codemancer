@@ -7,6 +7,10 @@ GNU General Public License (version 3 or any later version).
 
 <cpudl endian="little">
 <cpu name="6500"/>
+<cpu name="65c00">
+ <!-- Features common to all 65C00 variants. -->
+ <feature name="65c00"/>
+</cpu>
 
 <style>
  <property name="base" value="16"/>
@@ -457,10 +461,83 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="ind-mode">
+ <fragment>
+  <var name="addr">
+   <integer class="zp" size="8"/>
+  </var>
+  <pattern>
+   <const>001</const>
+  </pattern>
+  <pattern>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <literal>(</literal>
+   <ref name="addr"/>
+   <literal>)</literal>
+  </phrase>
+  <effect>
+   <memory size="8">
+    <memory size="16">
+     <ref name="addr"/>
+    </memory>
+   </memory>
+  </effect>
+ </fragment>
+</define>
+
+<define name="zp-trb-mode">
+ <fragment>
+  <var name="addr">
+   <integer class="zp" size="8"/>
+  </var>
+  <pattern>
+   <const>10</const>
+  </pattern>
+  <pattern>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <memory size="8">
+    <ref name="addr"/>
+   </memory>
+  </effect>
+ </fragment>
+</define>
+
+<define name="abs-trb-mode">
+ <fragment>
+  <var name="addr">
+   <integer class="abs" size="16"/>
+  </var>
+  <pattern>
+   <const>11</const>
+  </pattern>
+  <pattern>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <memory size="8">
+    <ref name="addr"/>
+   </memory>
+  </effect>
+ </fragment>
+</define>
+
 <define name="phpl-operand">
  <fragment>
   <pattern>
-   <const>0</const>
+   <const>00010</const>
+  </pattern>
+  <pattern>
+   <const>00</const>
   </pattern>
   <phrase>
    <literal>P</literal>
@@ -472,7 +549,10 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <pattern>
-   <const>1</const>
+   <const>00010</const>
+  </pattern>
+  <pattern>
+   <const>10</const>
   </pattern>
   <phrase>
    <literal>A</literal>
@@ -481,6 +561,38 @@ GNU General Public License (version 3 or any later version).
    <register name="A"/>
   </effect>
  </fragment>
+
+ <require name="65c00">
+  <fragment>
+   <pattern>
+    <const>01011</const>
+   </pattern>
+   <pattern>
+    <const>10</const>
+   </pattern>
+   <phrase>
+    <literal>Y</literal>
+   </phrase>
+   <effect>
+    <register name="Y"/>
+   </effect>
+  </fragment>
+
+  <fragment>
+   <pattern>
+    <const>01011</const>
+   </pattern>
+   <pattern>
+    <const>11</const>
+   </pattern>
+   <phrase>
+    <literal>X</literal>
+   </phrase>
+   <effect>
+    <register name="X"/>
+   </effect>
+  </fragment>
+ </require>
 </define>
 
 <define name="clse-operand">
@@ -756,7 +868,7 @@ GNU General Public License (version 3 or any later version).
 <define name="dec-instr">
  <fragment>
   <pattern>
-   <const>011</const>
+   <const>0</const>
   </pattern>
   <phrase>
    <literal>DEC</literal>
@@ -776,7 +888,7 @@ GNU General Public License (version 3 or any later version).
 <define name="inc-instr">
  <fragment>
   <pattern>
-   <const>111</const>
+   <const>1</const>
   </pattern>
   <phrase>
    <literal>INC</literal>
@@ -1355,6 +1467,37 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="bra-instr">
+ <fragment>
+  <var name="offset">
+   <integer size="8" encoding="2c"/>
+  </var>
+  <var name="addr">
+   <integer class="abs" size="16"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="addr"/>
+    <add>
+     <register name="PC"/>
+     <const>2</const>
+     <ref name="offset"/>
+    </add>
+   </equals>
+  </where>
+  <pattern>
+   <const>00000001</const>
+   <ref name="offset"/>
+  </pattern>
+  <phrase>
+   <literal>BRA</literal>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+ </fragment>
+</define>
+
 <define name="jmp-instr">
  <fragment>
   <var name="addr">
@@ -1413,27 +1556,30 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 
  <fragment>
-  <var name="addr">
-   <integer class="abs" size="16"/>
+  <var name="operand">
+   <ref name="abs-mode"/>
+   <require name="65c00">
+    <ref name="absx-mode"/>
+   </require>
   </var>
   <pattern>
-   <const>00110110</const>
-   <ref name="addr"/>
+   <const>00</const>
+   <ref name="operand"/>
+   <const>110</const>
+   <ref name="operand"/>
   </pattern>
   <phrase>
    <literal>JMP</literal>
   </phrase>
   <phrase>
    <literal>(</literal>
-   <ref name="addr"/>
+   <ref name="operand"/>
    <literal>)</literal>
   </phrase>
   <effect>
    <assign>
     <register name="PC"/>
-    <memory>
-     <ref name="addr"/>
-    </memory>
+    <ref name="operand"/>
    </assign>
   </effect>
  </fragment>
@@ -1449,6 +1595,253 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <phrase></phrase>
   <effect></effect>
+ </fragment>
+</define>
+
+<define name="incdec-imp-instr">
+ <fragment>
+  <pattern>
+   <const>01011000</const>
+  </pattern>
+  <phrase>
+   <literal>INC</literal>
+  </phrase>
+  <phrase>
+   <literal>A</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <add>
+     <register name="A"/>
+     <const>1</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>01011100</const>
+  </pattern>
+  <phrase>
+   <literal>DEC</literal>
+  </phrase>
+  <phrase>
+   <literal>A</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <sub>
+     <register name="A"/>
+     <const>1</const>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="stz-instr">
+ <fragment>
+  <var name="operand">
+   <ref name="zp-mode"/>
+   <ref name="zpx-mode"/>
+  </var>
+  <pattern>
+   <const>00</const>
+   <ref name="operand"/>
+   <const>110</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <literal>STZ</literal>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <const>0</const>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="operand">
+   <ref name="absx-mode"/>
+  </var>
+  <pattern>
+   <const>01</const>
+   <ref name="operand"/>
+   <const>001</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <literal>STZ</literal>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <const>0</const>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="addr">
+   <integer class="abs" size="16"/>
+  </var>
+  <pattern>
+   <const>00111001</const>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <literal>STZ</literal>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <ref name="addr"/>
+    </memory>
+    <const>0</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="bit-instr">
+ <fragment>
+  <var name="operand">
+   <ref name="zp-mode"/>
+   <ref name="abs-mode"/>
+   <require name="65c00">
+    <ref name="zpx-mode"/>
+    <ref name="absx-mode"/>
+   </require>
+  </var>
+  <pattern>
+   <const>00</const>
+   <ref name="operand"/>
+   <const>100</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <literal>BIT</literal>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <and>
+    <register name="A"/>
+    <ref name="operand"/>
+   </and>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="operand">
+   <require name="65c00">
+    <ref name="imm-mode"/>
+   </require>
+  </var>
+  <pattern>
+   <const>10</const>
+   <ref name="operand"/>
+   <const>001</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <literal>BIT</literal>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <and>
+    <register name="A"/>
+    <ref name="operand"/>
+   </and>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tsb-instr">
+ <fragment>
+  <var name="operand">
+   <ref name="zp-mode"/>
+   <ref name="abs-mode"/>
+  </var>
+  <pattern>
+   <const>00</const>
+   <ref name="operand"/>
+   <const>000</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <literal>TSB</literal>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <and>
+    <ref name="operand"/>
+    <register name="A"/>
+   </and>
+   <assign>
+    <ref name="operand"/>
+    <or>
+     <ref name="operand"/>
+     <register name="A"/>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="trb-instr">
+ <fragment>
+  <var name="operand">
+   <ref name="zp-trb-mode"/>
+   <ref name="abs-trb-mode"/>
+  </var>
+  <pattern>
+   <const>00</const>
+   <ref name="operand"/>
+   <const>1000</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <literal>TRB</literal>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <and>
+    <ref name="operand"/>
+    <register name="A"/>
+   </and>
+   <assign>
+    <ref name="operand"/>
+    <and>
+     <ref name="operand"/>
+     <xor>
+      <register name="A"/>
+      <const>0x100</const>
+     </xor>
+    </and>
+   </assign>
+  </effect>
  </fragment>
 </define>
 
@@ -1524,6 +1917,41 @@ GNU General Public License (version 3 or any later version).
   </effect>
  </fragment>
 
+ <require name="65c00">
+  <fragment>
+   <var name="opcode">
+    <ref name="ora-instr"/>
+    <ref name="and-instr"/>
+    <ref name="xor-instr"/>
+    <ref name="adc-instr"/>
+    <ref name="sta-instr"/>
+    <ref name="lda-instr"/>
+    <ref name="cmp-instr"/>
+    <ref name="sbc-instr"/>
+   </var>
+   <var name="operand">
+    <ref name="ind-mode"/>
+   </var>
+   <pattern>
+    <const>01</const>
+    <ref name="operand"/>
+    <ref name="opcode"/>
+    <ref name="operand"/>
+   </pattern>
+   <phrase>
+    <ref name="opcode"/>
+   </phrase>
+   <phrase>
+    <ref name="operand"/>
+   </phrase>
+   <effect>
+    <ref name="opcode">
+     <bind name="operand" src="operand"/>
+    </ref>
+   </effect>
+  </fragment>
+ </require>
+
  <fragment>
   <var name="opcode">
    <ref name="asl-instr"/>
@@ -1572,6 +2000,7 @@ GNU General Public License (version 3 or any later version).
    <const>01</const>
    <ref name="operand"/>
    <ref name="opcode"/>
+   <const>11</const>
    <ref name="operand"/>
   </pattern>
   <phrase>
@@ -1584,31 +2013,6 @@ GNU General Public License (version 3 or any later version).
    <ref name="opcode">
     <bind name="operand" src="operand"/>
    </ref>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="operand">
-   <ref name="zp-mode"/>
-   <ref name="abs-mode"/>
-  </var>
-  <pattern>
-   <const>00</const>
-   <ref name="operand"/>
-   <const>100</const>
-   <ref name="operand"/>
-  </pattern>
-  <phrase>
-   <literal>BIT</literal>
-  </phrase>
-  <phrase>
-   <ref name="operand"/>
-  </phrase>
-  <effect>
-   <and>
-    <register name="A"/>
-    <ref name="operand"/>
-   </and>
   </effect>
  </fragment>
 
@@ -1796,10 +2200,9 @@ GNU General Public License (version 3 or any later version).
    <ref name="phpl-operand"/>
   </var>
   <pattern>
-   <const>00010</const>
+   <ref name="operand"/>
    <ref name="operation"/>
    <ref name="operand"/>
-   <const>0</const>
   </pattern>
   <phrase>
    <ref name="operation"/>
@@ -1838,6 +2241,7 @@ GNU General Public License (version 3 or any later version).
   </effect>
  </fragment>
 
+ <ref name="bit-instr"/>
  <ref name="clv-instr"/>
  <ref name="brk-instr"/>
  <ref name="jsr-instr"/>
@@ -1845,5 +2249,13 @@ GNU General Public License (version 3 or any later version).
  <ref name="rts-instr"/>
  <ref name="jmp-instr"/>
  <ref name="nop-instr"/>
+
+ <require name="65c00">
+  <ref name="bra-instr"/>
+  <ref name="incdec-imp-instr"/>
+  <ref name="stz-instr"/>
+  <ref name="tsb-instr"/>
+  <ref name="trb-instr"/>
+ </require>
 </start>
 </cpudl>
