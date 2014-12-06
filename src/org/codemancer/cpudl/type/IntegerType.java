@@ -134,6 +134,10 @@ public class IntegerType extends Type {
 			throw new IllegalArgumentException("incorrect number of chunks");
 		}
 		BitString bits = readers.get(0).read(size);
+		if (bits.length() < size) {
+			return null;
+		}
+
 		long value = bits.getBits(0, size, bigEndian);
 		switch (encoding) {
 		case UNSIGNED:
