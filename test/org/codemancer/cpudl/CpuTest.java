@@ -34,6 +34,7 @@ import org.codemancer.cpudl.expr.Constant;
 import org.codemancer.cpudl.expr.Register;
 import org.codemancer.cpudl.expr.Memory;
 import org.codemancer.cpudl.expr.Fragment;
+import org.codemancer.cpudl.expr.Prefix;
 
 @RunWith(Parameterized.class)
 public class CpuTest {
@@ -115,11 +116,35 @@ public class CpuTest {
 		features.add("armv2");
 		features.add("armv3");
 
-		Expression expr = start.decode(readers, features);
-		if (expr == null) {
-			System.err.println(line);
+		Expression expr;
+		try {
+			expr = start.decode(readers, features);
+		} catch (Exception ex) {
+			System.err.printf("!%s (%s)\n", line, ex.getMessage());
+			throw ex;
 		}
-		assertTrue(expr != null);
+
+		boolean shouldDecode = (fields.length > 1);
+		boolean didDecode = (expr != null) && !(expr instanceof Prefix);
+		if (shouldDecode) {
+			if (!didDecode) {
+				System.err.printf("-%s\n", line);
+			}
+		} else {
+			if (didDecode) {
+				try {
+					System.err.printf("+%s", line);
+					for (int i = 0; i != start.getPieceCount(); ++i) {
+						System.err.printf("\t!%s", start.unparse(i, expr));
+					}
+				} catch (Exception ex) {
+					System.err.printf("(exception caught)");
+				}
+				System.err.println();
+			}
+		}
+		assertTrue(didDecode == shouldDecode);
+		if (!shouldDecode) return;
 		expr = expr.resolveReferences(null, null);
 
 		Map<String, Expression> registers = new HashMap<String, Expression>();
