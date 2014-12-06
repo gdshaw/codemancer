@@ -3,6 +3,7 @@
 ; Distribution and modification are permitted within the terms of the
 ; GNU General Public License (version 3 or any later version).
 
++8
 !PC=8000
 00	NOP
 013412	LD	BC, 1234H
