@@ -167,6 +167,16 @@ GNU General Public License (version 3 or any later version).
  <ref name="edi"/>
 </define>
 
+<define name="r32-no-bp">
+ <ref name="eax"/>
+ <ref name="ecx"/>
+ <ref name="edx"/>
+ <ref name="ebx"/>
+ <ref name="esp"/>
+ <ref name="esi"/>
+ <ref name="edi"/>
+</define>
+
 <define name="r32-no-sp-bp">
  <ref name="eax"/>
  <ref name="ecx"/>
@@ -174,6 +184,150 @@ GNU General Public License (version 3 or any later version).
  <ref name="ebx"/>
  <ref name="esi"/>
  <ref name="edi"/>
+</define>
+
+<define name="sib-ss">
+ <fragment>
+  <pattern>
+   <const>00</const>
+  </pattern>
+  <phrase></phrase>
+  <effect>
+   <const>1</const>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10</const>
+  </pattern>
+  <phrase>
+   <literal>*2</literal>
+  </phrase>
+  <effect>
+   <const>2</const>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>01</const>
+  </pattern>
+  <phrase>
+   <literal>*4</literal>
+  </phrase>
+  <effect>
+   <const>4</const>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <literal>*8</literal>
+  </phrase>
+  <effect>
+   <const>8</const>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sib-ss-index">
+ <fragment>
+  <var name="index">
+   <ref name="r32-no-sp"/>
+  </var>
+  <var name="ss">
+   <ref name="sib-ss"/>
+  </var>
+  <pattern>
+   <ref name="index"/>
+   <ref name="ss"/>
+  </pattern>
+  <phrase>
+   <literal>+</literal>
+   <ref name="index"/>
+   <ref name="ss"/>
+  </phrase>
+  <effect>
+   <mul>
+    <ref name="index"/>
+    <ref name="ss"/>
+   </mul>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="ss">
+   <ref name="sib-ss"/>
+  </var>
+  <pattern>
+   <const>001</const>
+   <ref name="ss"/>
+  </pattern>
+  <phrase></phrase>
+  <effect>
+   <const>0</const>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sib">
+ <fragment>
+  <var name="base">
+   <ref name="r32"/>
+  </var>
+  <var name="ss-index">
+   <ref name="sib-ss-index"/>
+  </var>
+  <pattern>
+   <ref name="base"/>
+   <ref name="ss-index"/>
+  </pattern>
+  <phrase>
+   <ref name="base"/>
+   <ref name="ss-index"/>
+  </phrase>
+ </fragment>
+</define>
+
+<define name="sib-mod00">
+ <fragment>
+  <var name="base">
+   <ref name="r32-no-bp"/>
+  </var>
+  <var name="ss-index">
+   <ref name="sib-ss-index"/>
+  </var>
+  <pattern>
+   <ref name="base"/>
+   <ref name="ss-index"/>
+  </pattern>
+  <phrase>
+   <ref name="base"/>
+   <ref name="ss-index"/>
+  </phrase>
+ </fragment>
+
+ <fragment>
+  <var name="ss-index">
+   <ref name="sib-ss-index"/>
+  </var>
+  <var name="disp">
+   <integer size="32" encoding="2c"/>
+  </var>
+  <pattern>
+   <const>101</const>
+   <ref name="ss-index"/>
+   <ref name="disp"/>
+  </pattern>
+  <phrase>
+   <ref name="disp"/>
+   <ref name="ss-index"/>
+  </phrase>
+ </fragment>
 </define>
 
 <define name="rm8-r8-mode">
@@ -200,6 +354,37 @@ GNU General Public License (version 3 or any later version).
     <bind name="lhs">
      <memory size="32">
       <ref name="rm"/>
+     </memory>
+    </bind>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="r32"/>
+  </var>
+  <var name="sib">
+   <ref name="sib-mod00"/>
+  </var>
+  <pattern>
+   <const>001</const>
+   <ref name="r"/>
+   <const>00</const>
+   <ref name="sib"/>
+  </pattern>
+  <phrase>
+   <literal>DWORD PTR [</literal>
+   <ref name="sib"/>
+   <literal>],</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <memory size="32">
+      <ref name="sib"/>
      </memory>
     </bind>
     <bind name="rhs" src="r"/>
@@ -278,6 +463,46 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 
  <fragment>
+  <var name="r">
+   <ref name="r32"/>
+  </var>
+  <var name="sib">
+   <ref name="sib"/>
+  </var>
+  <var name="disp">
+   <integer size="8" encoding="2c"/>
+  </var>
+  <pattern>
+   <const>001</const>
+   <ref name="r"/>
+   <const>10</const>
+   <ref name="sib"/>
+   <ref name="disp"/>
+  </pattern>
+  <phrase>
+   <literal>DWORD PTR [</literal>
+   <ref name="sib"/>
+   <literal>+</literal>
+   <ref name="disp"/>
+   <literal>],</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <memory size="32">
+      <add>
+       <ref name="sib"/>
+       <ref name="disp"/>
+      </add>
+     </memory>
+    </bind>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
   <var name="rm">
    <ref name="r32-no-sp"/>
   </var>
@@ -307,6 +532,46 @@ GNU General Public License (version 3 or any later version).
      <memory size="32">
       <add>
        <ref name="rm"/>
+       <ref name="disp"/>
+      </add>
+     </memory>
+    </bind>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="r32"/>
+  </var>
+  <var name="sib">
+   <ref name="sib"/>
+  </var>
+  <var name="disp">
+   <integer size="32" encoding="2c"/>
+  </var>
+  <pattern>
+   <const>001</const>
+   <ref name="r"/>
+   <const>01</const>
+   <ref name="sib"/>
+   <ref name="disp"/>
+  </pattern>
+  <phrase>
+   <literal>DWORD PTR [</literal>
+   <ref name="sib"/>
+   <literal>+</literal>
+   <ref name="disp"/>
+   <literal>],</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <memory size="32">
+      <add>
+       <ref name="sib"/>
        <ref name="disp"/>
       </add>
      </memory>
