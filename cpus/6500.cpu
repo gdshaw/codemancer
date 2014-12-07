@@ -7,9 +7,13 @@ GNU General Public License (version 3 or any later version).
 
 <cpudl endian="little">
 <cpu name="6500"/>
-<cpu name="65c00">
+<cpu name="65c00" extends="6500">
  <!-- Features common to all 65C00 variants. -->
  <feature name="65c00"/>
+</cpu>
+<cpu name="r65c00" extends="65c00">
+ <!-- Rockwell R65C00 and WDC W65C02S. -->
+ <feature name="r65c00"/>
 </cpu>
 
 <style>
@@ -25,6 +29,10 @@ GNU General Public License (version 3 or any later version).
  </select>
  <select class="abs">
   <property name="width" value="4"/>
+ </select>
+ <select class="bit">
+  <property name="base" value="10"/>
+  <property name="prefix" value=""/>
  </select>
 </style>
 
@@ -161,6 +169,32 @@ GNU General Public License (version 3 or any later version).
     <ref name="Z"/>
     <const>1</const>
    </equals>
+  </effect>
+ </fragment>
+</define>
+
+<define name="bit-value">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>R</literal>
+  </phrase>
+  <effect>
+   <const>0</const>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>S</literal>
+  </phrase>
+  <effect>
+   <const>1</const>
   </effect>
  </fragment>
 </define>
@@ -1845,6 +1879,118 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="rsmb-instr">
+ <fragment>
+  <var name="bit">
+   <integer class="bit" size="3"/>
+  </var>
+  <var name="value">
+   <ref name="bit-value"/>
+  </var>
+  <var name="addr">
+   <integer class="zp" size="8"/>
+  </var>
+  <pattern>
+   <const>1110</const>
+   <ref name="bit"/>
+   <ref name="value"/>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <ref name="value"/>
+   <literal>MB</literal>
+   <ref name="bit"/>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <ref name="addr"/>
+    </memory>
+    <or>
+     <and>
+      <memory size="8">
+       <ref name="addr"/>
+      </memory>
+      <xor>
+       <shift width="8" method="logical">
+        <ref name="value"/>
+       </shift>
+       <const>0xFF</const>
+      </xor>
+     </and>
+     <shift width="8" method="logical">
+      <ref name="value"/>
+     </shift>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="bb-instr">
+ <fragment>
+  <var name="bit">
+   <integer class="bit" size="3"/>
+  </var>
+  <var name="value">
+   <ref name="bit-value"/>
+  </var>
+  <var name="maddr">
+   <integer class="zp" size="8"/>
+  </var>
+  <var name="offset">
+   <integer size="8" encoding="2c"/>
+  </var>
+  <var name="baddr">
+   <integer class="abs" size="16"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="baddr"/>
+    <add>
+     <register name="PC"/>
+     <const>3</const>
+     <ref name="offset"/>
+    </add>
+   </equals>
+  </where>
+  <pattern>
+   <const>1111</const>
+   <ref name="bit"/>
+   <ref name="value"/>
+   <ref name="maddr"/>
+   <ref name="offset"/>
+  </pattern>
+  <phrase>
+   <literal>BB</literal>
+   <ref name="value"/>
+   <ref name="bit"/>
+  </phrase>
+  <phrase>
+   <ref name="maddr"/>
+   <literal>,</literal><ws/>
+   <ref name="baddr"/>
+  </phrase>
+  <effect>
+   <equals>
+    <and>
+     <shift width="8" method="logical">
+      <memory size="8">
+       <ref name="maddr"/>
+      </memory>
+      <ref name="bit"/>
+     </shift>
+     <const>1</const>
+    </and>
+    <ref name="value"/>
+   </equals>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -2256,6 +2402,11 @@ GNU General Public License (version 3 or any later version).
   <ref name="stz-instr"/>
   <ref name="tsb-instr"/>
   <ref name="trb-instr"/>
+ </require>
+
+ <require name="r65c00">
+  <ref name="rsmb-instr"/>
+  <ref name="bb-instr"/>
  </require>
 </start>
 </cpudl>
