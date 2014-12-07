@@ -1045,6 +1045,220 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="sba-instr">
+ <fragment>
+  <pattern>
+   <const>00010000</const>
+  </pattern>
+  <phrase>
+   <literal>SBA</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="ACCA"/>
+    <sub>
+     <register name="ACCA"/>
+     <register name="ACCB"/>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cba-instr">
+ <fragment>
+  <pattern>
+   <const>00010001</const>
+  </pattern>
+  <phrase>
+   <literal>CBA</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <sub>
+    <register name="ACCA"/>
+    <register name="ACCB"/>
+   </sub>
+  </effect>
+ </fragment>
+</define>
+
+<define name="daa-instr">
+ <fragment>
+  <pattern>
+   <const>00011001</const>
+  </pattern>
+  <phrase>
+   <literal>DAA</literal>
+  </phrase>
+  <phrase></phrase>
+ </fragment>
+</define>
+
+<define name="aba-instr">
+ <fragment>
+  <pattern>
+   <const>00011011</const>
+  </pattern>
+  <phrase>
+   <literal>ABA</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="ACCA"/>
+    <add>
+     <register name="ACCA"/>
+     <register name="ACCB"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="pul-instr">
+ <fragment>
+  <var name="accumulator">
+   <ref name="accumulator"/>
+  </var>
+  <pattern>
+   <const>0011001</const>
+   <ref name="accumulator"/>
+  </pattern>
+  <phrase>
+   <literal>PUL</literal>
+  </phrase>
+  <phrase>
+   <ref name="accumulator"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>1</const>
+    </add>
+   </assign>
+   <assign>
+    <ref name="accumulator"/>
+    <memory size="8">
+     <register name="SP"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="psh-instr">
+ <fragment>
+  <var name="accumulator">
+   <ref name="accumulator"/>
+  </var>
+  <pattern>
+   <const>0011011</const>
+   <ref name="accumulator"/>
+  </pattern>
+  <phrase>
+   <literal>PSH</literal>
+  </phrase>
+  <phrase>
+   <ref name="accumulator"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <register name="SP"/>
+    </memory>
+    <ref name="accumulator"/>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>1</const>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="inx-instr">
+ <fragment>
+  <pattern>
+   <const>00001000</const>
+  </pattern>
+  <phrase>
+   <literal>INX</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <register name="IX"/>
+   <add>
+    <register name="IX"/>
+    <const>1</const>
+   </add>
+  </effect>
+ </fragment>
+</define>
+
+<define name="dex-instr">
+ <fragment>
+  <pattern>
+   <const>00001001</const>
+  </pattern>
+  <phrase>
+   <literal>DEX</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <register name="IX"/>
+   <sub>
+    <register name="IX"/>
+    <const>1</const>
+   </sub>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ins-instr">
+ <fragment>
+  <pattern>
+   <const>00110001</const>
+  </pattern>
+  <phrase>
+   <literal>INS</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <register name="SP"/>
+   <add>
+    <register name="SP"/>
+    <const>1</const>
+   </add>
+  </effect>
+ </fragment>
+</define>
+
+<define name="des-instr">
+ <fragment>
+  <pattern>
+   <const>00110100</const>
+  </pattern>
+  <phrase>
+   <literal>DES</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <register name="SP"/>
+   <sub>
+    <register name="SP"/>
+    <const>1</const>
+   </sub>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -1171,15 +1385,26 @@ GNU General Public License (version 3 or any later version).
 
  <ref name="tap-instr"/>
  <ref name="tpa-instr"/>
+ <ref name="inx-instr"/>
+ <ref name="dex-instr"/>
  <ref name="clv-instr"/>
  <ref name="sev-instr"/>
  <ref name="clc-instr"/>
  <ref name="sec-instr"/>
  <ref name="cli-instr"/>
  <ref name="sei-instr"/>
+ <ref name="sba-instr"/>
+ <ref name="cba-instr"/>
  <ref name="tab-instr"/>
  <ref name="tba-instr"/>
+ <ref name="daa-instr"/>
+ <ref name="aba-instr"/>
+
  <ref name="tsx-instr"/>
+ <ref name="ins-instr"/>
+ <ref name="des-instr"/>
  <ref name="txs-instr"/>
+ <ref name="pul-instr"/>
+ <ref name="psh-instr"/>
 </start>
 </cpudl>
