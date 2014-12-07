@@ -34,7 +34,7 @@ GNU General Public License (version 3 or any later version).
 <register name="DF" size="1"/>
 <register name="OF" size="1"/>
 
-<define name="r32">
+<define name="eax">
  <fragment>
   <pattern>
    <const>000</const>
@@ -46,7 +46,9 @@ GNU General Public License (version 3 or any later version).
    <register name="EAX"/>
   </effect>
  </fragment>
+</define>
 
+<define name="ecx">
  <fragment>
   <pattern>
    <const>100</const>
@@ -58,7 +60,9 @@ GNU General Public License (version 3 or any later version).
    <register name="ECX"/>
   </effect>
  </fragment>
+</define>
 
+<define name="edx">
  <fragment>
   <pattern>
    <const>010</const>
@@ -70,7 +74,9 @@ GNU General Public License (version 3 or any later version).
    <register name="EDX"/>
   </effect>
  </fragment>
+</define>
 
+<define name="ebx">
  <fragment>
   <pattern>
    <const>110</const>
@@ -82,7 +88,9 @@ GNU General Public License (version 3 or any later version).
    <register name="EBX"/>
   </effect>
  </fragment>
+</define>
 
+<define name="esp">
  <fragment>
   <pattern>
    <const>001</const>
@@ -94,7 +102,9 @@ GNU General Public License (version 3 or any later version).
    <register name="ESP"/>
   </effect>
  </fragment>
+</define>
 
+<define name="ebp">
  <fragment>
   <pattern>
    <const>101</const>
@@ -106,7 +116,9 @@ GNU General Public License (version 3 or any later version).
    <register name="EBP"/>
   </effect>
  </fragment>
+</define>
 
+<define name="esi">
  <fragment>
   <pattern>
    <const>011</const>
@@ -118,7 +130,9 @@ GNU General Public License (version 3 or any later version).
    <register name="ESI"/>
   </effect>
  </fragment>
+</define>
 
+<define name="edi">
  <fragment>
   <pattern>
    <const>111</const>
@@ -132,28 +146,197 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="r32">
+ <ref name="eax"/>
+ <ref name="ecx"/>
+ <ref name="edx"/>
+ <ref name="ebx"/>
+ <ref name="esp"/>
+ <ref name="ebp"/>
+ <ref name="esi"/>
+ <ref name="edi"/>
+</define>
+
+<define name="r32-no-sp">
+ <ref name="eax"/>
+ <ref name="ecx"/>
+ <ref name="edx"/>
+ <ref name="ebx"/>
+ <ref name="ebp"/>
+ <ref name="esi"/>
+ <ref name="edi"/>
+</define>
+
+<define name="r32-no-sp-bp">
+ <ref name="eax"/>
+ <ref name="ecx"/>
+ <ref name="edx"/>
+ <ref name="ebx"/>
+ <ref name="esi"/>
+ <ref name="edi"/>
+</define>
+
 <define name="rm8-r8-mode">
+ <fragment>
+  <var name="rm">
+   <ref name="r32-no-sp-bp"/>
+  </var>
+  <var name="r">
+   <ref name="r32"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <ref name="r"/>
+   <const>00</const>
+  </pattern>
+  <phrase>
+   <literal>DWORD PTR [</literal>
+   <ref name="rm"/>
+   <literal>],</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <memory size="32">
+      <ref name="rm"/>
+     </memory>
+    </bind>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
  <fragment>
   <var name="r">
    <ref name="r32"/>
   </var>
-  <var name="ea">
-   <ref name="r32"/>
+  <var name="disp">
+   <integer size="32" encoding="2c"/>
   </var>
   <pattern>
+   <const>101</const>
    <ref name="r"/>
-   <ref name="ea"/>
-   <const>11</const>
+   <const>00</const>
+   <ref name="disp"/>
   </pattern>
   <phrase>
+   <literal>DWORD PTR [</literal>
+   <ref name="disp"/>
+   <literal>],</literal><ws/>
    <ref name="r"/>
-   <literal>,</literal><ws/>
-   <ref name="ea"/>
   </phrase>
   <effect>
    <ref name="opcode">
-    <bind name="r" src="r"/>
-    <bind name="ea" src="ea"/>
+    <bind name="lhs">
+     <memory size="32">
+      <ref name="disp"/>
+     </memory>
+    </bind>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rm">
+   <ref name="r32-no-sp"/>
+  </var>
+  <var name="r">
+   <ref name="r32"/>
+  </var>
+  <var name="disp">
+   <integer size="8" encoding="2c"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <ref name="r"/>
+   <const>10</const>
+   <ref name="disp"/>
+  </pattern>
+  <phrase>
+   <literal>DWORD PTR [</literal>
+   <ref name="rm"/>
+   <literal>+</literal>
+   <ref name="disp"/>
+   <literal>],</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <memory size="32">
+      <add>
+       <ref name="rm"/>
+       <ref name="disp"/>
+      </add>
+     </memory>
+    </bind>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rm">
+   <ref name="r32-no-sp"/>
+  </var>
+  <var name="r">
+   <ref name="r32"/>
+  </var>
+  <var name="disp">
+   <integer size="32" encoding="2c"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <ref name="r"/>
+   <const>01</const>
+   <ref name="disp"/>
+  </pattern>
+  <phrase>
+   <literal>DWORD PTR [</literal>
+   <ref name="rm"/>
+   <literal>+</literal>
+   <ref name="disp"/>
+   <literal>],</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <memory size="32">
+      <add>
+       <ref name="rm"/>
+       <ref name="disp"/>
+      </add>
+     </memory>
+    </bind>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="r32"/>
+  </var>
+  <var name="rm">
+   <ref name="r32"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <ref name="r"/>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <ref name="rm"/>
+   <literal>,</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs" src="rm"/>
+    <bind name="rhs" src="r"/>
    </ref>
   </effect>
  </fragment>
@@ -169,10 +352,10 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <assign>
-    <ref name="r"/>
+    <ref name="lhs"/>
     <add>
-     <ref name="r"/>
-     <ref name="ea"/>
+     <ref name="lhs"/>
+     <ref name="rhs"/>
     </add>
    </assign>
   </effect>
@@ -189,10 +372,10 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <assign>
-    <ref name="r"/>
+    <ref name="lhs"/>
     <or>
-     <ref name="r"/>
-     <ref name="ea"/>
+     <ref name="lhs"/>
+     <ref name="rhs"/>
     </or>
    </assign>
   </effect>
@@ -209,10 +392,10 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <assign>
-    <ref name="r"/>
+    <ref name="lhs"/>
     <add>
-     <ref name="r"/>
-     <ref name="ea"/>
+     <ref name="lhs"/>
+     <ref name="rhs"/>
      <register name="CF"/>
     </add>
    </assign>
@@ -230,10 +413,10 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <assign>
-    <ref name="r"/>
+    <ref name="lhs"/>
     <sub>
-     <ref name="r"/>
-     <ref name="ea"/>
+     <ref name="lhs"/>
+     <ref name="rhs"/>
      <register name="CF"/>
     </sub>
    </assign>
@@ -251,10 +434,10 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <assign>
-    <ref name="r"/>
+    <ref name="lhs"/>
     <and>
-     <ref name="r"/>
-     <ref name="ea"/>
+     <ref name="lhs"/>
+     <ref name="rhs"/>
     </and>
    </assign>
   </effect>
@@ -271,10 +454,10 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <assign>
-    <ref name="r"/>
+    <ref name="lhs"/>
     <sub>
-     <ref name="r"/>
-     <ref name="ea"/>
+     <ref name="lhs"/>
+     <ref name="rhs"/>
     </sub>
    </assign>
   </effect>
@@ -291,10 +474,10 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <assign>
-    <ref name="r"/>
+    <ref name="lhs"/>
     <xor>
-     <ref name="r"/>
-     <ref name="ea"/>
+     <ref name="lhs"/>
+     <ref name="rhs"/>
     </xor>
    </assign>
   </effect>
@@ -311,8 +494,8 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <sub>
-    <ref name="r"/>
-    <ref name="ea"/>
+    <ref name="lhs"/>
+    <ref name="rhs"/>
    </sub>
   </effect>
  </fragment>
