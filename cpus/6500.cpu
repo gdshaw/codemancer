@@ -12,8 +12,12 @@ GNU General Public License (version 3 or any later version).
  <feature name="65c00"/>
 </cpu>
 <cpu name="r65c00" extends="65c00">
- <!-- Rockwell R65C00 and WDC W65C02S. -->
+ <!-- Adds RMB, SMB, BBR and BBS instructions. -->
  <feature name="r65c00"/>
+</cpu>
+<cpu name="w65c00s" extends="r65c00">
+ <!-- Adds WAI and STP instructions. -->
+ <feature name="w65c00s"/>
 </cpu>
 
 <style>
@@ -1991,6 +1995,30 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="wai-instr">
+ <fragment>
+  <pattern>
+   <const>11010011</const>
+  </pattern>
+  <phrase>
+   <literal>WAI</literal>
+  </phrase>
+  <phrase></phrase>
+ </fragment>
+</define>
+
+<define name="stp-instr">
+ <fragment>
+  <pattern>
+   <const>11011011</const>
+  </pattern>
+  <phrase>
+   <literal>STP</literal>
+  </phrase>
+  <phrase></phrase>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -2407,6 +2435,11 @@ GNU General Public License (version 3 or any later version).
  <require name="r65c00">
   <ref name="rsmb-instr"/>
   <ref name="bb-instr"/>
+ </require>
+
+ <require name="w65c00s">
+  <ref name="wai-instr"/>
+  <ref name="stp-instr"/>
  </require>
 </start>
 </cpudl>
