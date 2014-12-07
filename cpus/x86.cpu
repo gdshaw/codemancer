@@ -1,0 +1,355 @@
+<!--
+This file is part of Codemancer.
+Copyright 2014 Graham Shaw.
+Distribution and modification are permitted within the terms of the
+GNU General Public License (version 3 or any later version).
+-->
+
+<cpudl endian="little">
+<cpu name="x86"/>
+
+<style>
+ <property name="base" value="16"/>
+ <property name="prefix" value=""/>
+ <property name="suffix" value="H"/>
+ <property name="whitespace" value=" "/>
+</style>
+
+<register name="EAX" size="32"/>
+<register name="ECX" size="32"/>
+<register name="EDX" size="32"/>
+<register name="EBX" size="32"/>
+<register name="ESP" size="32"/>
+<register name="EBP" size="32"/>
+<register name="ESI" size="32"/>
+<register name="EDI" size="32"/>
+
+<register name="CF" size="1"/>
+<register name="PF" size="1"/>
+<register name="AF" size="1"/>
+<register name="ZF" size="1"/>
+<register name="SF" size="1"/>
+<register name="TF" size="1"/>
+<register name="IF" size="1"/>
+<register name="DF" size="1"/>
+<register name="OF" size="1"/>
+
+<define name="r32">
+ <fragment>
+  <pattern>
+   <const>000</const>
+  </pattern>
+  <phrase>
+   <literal>EAX</literal>
+  </phrase>
+  <effect>
+   <register name="EAX"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>100</const>
+  </pattern>
+  <phrase>
+   <literal>ECX</literal>
+  </phrase>
+  <effect>
+   <register name="ECX"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>010</const>
+  </pattern>
+  <phrase>
+   <literal>EDX</literal>
+  </phrase>
+  <effect>
+   <register name="EDX"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>110</const>
+  </pattern>
+  <phrase>
+   <literal>EBX</literal>
+  </phrase>
+  <effect>
+   <register name="EBX"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>001</const>
+  </pattern>
+  <phrase>
+   <literal>ESP</literal>
+  </phrase>
+  <effect>
+   <register name="ESP"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>101</const>
+  </pattern>
+  <phrase>
+   <literal>EBP</literal>
+  </phrase>
+  <effect>
+   <register name="EBP"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>011</const>
+  </pattern>
+  <phrase>
+   <literal>ESI</literal>
+  </phrase>
+  <effect>
+   <register name="ESI"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>111</const>
+  </pattern>
+  <phrase>
+   <literal>EDI</literal>
+  </phrase>
+  <effect>
+   <register name="EDI"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="rm8-r8-mode">
+ <fragment>
+  <var name="r">
+   <ref name="r32"/>
+  </var>
+  <var name="ea">
+   <ref name="r32"/>
+  </var>
+  <pattern>
+   <ref name="r"/>
+   <ref name="ea"/>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
+   <ref name="ea"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="r" src="r"/>
+    <bind name="ea" src="ea"/>
+   </ref>
+  </effect>
+ </fragment>
+</define>
+
+<define name="add-instr">
+ <fragment>
+  <pattern>
+   <const>000</const>
+  </pattern>
+  <phrase>
+   <literal>ADD</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="r"/>
+    <add>
+     <ref name="r"/>
+     <ref name="ea"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="or-instr">
+ <fragment>
+  <pattern>
+   <const>100</const>
+  </pattern>
+  <phrase>
+   <literal>OR</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="r"/>
+    <or>
+     <ref name="r"/>
+     <ref name="ea"/>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="adc-instr">
+ <fragment>
+  <pattern>
+   <const>010</const>
+  </pattern>
+  <phrase>
+   <literal>ADC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="r"/>
+    <add>
+     <ref name="r"/>
+     <ref name="ea"/>
+     <register name="CF"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sbb-instr">
+ <fragment>
+  <pattern>
+   <const>110</const>
+  </pattern>
+  <phrase>
+   <literal>SBB</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="r"/>
+    <sub>
+     <ref name="r"/>
+     <ref name="ea"/>
+     <register name="CF"/>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="and-instr">
+ <fragment>
+  <pattern>
+   <const>001</const>
+  </pattern>
+  <phrase>
+   <literal>AND</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="r"/>
+    <and>
+     <ref name="r"/>
+     <ref name="ea"/>
+    </and>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sub-instr">
+ <fragment>
+  <pattern>
+   <const>101</const>
+  </pattern>
+  <phrase>
+   <literal>SUB</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="r"/>
+    <sub>
+     <ref name="r"/>
+     <ref name="ea"/>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="xor-instr">
+ <fragment>
+  <pattern>
+   <const>011</const>
+  </pattern>
+  <phrase>
+   <literal>XOR</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="r"/>
+    <xor>
+     <ref name="r"/>
+     <ref name="ea"/>
+    </xor>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cmp-instr">
+ <fragment>
+  <pattern>
+   <const>111</const>
+  </pattern>
+  <phrase>
+   <literal>CMP</literal>
+  </phrase>
+  <effect>
+   <sub>
+    <ref name="r"/>
+    <ref name="ea"/>
+   </sub>
+  </effect>
+ </fragment>
+</define>
+
+<start>
+ <fragment>
+  <var name="opcode">
+   <ref name="add-instr"/>
+   <ref name="or-instr"/>
+   <ref name="adc-instr"/>
+   <ref name="sbb-instr"/>
+   <ref name="and-instr"/>
+   <ref name="sub-instr"/>
+   <ref name="xor-instr"/>
+   <ref name="cmp-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="rm8-r8-mode"/>
+  </var>
+  <pattern>
+   <const>100</const>
+   <ref name="opcode"/>
+   <const>00</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="operand">
+    <bind name="opcode" ref="opcode"/>
+   </ref>
+  </effect>
+ </fragment>
+</start>
+</cpudl>
