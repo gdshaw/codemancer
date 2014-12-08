@@ -15,6 +15,15 @@ GNU General Public License (version 3 or any later version).
  <property name="whitespace" value=" "/>
 </style>
 
+<register name="AX" size="16"/>
+<register name="CX" size="16"/>
+<register name="DX" size="16"/>
+<register name="BX" size="16"/>
+<register name="SP" size="16"/>
+<register name="BP" size="16"/>
+<register name="SI" size="16"/>
+<register name="DI" size="16"/>
+
 <register name="EAX" size="32"/>
 <register name="ECX" size="32"/>
 <register name="EDX" size="32"/>
@@ -33,6 +42,118 @@ GNU General Public License (version 3 or any later version).
 <register name="IF" size="1"/>
 <register name="DF" size="1"/>
 <register name="OF" size="1"/>
+
+<define name="ax">
+ <fragment>
+  <pattern>
+   <const>000</const>
+  </pattern>
+  <phrase>
+   <literal>AX</literal>
+  </phrase>
+  <effect>
+   <register name="AX"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cx">
+ <fragment>
+  <pattern>
+   <const>100</const>
+  </pattern>
+  <phrase>
+   <literal>CX</literal>
+  </phrase>
+  <effect>
+   <register name="CX"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="dx">
+ <fragment>
+  <pattern>
+   <const>010</const>
+  </pattern>
+  <phrase>
+   <literal>DX</literal>
+  </phrase>
+  <effect>
+   <register name="DX"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="bx">
+ <fragment>
+  <pattern>
+   <const>110</const>
+  </pattern>
+  <phrase>
+   <literal>BX</literal>
+  </phrase>
+  <effect>
+   <register name="BX"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sp">
+ <fragment>
+  <pattern>
+   <const>001</const>
+  </pattern>
+  <phrase>
+   <literal>SP</literal>
+  </phrase>
+  <effect>
+   <register name="SP"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="bp">
+ <fragment>
+  <pattern>
+   <const>101</const>
+  </pattern>
+  <phrase>
+   <literal>BP</literal>
+  </phrase>
+  <effect>
+   <register name="BP"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="si">
+ <fragment>
+  <pattern>
+   <const>011</const>
+  </pattern>
+  <phrase>
+   <literal>SI</literal>
+  </phrase>
+  <effect>
+   <register name="SI"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="di">
+ <fragment>
+  <pattern>
+   <const>111</const>
+  </pattern>
+  <phrase>
+   <literal>DI</literal>
+  </phrase>
+  <effect>
+   <register name="DI"/>
+  </effect>
+ </fragment>
+</define>
 
 <define name="eax">
  <fragment>
@@ -144,6 +265,17 @@ GNU General Public License (version 3 or any later version).
    <register name="EDI"/>
   </effect>
  </fragment>
+</define>
+
+<define name="r16">
+ <ref name="ax"/>
+ <ref name="cx"/>
+ <ref name="dx"/>
+ <ref name="bx"/>
+ <ref name="sp"/>
+ <ref name="bp"/>
+ <ref name="si"/>
+ <ref name="di"/>
 </define>
 
 <define name="r32">
@@ -330,7 +462,284 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="rm8-r8-mode">
+<define name="rm16-r16-mode">
+ <fragment>
+  <var name="rm">
+   <ref name="r32-no-sp-bp"/>
+  </var>
+  <var name="r">
+   <ref name="r16"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <ref name="r"/>
+   <const>00</const>
+  </pattern>
+  <phrase>
+   <literal>WORD PTR [</literal>
+   <ref name="rm"/>
+   <literal>],</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <memory size="16">
+      <ref name="rm"/>
+     </memory>
+    </bind>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="r16"/>
+  </var>
+  <var name="sib">
+   <ref name="sib-mod00"/>
+  </var>
+  <pattern>
+   <const>001</const>
+   <ref name="r"/>
+   <const>00</const>
+   <ref name="sib"/>
+  </pattern>
+  <phrase>
+   <literal>WORD PTR [</literal>
+   <ref name="sib"/>
+   <literal>],</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <memory size="16">
+      <ref name="sib"/>
+     </memory>
+    </bind>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="r16"/>
+  </var>
+  <var name="disp">
+   <integer size="32" encoding="2c"/>
+  </var>
+  <pattern>
+   <const>101</const>
+   <ref name="r"/>
+   <const>00</const>
+   <ref name="disp"/>
+  </pattern>
+  <phrase>
+   <literal>WORD PTR [</literal>
+   <ref name="disp"/>
+   <literal>],</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <memory size="16">
+      <ref name="disp"/>
+     </memory>
+    </bind>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rm">
+   <ref name="r32-no-sp"/>
+  </var>
+  <var name="r">
+   <ref name="r16"/>
+  </var>
+  <var name="disp">
+   <integer size="8" encoding="2c"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <ref name="r"/>
+   <const>10</const>
+   <ref name="disp"/>
+  </pattern>
+  <phrase>
+   <literal>WORD PTR [</literal>
+   <ref name="rm"/>
+   <literal>+</literal>
+   <ref name="disp"/>
+   <literal>],</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <memory size="16">
+      <add>
+       <ref name="rm"/>
+       <ref name="disp"/>
+      </add>
+     </memory>
+    </bind>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="r16"/>
+  </var>
+  <var name="sib">
+   <ref name="sib"/>
+  </var>
+  <var name="disp">
+   <integer size="8" encoding="2c"/>
+  </var>
+  <pattern>
+   <const>001</const>
+   <ref name="r"/>
+   <const>10</const>
+   <ref name="sib"/>
+   <ref name="disp"/>
+  </pattern>
+  <phrase>
+   <literal>WORD PTR [</literal>
+   <ref name="sib"/>
+   <literal>+</literal>
+   <ref name="disp"/>
+   <literal>],</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <memory size="16">
+      <add>
+       <ref name="sib"/>
+       <ref name="disp"/>
+      </add>
+     </memory>
+    </bind>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rm">
+   <ref name="r32-no-sp"/>
+  </var>
+  <var name="r">
+   <ref name="r16"/>
+  </var>
+  <var name="disp">
+   <integer size="32" encoding="2c"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <ref name="r"/>
+   <const>01</const>
+   <ref name="disp"/>
+  </pattern>
+  <phrase>
+   <literal>WORD PTR [</literal>
+   <ref name="rm"/>
+   <literal>+</literal>
+   <ref name="disp"/>
+   <literal>],</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <memory size="16">
+      <add>
+       <ref name="rm"/>
+       <ref name="disp"/>
+      </add>
+     </memory>
+    </bind>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="r16"/>
+  </var>
+  <var name="sib">
+   <ref name="sib"/>
+  </var>
+  <var name="disp">
+   <integer size="32" encoding="2c"/>
+  </var>
+  <pattern>
+   <const>001</const>
+   <ref name="r"/>
+   <const>01</const>
+   <ref name="sib"/>
+   <ref name="disp"/>
+  </pattern>
+  <phrase>
+   <literal>WORD PTR [</literal>
+   <ref name="sib"/>
+   <literal>+</literal>
+   <ref name="disp"/>
+   <literal>],</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <memory size="16">
+      <add>
+       <ref name="sib"/>
+       <ref name="disp"/>
+      </add>
+     </memory>
+    </bind>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="r16"/>
+  </var>
+  <var name="rm">
+   <ref name="r16"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <ref name="r"/>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <ref name="rm"/>
+   <literal>,</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs" src="rm"/>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+</define>
+
+<define name="rm32-r32-mode">
  <fragment>
   <var name="rm">
    <ref name="r32-no-sp-bp"/>
@@ -607,6 +1016,15 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="rm-r-mode">
+ <require name="!osvp">
+  <ref name="rm32-r32-mode"/>
+ </require>
+ <require name="osvp">
+  <ref name="rm16-r16-mode"/>
+ </require>
+</define>
+
 <define name="add-instr">
  <fragment>
   <pattern>
@@ -767,6 +1185,9 @@ GNU General Public License (version 3 or any later version).
 </define>
 
 <start>
+ <prefix name="osvp">01100110</prefix>
+ <prefix name="asvp">10111111</prefix>
+
  <fragment>
   <var name="opcode">
    <ref name="add-instr"/>
@@ -779,7 +1200,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="cmp-instr"/>
   </var>
   <var name="operand">
-   <ref name="rm8-r8-mode"/>
+   <ref name="rm-r-mode"/>
   </var>
   <pattern>
    <const>100</const>
