@@ -303,10 +303,10 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="imm-mode">
+<define name="imm8-mode">
  <fragment>
   <var name="imm">
-   <integer class="imm" size="8"/>
+   <integer class="imm8" size="8"/>
   </var>
   <pattern>
    <const>00</const>
@@ -324,7 +324,28 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="dir-mode">
+<define name="imm16-mode">
+ <fragment>
+  <var name="imm">
+   <integer class="imm16" size="16"/>
+  </var>
+  <pattern>
+   <const>00</const>
+  </pattern>
+  <pattern>
+   <ref name="imm"/>
+  </pattern>
+  <phrase>
+   <literal>#</literal>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <ref name="imm"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="dir-mode-ea">
  <fragment>
   <var name="addr">
    <integer class="dir" size="8"/>
@@ -339,14 +360,12 @@ GNU General Public License (version 3 or any later version).
    <ref name="addr"/>
   </phrase>
   <effect>
-   <memory size="8">
-    <ref name="addr"/>
-   </memory>
+   <ref name="addr"/>
   </effect>
  </fragment>
 </define>
 
-<define name="ind-mode">
+<define name="ind-mode-ea">
  <fragment>
   <var name="addr">
    <integer class="dir" size="8"/>
@@ -363,17 +382,15 @@ GNU General Public License (version 3 or any later version).
    <literal>X</literal>
   </phrase>
   <effect>
-   <memory size="8">
-    <add>
-     <ref name="addr"/>
-     <register name="IX"/>
-    </add>
-   </memory>
+   <add>
+    <ref name="addr"/>
+    <register name="IX"/>
+   </add>
   </effect>
  </fragment>
 </define>
 
-<define name="ext-mode">
+<define name="ext-mode-ea">
  <fragment>
   <var name="addr">
    <integer class="ext" size="16"/>
@@ -388,9 +405,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="addr"/>
   </phrase>
   <effect>
-   <memory size="8">
-    <ref name="addr"/>
-   </memory>
+   <ref name="addr"/>
   </effect>
  </fragment>
 </define>
@@ -537,6 +552,23 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="sta-instr">
+ <fragment>
+  <pattern>
+   <const>0111</const>
+  </pattern>
+  <phrase>
+   <literal>STA</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <ref name="accumulator"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <define name="eor-instr">
  <fragment>
   <pattern>
@@ -613,6 +645,106 @@ GNU General Public License (version 3 or any later version).
      <ref name="accumulator"/>
      <ref name="operand"/>
     </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cpx-instr">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <pattern>
+   <const>1100</const>
+  </pattern>
+  <phrase>
+   <literal>CPX</literal>
+  </phrase>
+  <effect>
+   <sub>
+    <register name="IX"/>
+    <ref name="operand"/>
+   </sub>
+  </effect>
+ </fragment>
+</define>
+
+<define name="lds-instr">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <pattern>
+   <const>1110</const>
+  </pattern>
+  <phrase>
+   <literal>LDS</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="SP"/>
+    <ref name="operand"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sts-instr">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <pattern>
+   <const>1111</const>
+  </pattern>
+  <phrase>
+   <literal>STS</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <register name="SP"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ldx-instr">
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <pattern>
+   <const>1110</const>
+  </pattern>
+  <phrase>
+   <literal>LDX</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="IX"/>
+    <ref name="operand"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="stx-instr">
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <pattern>
+   <const>1111</const>
+  </pattern>
+  <phrase>
+   <literal>STX</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <register name="IX"/>
    </assign>
   </effect>
  </fragment>
@@ -1277,10 +1409,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="accumulator"/>
   </var>
   <var name="operand">
-   <ref name="imm-mode"/>
-   <ref name="dir-mode"/>
-   <ref name="ind-mode"/>
-   <ref name="ext-mode"/>
+   <ref name="imm8-mode"/>
   </var>
   <pattern>
    <const>1</const>
@@ -1306,6 +1435,120 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="opcode">
+   <ref name="cpx-instr"/>
+   <ref name="lds-instr"/>
+   <ref name="ldx-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="imm16-mode"/>
+  </var>
+  <pattern>
+   <const>1</const>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="operand"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="sub-instr"/>
+   <ref name="cmp-instr"/>
+   <ref name="sbc-instr"/>
+   <ref name="and-instr"/>
+   <ref name="bit-instr"/>
+   <ref name="lda-instr"/>
+   <ref name="sta-instr"/>
+   <ref name="eor-instr"/>
+   <ref name="adc-instr"/>
+   <ref name="ora-instr"/>
+   <ref name="add-instr"/>
+  </var>
+  <var name="accumulator">
+   <ref name="accumulator"/>
+  </var>
+  <var name="operand">
+   <ref name="dir-mode-ea"/>
+   <ref name="ind-mode-ea"/>
+   <ref name="ext-mode-ea"/>
+  </var>
+  <pattern>
+   <const>1</const>
+   <ref name="accumulator"/>
+   <ref name="operand"/>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+   <ref name="accumulator"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand">
+     <memory size="8">
+      <ref name="operand"/>
+     </memory>
+    </bind>
+    <bind name="accumulator" src="accumulator"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="cpx-instr"/>
+   <ref name="lds-instr"/>
+   <ref name="sts-instr"/>
+   <ref name="ldx-instr"/>
+   <ref name="stx-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="dir-mode-ea"/>
+   <ref name="ind-mode-ea"/>
+   <ref name="ext-mode-ea"/>
+  </var>
+  <pattern>
+   <const>1</const>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand">
+     <memory size="16">
+      <ref name="operand"/>
+     </memory>
+    </bind>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
    <ref name="com-instr"/>
    <ref name="neg-instr"/>
    <ref name="lsr-instr"/>
@@ -1321,8 +1564,6 @@ GNU General Public License (version 3 or any later version).
   <var name="operand">
    <ref name="impa-mode"/>
    <ref name="impb-mode"/>
-   <ref name="ind-mode"/>
-   <ref name="ext-mode"/>
   </var>
   <pattern>
    <const>01</const>
@@ -1339,6 +1580,47 @@ GNU General Public License (version 3 or any later version).
   <effect>
    <ref name="opcode">
     <bind name="operand" src="operand"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="com-instr"/>
+   <ref name="neg-instr"/>
+   <ref name="lsr-instr"/>
+   <ref name="ror-instr"/>
+   <ref name="asr-instr"/>
+   <ref name="asl-instr"/>
+   <ref name="rol-instr"/>
+   <ref name="dec-instr"/>
+   <ref name="inc-instr"/>
+   <ref name="tst-instr"/>
+   <ref name="clr-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="ind-mode-ea"/>
+   <ref name="ext-mode-ea"/>
+  </var>
+  <pattern>
+   <const>01</const>
+   <ref name="operand"/>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand">
+     <memory size="8">
+      <ref name="operand"/>
+     </memory>
+    </bind>
    </ref>
   </effect>
  </fragment>
