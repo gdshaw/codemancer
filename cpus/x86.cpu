@@ -318,6 +318,83 @@ GNU General Public License (version 3 or any later version).
  <ref name="edi"/>
 </define>
 
+<define name="segment">
+ <require name="!es"><require name="!cs"><require name="!ss">
+ <require name="!ds"><require name="!fs"><require name="!gs">
+  <fragment>
+   <pattern></pattern>
+   <phrase></phrase>
+  </fragment>
+ </require></require></require>
+ </require></require></require>
+
+ <require name="es"><require name="!cs"><require name="!ss">
+ <require name="!ds"><require name="!fs"><require name="!gs">
+  <fragment>
+   <pattern></pattern>
+   <phrase>
+    <literal>ES:</literal>
+   </phrase>
+  </fragment>
+ </require></require></require>
+ </require></require></require>
+
+ <require name="!es"><require name="cs"><require name="!ss">
+ <require name="!ds"><require name="!fs"><require name="!gs">
+  <fragment>
+   <pattern></pattern>
+   <phrase>
+    <literal>CS:</literal>
+   </phrase>
+  </fragment>
+ </require></require></require>
+ </require></require></require>
+
+ <require name="!es"><require name="!cs"><require name="ss">
+ <require name="!ds"><require name="!fs"><require name="!gs">
+  <fragment>
+   <pattern></pattern>
+   <phrase>
+    <literal>SS:</literal>
+   </phrase>
+  </fragment>
+ </require></require></require>
+ </require></require></require>
+
+ <require name="!es"><require name="!cs"><require name="!ss">
+ <require name="ds"><require name="!fs"><require name="!gs">
+  <fragment>
+   <pattern></pattern>
+   <phrase>
+    <literal>DS:</literal>
+   </phrase>
+  </fragment>
+ </require></require></require>
+ </require></require></require>
+
+ <require name="!es"><require name="!cs"><require name="!ss">
+ <require name="!ds"><require name="fs"><require name="!gs">
+  <fragment>
+   <pattern></pattern>
+   <phrase>
+    <literal>FS:</literal>
+   </phrase>
+  </fragment>
+ </require></require></require>
+ </require></require></require>
+
+ <require name="!es"><require name="!cs"><require name="!ss">
+ <require name="!ds"><require name="!fs"><require name="gs">
+  <fragment>
+   <pattern></pattern>
+   <phrase>
+    <literal>GS:</literal>
+   </phrase>
+  </fragment>
+ </require></require></require>
+ </require></require></require>
+</define>
+
 <define name="sib-ss">
  <fragment>
   <pattern>
@@ -858,6 +935,9 @@ GNU General Public License (version 3 or any later version).
     <ref name="ea16"/>
    </require>
   </var>
+  <var name="seg">
+   <ref name="segment"/>
+  </var>
   <var name="r">
    <ref name="r16"/>
   </var>
@@ -865,9 +945,12 @@ GNU General Public License (version 3 or any later version).
    <ref name="ea"/>
    <ref name="r"/>
    <ref name="ea"/>
+   <ref name="seg"/>
   </pattern>
   <phrase>
-   <literal>WORD PTR [</literal>
+   <literal>WORD PTR </literal>
+   <ref name="seg"/>
+   <literal>[</literal>
    <ref name="ea"/>
    <literal>],</literal><ws/>
    <ref name="r"/>
@@ -920,6 +1003,9 @@ GNU General Public License (version 3 or any later version).
     <ref name="ea16"/>
    </require>
   </var>
+  <var name="seg">
+   <ref name="segment"/>
+  </var>
   <var name="r">
    <ref name="r32"/>
   </var>
@@ -927,9 +1013,12 @@ GNU General Public License (version 3 or any later version).
    <ref name="ea"/>
    <ref name="r"/>
    <ref name="ea"/>
+   <ref name="seg"/>
   </pattern>
   <phrase>
-   <literal>DWORD PTR [</literal>
+   <literal>DWORD PTR </literal>
+   <ref name="seg"/>
+   <literal>[</literal>
    <ref name="ea"/>
    <literal>],</literal><ws/>
    <ref name="r"/>
@@ -1143,6 +1232,12 @@ GNU General Public License (version 3 or any later version).
 <start>
  <prefix name="osvp">01100110</prefix>
  <prefix name="asvp">11100110</prefix>
+ <prefix name="es">01100100</prefix>
+ <prefix name="cs">01110100</prefix>
+ <prefix name="ss">01101100</prefix>
+ <prefix name="ds">01111100</prefix>
+ <prefix name="fs">00100110</prefix>
+ <prefix name="gs">10100110</prefix>
 
  <fragment>
   <var name="opcode">
