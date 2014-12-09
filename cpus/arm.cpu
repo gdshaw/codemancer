@@ -2982,6 +2982,108 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="swp-instr">
+ <fragment>
+  <var name="rd">
+   <ref name="register"/>
+  </var>
+  <var name="rn">
+   <ref name="register"/>
+  </var>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>10010000</const>
+   <ref name="rd"/>
+   <ref name="rn"/>
+   <const>00001000</const>
+  </pattern>
+  <phrase>
+   <literal>SWP</literal>
+  </phrase>
+  <phrase></phrase>
+  <phrase>
+   <ref name="rd"/>
+   <literal>,</literal><ws/>
+   <ref name="rm"/>
+   <literal>,</literal><ws/>
+   <literal>[</literal>
+   <ref name="rn"/>
+   <literal>]</literal>
+  </phrase>
+  <effect>
+   <temp name="rd">
+    <memory size="32">
+     <ref name="rn"/>
+    </memory>
+   </temp>
+   <assign>
+    <memory size="32">
+     <ref name="rn"/>
+    </memory>
+    <ref name="rm"/>
+   </assign>
+   <assign>
+    <ref name="rd"/>
+    <temp name="rd"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rd">
+   <ref name="register"/>
+  </var>
+  <var name="rn">
+   <ref name="register"/>
+  </var>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>10010000</const>
+   <ref name="rd"/>
+   <ref name="rn"/>
+   <const>00101000</const>
+  </pattern>
+  <phrase>
+   <literal>SWP</literal>
+  </phrase>
+  <phrase>
+   <literal>B</literal>
+  </phrase>
+  <phrase>
+   <ref name="rd"/>
+   <literal>,</literal><ws/>
+   <ref name="rm"/>
+   <literal>,</literal><ws/>
+   <literal>[</literal>
+   <ref name="rn"/>
+   <literal>]</literal>
+  </phrase>
+  <effect>
+   <temp name="rd">
+    <memory size="8">
+     <ref name="rn"/>
+    </memory>
+   </temp>
+   <assign>
+    <memory size="8">
+     <ref name="rn"/>
+    </memory>
+    <ref name="rm"/>
+   </assign>
+   <assign>
+    <ref name="rd"/>
+    <temp name="rd"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -2996,6 +3098,7 @@ GNU General Public License (version 3 or any later version).
    </require>
    <require name="armv3">
     <ref name="status-instr"/>
+    <ref name="swp-instr"/>
    </require>
   </var>
   <var name="cc">
