@@ -319,8 +319,8 @@ GNU General Public License (version 3 or any later version).
 </define>
 
 <define name="segment">
- <require name="!es"><require name="!cs"><require name="!ss">
- <require name="!ds"><require name="!fs"><require name="!gs">
+ <require name="!esvp"><require name="!csvp"><require name="!ssvp">
+ <require name="!dsvp"><require name="!fsvp"><require name="!gsvp">
   <fragment>
    <pattern></pattern>
    <phrase></phrase>
@@ -328,8 +328,8 @@ GNU General Public License (version 3 or any later version).
  </require></require></require>
  </require></require></require>
 
- <require name="es"><require name="!cs"><require name="!ss">
- <require name="!ds"><require name="!fs"><require name="!gs">
+ <require name="esvp"><require name="!csvp"><require name="!ssvp">
+ <require name="!dsvp"><require name="!fsvp"><require name="!gsvp">
   <fragment>
    <pattern></pattern>
    <phrase>
@@ -339,8 +339,8 @@ GNU General Public License (version 3 or any later version).
  </require></require></require>
  </require></require></require>
 
- <require name="!es"><require name="cs"><require name="!ss">
- <require name="!ds"><require name="!fs"><require name="!gs">
+ <require name="!esvp"><require name="csvp"><require name="!ssvp">
+ <require name="!dsvp"><require name="!fsvp"><require name="!gsvp">
   <fragment>
    <pattern></pattern>
    <phrase>
@@ -350,8 +350,8 @@ GNU General Public License (version 3 or any later version).
  </require></require></require>
  </require></require></require>
 
- <require name="!es"><require name="!cs"><require name="ss">
- <require name="!ds"><require name="!fs"><require name="!gs">
+ <require name="!esvp"><require name="!csvp"><require name="ssvp">
+ <require name="!dsvp"><require name="!fsvp"><require name="!gsvp">
   <fragment>
    <pattern></pattern>
    <phrase>
@@ -361,8 +361,8 @@ GNU General Public License (version 3 or any later version).
  </require></require></require>
  </require></require></require>
 
- <require name="!es"><require name="!cs"><require name="!ss">
- <require name="ds"><require name="!fs"><require name="!gs">
+ <require name="!esvp"><require name="!csvp"><require name="!ssvp">
+ <require name="dsvp"><require name="!fsvp"><require name="!gsvp">
   <fragment>
    <pattern></pattern>
    <phrase>
@@ -372,8 +372,8 @@ GNU General Public License (version 3 or any later version).
  </require></require></require>
  </require></require></require>
 
- <require name="!es"><require name="!cs"><require name="!ss">
- <require name="!ds"><require name="fs"><require name="!gs">
+ <require name="!esvp"><require name="!csvp"><require name="!ssvp">
+ <require name="!dsvp"><require name="fsvp"><require name="!gsvp">
   <fragment>
    <pattern></pattern>
    <phrase>
@@ -383,8 +383,8 @@ GNU General Public License (version 3 or any later version).
  </require></require></require>
  </require></require></require>
 
- <require name="!es"><require name="!cs"><require name="!ss">
- <require name="!ds"><require name="!fs"><require name="gs">
+ <require name="!esvp"><require name="!csvp"><require name="!ssvp">
+ <require name="!dsvp"><require name="!fsvp"><require name="gsvp">
   <fragment>
    <pattern></pattern>
    <phrase>
@@ -993,6 +993,75 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="r16-rm16-mode">
+ <fragment>
+  <var name="ea">
+   <require name="!asvp">
+    <ref name="ea32"/>
+   </require>
+   <require name="asvp">
+    <ref name="ea16"/>
+   </require>
+  </var>
+  <var name="seg">
+   <ref name="segment"/>
+  </var>
+  <var name="r">
+   <ref name="r16"/>
+  </var>
+  <pattern>
+   <ref name="ea"/>
+   <ref name="r"/>
+   <ref name="ea"/>
+   <ref name="seg"/>
+  </pattern>
+  <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
+   <literal>WORD PTR </literal>
+   <ref name="seg"/>
+   <literal>[</literal>
+   <ref name="ea"/>
+   <literal>]</literal>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs" src="r"/>
+    <bind name="rhs">
+     <memory size="16">
+      <ref name="ea"/>
+     </memory>
+    </bind>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="r16"/>
+  </var>
+  <var name="rm">
+   <ref name="r16"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <ref name="r"/>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
+   <ref name="rm"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs" src="r"/>
+    <bind name="rhs" src="rm"/>
+   </ref>
+  </effect>
+ </fragment>
+</define>
+
 <define name="rm32-r32-mode">
  <fragment>
   <var name="ea">
@@ -1061,12 +1130,90 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="r32-rm32-mode">
+ <fragment>
+  <var name="ea">
+   <require name="!asvp">
+    <ref name="ea32"/>
+   </require>
+   <require name="asvp">
+    <ref name="ea16"/>
+   </require>
+  </var>
+  <var name="seg">
+   <ref name="segment"/>
+  </var>
+  <var name="r">
+   <ref name="r32"/>
+  </var>
+  <pattern>
+   <ref name="ea"/>
+   <ref name="r"/>
+   <ref name="ea"/>
+   <ref name="seg"/>
+  </pattern>
+  <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
+   <literal>DWORD PTR </literal>
+   <ref name="seg"/>
+   <literal>[</literal>
+   <ref name="ea"/>
+   <literal>]</literal>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs" src="r"/>
+    <bind name="rhs">
+     <memory size="32">
+      <ref name="ea"/>
+     </memory>
+    </bind>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="r32"/>
+  </var>
+  <var name="rm">
+   <ref name="r32"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <ref name="r"/>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
+   <ref name="rm"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs" src="r"/>
+    <bind name="rhs" src="rm"/>
+   </ref>
+  </effect>
+ </fragment>
+</define>
+
 <define name="rm-r-mode">
  <require name="!osvp">
   <ref name="rm32-r32-mode"/>
  </require>
  <require name="osvp">
   <ref name="rm16-r16-mode"/>
+ </require>
+</define>
+
+<define name="r-rm-mode">
+ <require name="!osvp">
+  <ref name="r32-rm32-mode"/>
+ </require>
+ <require name="osvp">
+  <ref name="r16-rm16-mode"/>
  </require>
 </define>
 
@@ -1232,12 +1379,12 @@ GNU General Public License (version 3 or any later version).
 <start>
  <prefix name="osvp">01100110</prefix>
  <prefix name="asvp">11100110</prefix>
- <prefix name="es">01100100</prefix>
- <prefix name="cs">01110100</prefix>
- <prefix name="ss">01101100</prefix>
- <prefix name="ds">01111100</prefix>
- <prefix name="fs">00100110</prefix>
- <prefix name="gs">10100110</prefix>
+ <prefix name="esvp">01100100</prefix>
+ <prefix name="csvp">01110100</prefix>
+ <prefix name="ssvp">01101100</prefix>
+ <prefix name="dsvp">01111100</prefix>
+ <prefix name="fsvp">00100110</prefix>
+ <prefix name="gsvp">10100110</prefix>
 
  <fragment>
   <var name="opcode">
@@ -1255,6 +1402,39 @@ GNU General Public License (version 3 or any later version).
   </var>
   <pattern>
    <const>100</const>
+   <ref name="opcode"/>
+   <const>00</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="operand">
+    <bind name="opcode" ref="opcode"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="add-instr"/>
+   <ref name="or-instr"/>
+   <ref name="adc-instr"/>
+   <ref name="sbb-instr"/>
+   <ref name="and-instr"/>
+   <ref name="sub-instr"/>
+   <ref name="xor-instr"/>
+   <ref name="cmp-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="r-rm-mode"/>
+  </var>
+  <pattern>
+   <const>110</const>
    <ref name="opcode"/>
    <const>00</const>
    <ref name="operand"/>
