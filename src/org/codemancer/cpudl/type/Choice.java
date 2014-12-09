@@ -200,7 +200,7 @@ public class Choice extends Type {
 			Prefix prefix = (Prefix)expr;
 			FeatureSet childFeatures = new FeatureSet(features);
 			childFeatures.add(prefix.getFeatureName());
-			expr = decoder.decode(readers, childFeatures);
+			expr = decode(readers, childFeatures);
 		}
 		return expr;
 	}
