@@ -1046,7 +1046,9 @@ GNU General Public License (version 3 or any later version).
    <literal></literal>
   </phrase>
   <effect>
-   <const>4</const>
+   <memory size="4">
+    <ref name="ea"/>
+   </memory>
   </effect>
  </fragment>
 
@@ -1058,7 +1060,9 @@ GNU General Public License (version 3 or any later version).
    <literal>B</literal>
   </phrase>
   <effect>
-   <const>1</const>
+   <memory size="1">
+    <ref name="ea"/>
+   </memory>
   </effect>
  </fragment>
 </define>
@@ -1620,12 +1624,14 @@ GNU General Public License (version 3 or any later version).
    <ref name="offset"/>
   </phrase>
   <effect>
-   <memory>
-    <add>
-     <ref name="rn"/>
-     <ref name="offset"/>
-    </add>
-   </memory>
+   <ref name="b">
+    <bind name="ea">
+     <add>
+      <ref name="rn"/>
+      <ref name="offset"/>
+     </add>
+    </bind>
+   </ref>
   </effect>
  </fragment>
 
@@ -2238,7 +2244,11 @@ GNU General Public License (version 3 or any later version).
   <effect>
    <ref name="opcode">
     <bind name="rd" src="rd"/>
-    <bind name="operand" src="operand"/>
+    <bind name="operand">
+     <ref name="operand">
+      <bind name="b" src="b"/>
+     </ref>
+    </bind>
    </ref>
   </effect>
  </fragment>
@@ -2993,67 +3003,23 @@ GNU General Public License (version 3 or any later version).
   <var name="rm">
    <ref name="register"/>
   </var>
-  <pattern>
-   <ref name="rm"/>
-   <const>10010000</const>
-   <ref name="rd"/>
-   <ref name="rn"/>
-   <const>00001000</const>
-  </pattern>
-  <phrase>
-   <literal>SWP</literal>
-  </phrase>
-  <phrase></phrase>
-  <phrase>
-   <ref name="rd"/>
-   <literal>,</literal><ws/>
-   <ref name="rm"/>
-   <literal>,</literal><ws/>
-   <literal>[</literal>
-   <ref name="rn"/>
-   <literal>]</literal>
-  </phrase>
-  <effect>
-   <temp name="rd">
-    <memory size="32">
-     <ref name="rn"/>
-    </memory>
-   </temp>
-   <assign>
-    <memory size="32">
-     <ref name="rn"/>
-    </memory>
-    <ref name="rm"/>
-   </assign>
-   <assign>
-    <ref name="rd"/>
-    <temp name="rd"/>
-   </assign>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="rd">
-   <ref name="register"/>
-  </var>
-  <var name="rn">
-   <ref name="register"/>
-  </var>
-  <var name="rm">
-   <ref name="register"/>
+  <var name="b">
+   <ref name="b-bit"/>
   </var>
   <pattern>
    <ref name="rm"/>
    <const>10010000</const>
    <ref name="rd"/>
    <ref name="rn"/>
-   <const>00101000</const>
+   <const>00</const>
+   <ref name="b"/>
+   <const>01000</const>
   </pattern>
   <phrase>
    <literal>SWP</literal>
   </phrase>
   <phrase>
-   <literal>B</literal>
+   <ref name="b"/>
   </phrase>
   <phrase>
    <ref name="rd"/>
@@ -3066,14 +3032,14 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <temp name="rd">
-    <memory size="8">
-     <ref name="rn"/>
-    </memory>
+    <ref name="b">
+     <bind name="ea" src="rn"/>
+    </ref>
    </temp>
    <assign>
-    <memory size="8">
-     <ref name="rn"/>
-    </memory>
+    <ref name="b">
+     <bind name="ea" src="rn"/>
+    </ref>
     <ref name="rm"/>
    </assign>
    <assign>
