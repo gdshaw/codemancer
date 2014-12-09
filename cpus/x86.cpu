@@ -15,6 +15,15 @@ GNU General Public License (version 3 or any later version).
  <property name="whitespace" value=" "/>
 </style>
 
+<register name="AL" size="8"/>
+<register name="CL" size="8"/>
+<register name="DL" size="8"/>
+<register name="BL" size="8"/>
+<register name="AH" size="8"/>
+<register name="CH" size="8"/>
+<register name="DH" size="8"/>
+<register name="BH" size="8"/>
+
 <register name="AX" size="16"/>
 <register name="CX" size="16"/>
 <register name="DX" size="16"/>
@@ -42,6 +51,118 @@ GNU General Public License (version 3 or any later version).
 <register name="IF" size="1"/>
 <register name="DF" size="1"/>
 <register name="OF" size="1"/>
+
+<define name="al">
+ <fragment>
+  <pattern>
+   <const>000</const>
+  </pattern>
+  <phrase>
+   <literal>AL</literal>
+  </phrase>
+  <effect>
+   <register name="AL"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cl">
+ <fragment>
+  <pattern>
+   <const>100</const>
+  </pattern>
+  <phrase>
+   <literal>CL</literal>
+  </phrase>
+  <effect>
+   <register name="CL"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="dl">
+ <fragment>
+  <pattern>
+   <const>010</const>
+  </pattern>
+  <phrase>
+   <literal>DL</literal>
+  </phrase>
+  <effect>
+   <register name="DL"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="bl">
+ <fragment>
+  <pattern>
+   <const>110</const>
+  </pattern>
+  <phrase>
+   <literal>BL</literal>
+  </phrase>
+  <effect>
+   <register name="BL"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ah">
+ <fragment>
+  <pattern>
+   <const>001</const>
+  </pattern>
+  <phrase>
+   <literal>AH</literal>
+  </phrase>
+  <effect>
+   <register name="AH"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ch">
+ <fragment>
+  <pattern>
+   <const>101</const>
+  </pattern>
+  <phrase>
+   <literal>CH</literal>
+  </phrase>
+  <effect>
+   <register name="CH"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="dh">
+ <fragment>
+  <pattern>
+   <const>011</const>
+  </pattern>
+  <phrase>
+   <literal>DH</literal>
+  </phrase>
+  <effect>
+   <register name="DH"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="bh">
+ <fragment>
+  <pattern>
+   <const>111</const>
+  </pattern>
+  <phrase>
+   <literal>BH</literal>
+  </phrase>
+  <effect>
+   <register name="BH"/>
+  </effect>
+ </fragment>
+</define>
 
 <define name="ax">
  <fragment>
@@ -265,6 +386,17 @@ GNU General Public License (version 3 or any later version).
    <register name="EDI"/>
   </effect>
  </fragment>
+</define>
+
+<define name="r8">
+ <ref name="al"/>
+ <ref name="cl"/>
+ <ref name="dl"/>
+ <ref name="bl"/>
+ <ref name="ah"/>
+ <ref name="ch"/>
+ <ref name="dh"/>
+ <ref name="bh"/>
 </define>
 
 <define name="r16">
@@ -925,6 +1057,143 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="rm8-r8-mode">
+ <fragment>
+  <var name="ea">
+   <require name="!asvp">
+    <ref name="ea32"/>
+   </require>
+   <require name="asvp">
+    <ref name="ea16"/>
+   </require>
+  </var>
+  <var name="seg">
+   <ref name="segment"/>
+  </var>
+  <var name="r">
+   <ref name="r8"/>
+  </var>
+  <pattern>
+   <ref name="ea"/>
+   <ref name="r"/>
+   <ref name="ea"/>
+   <ref name="seg"/>
+  </pattern>
+  <phrase>
+   <literal>BYTE PTR </literal>
+   <ref name="seg"/>
+   <literal>[</literal>
+   <ref name="ea"/>
+   <literal>],</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <memory size="8">
+      <ref name="ea"/>
+     </memory>
+    </bind>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="r8"/>
+  </var>
+  <var name="rm">
+   <ref name="r8"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <ref name="r"/>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <ref name="rm"/>
+   <literal>,</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs" src="rm"/>
+    <bind name="rhs" src="r"/>
+   </ref>
+  </effect>
+ </fragment>
+</define>
+
+<define name="r8-rm8-mode">
+ <fragment>
+  <var name="ea">
+   <require name="!asvp">
+    <ref name="ea32"/>
+   </require>
+   <require name="asvp">
+    <ref name="ea16"/>
+   </require>
+  </var>
+  <var name="seg">
+   <ref name="segment"/>
+  </var>
+  <var name="r">
+   <ref name="r8"/>
+  </var>
+  <pattern>
+   <ref name="ea"/>
+   <ref name="r"/>
+   <ref name="ea"/>
+   <ref name="seg"/>
+  </pattern>
+  <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
+   <literal>BYTE PTR </literal>
+   <ref name="seg"/>
+   <literal>[</literal>
+   <ref name="ea"/>
+   <literal>]</literal>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs" src="r"/>
+    <bind name="rhs">
+     <memory size="8">
+      <ref name="ea"/>
+     </memory>
+    </bind>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="r8"/>
+  </var>
+  <var name="rm">
+   <ref name="r8"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <ref name="r"/>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
+   <ref name="rm"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs" src="r"/>
+    <bind name="rhs" src="rm"/>
+   </ref>
+  </effect>
+ </fragment>
+</define>
+
 <define name="rm16-r16-mode">
  <fragment>
   <var name="ea">
@@ -1398,6 +1667,39 @@ GNU General Public License (version 3 or any later version).
    <ref name="cmp-instr"/>
   </var>
   <var name="operand">
+   <ref name="rm8-r8-mode"/>
+  </var>
+  <pattern>
+   <const>000</const>
+   <ref name="opcode"/>
+   <const>00</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="operand">
+    <bind name="opcode" ref="opcode"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="add-instr"/>
+   <ref name="or-instr"/>
+   <ref name="adc-instr"/>
+   <ref name="sbb-instr"/>
+   <ref name="and-instr"/>
+   <ref name="sub-instr"/>
+   <ref name="xor-instr"/>
+   <ref name="cmp-instr"/>
+  </var>
+  <var name="operand">
    <ref name="rm-r-mode"/>
   </var>
   <pattern>
@@ -1435,6 +1737,39 @@ GNU General Public License (version 3 or any later version).
   </var>
   <pattern>
    <const>110</const>
+   <ref name="opcode"/>
+   <const>00</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="operand">
+    <bind name="opcode" ref="opcode"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="add-instr"/>
+   <ref name="or-instr"/>
+   <ref name="adc-instr"/>
+   <ref name="sbb-instr"/>
+   <ref name="and-instr"/>
+   <ref name="sub-instr"/>
+   <ref name="xor-instr"/>
+   <ref name="cmp-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="r8-rm8-mode"/>
+  </var>
+  <pattern>
+   <const>010</const>
    <ref name="opcode"/>
    <const>00</const>
    <ref name="operand"/>
