@@ -421,6 +421,15 @@ GNU General Public License (version 3 or any later version).
  <ref name="edi"/>
 </define>
 
+<define name="r32-16">
+ <require name="!osvp">
+  <ref name="r32"/>
+ </require>
+ <require name="osvp">
+  <ref name="r16"/>
+ </require>
+</define>
+
 <define name="r32-no-sp">
  <ref name="eax"/>
  <ref name="ecx"/>
@@ -1057,7 +1066,7 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="rm8-r8-mode">
+<define name="rm8">
  <fragment>
   <var name="ea">
    <require name="!asvp">
@@ -1070,12 +1079,10 @@ GNU General Public License (version 3 or any later version).
   <var name="seg">
    <ref name="segment"/>
   </var>
-  <var name="r">
-   <ref name="r8"/>
-  </var>
   <pattern>
    <ref name="ea"/>
-   <ref name="r"/>
+  </pattern>
+  <pattern>
    <ref name="ea"/>
    <ref name="seg"/>
   </pattern>
@@ -1084,117 +1091,35 @@ GNU General Public License (version 3 or any later version).
    <ref name="seg"/>
    <literal>[</literal>
    <ref name="ea"/>
-   <literal>],</literal><ws/>
-   <ref name="r"/>
-  </phrase>
-  <effect>
-   <ref name="opcode">
-    <bind name="lhs">
-     <memory size="8">
-      <ref name="ea"/>
-     </memory>
-    </bind>
-    <bind name="rhs" src="r"/>
-   </ref>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="r">
-   <ref name="r8"/>
-  </var>
-  <var name="rm">
-   <ref name="r8"/>
-  </var>
-  <pattern>
-   <ref name="rm"/>
-   <ref name="r"/>
-   <const>11</const>
-  </pattern>
-  <phrase>
-   <ref name="rm"/>
-   <literal>,</literal><ws/>
-   <ref name="r"/>
-  </phrase>
-  <effect>
-   <ref name="opcode">
-    <bind name="lhs" src="rm"/>
-    <bind name="rhs" src="r"/>
-   </ref>
-  </effect>
- </fragment>
-</define>
-
-<define name="r8-rm8-mode">
- <fragment>
-  <var name="ea">
-   <require name="!asvp">
-    <ref name="ea32"/>
-   </require>
-   <require name="asvp">
-    <ref name="ea16"/>
-   </require>
-  </var>
-  <var name="seg">
-   <ref name="segment"/>
-  </var>
-  <var name="r">
-   <ref name="r8"/>
-  </var>
-  <pattern>
-   <ref name="ea"/>
-   <ref name="r"/>
-   <ref name="ea"/>
-   <ref name="seg"/>
-  </pattern>
-  <phrase>
-   <ref name="r"/>
-   <literal>,</literal><ws/>
-   <literal>BYTE PTR </literal>
-   <ref name="seg"/>
-   <literal>[</literal>
-   <ref name="ea"/>
    <literal>]</literal>
   </phrase>
   <effect>
-   <ref name="opcode">
-    <bind name="lhs" src="r"/>
-    <bind name="rhs">
-     <memory size="8">
-      <ref name="ea"/>
-     </memory>
-    </bind>
-   </ref>
+   <memory size="8">
+    <ref name="ea"/>
+   </memory>
   </effect>
  </fragment>
 
  <fragment>
-  <var name="r">
-   <ref name="r8"/>
-  </var>
   <var name="rm">
    <ref name="r8"/>
   </var>
   <pattern>
    <ref name="rm"/>
-   <ref name="r"/>
+  </pattern>
+  <pattern>
    <const>11</const>
   </pattern>
   <phrase>
-   <ref name="r"/>
-   <literal>,</literal><ws/>
    <ref name="rm"/>
   </phrase>
   <effect>
-   <ref name="opcode">
-    <bind name="lhs" src="r"/>
-    <bind name="rhs" src="rm"/>
-   </ref>
+   <ref name="rm"/>
   </effect>
  </fragment>
 </define>
 
-<define name="rm16-r16-mode">
+<define name="rm16">
  <fragment>
   <var name="ea">
    <require name="!asvp">
@@ -1207,12 +1132,10 @@ GNU General Public License (version 3 or any later version).
   <var name="seg">
    <ref name="segment"/>
   </var>
-  <var name="r">
-   <ref name="r16"/>
-  </var>
   <pattern>
    <ref name="ea"/>
-   <ref name="r"/>
+  </pattern>
+  <pattern>
    <ref name="ea"/>
    <ref name="seg"/>
   </pattern>
@@ -1221,117 +1144,35 @@ GNU General Public License (version 3 or any later version).
    <ref name="seg"/>
    <literal>[</literal>
    <ref name="ea"/>
-   <literal>],</literal><ws/>
-   <ref name="r"/>
-  </phrase>
-  <effect>
-   <ref name="opcode">
-    <bind name="lhs">
-     <memory size="16">
-      <ref name="ea"/>
-     </memory>
-    </bind>
-    <bind name="rhs" src="r"/>
-   </ref>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="r">
-   <ref name="r16"/>
-  </var>
-  <var name="rm">
-   <ref name="r16"/>
-  </var>
-  <pattern>
-   <ref name="rm"/>
-   <ref name="r"/>
-   <const>11</const>
-  </pattern>
-  <phrase>
-   <ref name="rm"/>
-   <literal>,</literal><ws/>
-   <ref name="r"/>
-  </phrase>
-  <effect>
-   <ref name="opcode">
-    <bind name="lhs" src="rm"/>
-    <bind name="rhs" src="r"/>
-   </ref>
-  </effect>
- </fragment>
-</define>
-
-<define name="r16-rm16-mode">
- <fragment>
-  <var name="ea">
-   <require name="!asvp">
-    <ref name="ea32"/>
-   </require>
-   <require name="asvp">
-    <ref name="ea16"/>
-   </require>
-  </var>
-  <var name="seg">
-   <ref name="segment"/>
-  </var>
-  <var name="r">
-   <ref name="r16"/>
-  </var>
-  <pattern>
-   <ref name="ea"/>
-   <ref name="r"/>
-   <ref name="ea"/>
-   <ref name="seg"/>
-  </pattern>
-  <phrase>
-   <ref name="r"/>
-   <literal>,</literal><ws/>
-   <literal>WORD PTR </literal>
-   <ref name="seg"/>
-   <literal>[</literal>
-   <ref name="ea"/>
    <literal>]</literal>
   </phrase>
   <effect>
-   <ref name="opcode">
-    <bind name="lhs" src="r"/>
-    <bind name="rhs">
-     <memory size="16">
-      <ref name="ea"/>
-     </memory>
-    </bind>
-   </ref>
+   <memory size="16">
+    <ref name="ea"/>
+   </memory>
   </effect>
  </fragment>
 
  <fragment>
-  <var name="r">
-   <ref name="r16"/>
-  </var>
   <var name="rm">
    <ref name="r16"/>
   </var>
   <pattern>
    <ref name="rm"/>
-   <ref name="r"/>
+  </pattern>
+  <pattern>
    <const>11</const>
   </pattern>
   <phrase>
-   <ref name="r"/>
-   <literal>,</literal><ws/>
    <ref name="rm"/>
   </phrase>
   <effect>
-   <ref name="opcode">
-    <bind name="lhs" src="r"/>
-    <bind name="rhs" src="rm"/>
-   </ref>
+   <ref name="rm"/>
   </effect>
  </fragment>
 </define>
 
-<define name="rm32-r32-mode">
+<define name="rm32">
  <fragment>
   <var name="ea">
    <require name="!asvp">
@@ -1344,12 +1185,10 @@ GNU General Public License (version 3 or any later version).
   <var name="seg">
    <ref name="segment"/>
   </var>
-  <var name="r">
-   <ref name="r32"/>
-  </var>
   <pattern>
    <ref name="ea"/>
-   <ref name="r"/>
+  </pattern>
+  <pattern>
    <ref name="ea"/>
    <ref name="seg"/>
   </pattern>
@@ -1358,117 +1197,44 @@ GNU General Public License (version 3 or any later version).
    <ref name="seg"/>
    <literal>[</literal>
    <ref name="ea"/>
-   <literal>],</literal><ws/>
-   <ref name="r"/>
-  </phrase>
-  <effect>
-   <ref name="opcode">
-    <bind name="lhs">
-     <memory size="32">
-      <ref name="ea"/>
-     </memory>
-    </bind>
-    <bind name="rhs" src="r"/>
-   </ref>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="r">
-   <ref name="r32"/>
-  </var>
-  <var name="rm">
-   <ref name="r32"/>
-  </var>
-  <pattern>
-   <ref name="rm"/>
-   <ref name="r"/>
-   <const>11</const>
-  </pattern>
-  <phrase>
-   <ref name="rm"/>
-   <literal>,</literal><ws/>
-   <ref name="r"/>
-  </phrase>
-  <effect>
-   <ref name="opcode">
-    <bind name="lhs" src="rm"/>
-    <bind name="rhs" src="r"/>
-   </ref>
-  </effect>
- </fragment>
-</define>
-
-<define name="r32-rm32-mode">
- <fragment>
-  <var name="ea">
-   <require name="!asvp">
-    <ref name="ea32"/>
-   </require>
-   <require name="asvp">
-    <ref name="ea16"/>
-   </require>
-  </var>
-  <var name="seg">
-   <ref name="segment"/>
-  </var>
-  <var name="r">
-   <ref name="r32"/>
-  </var>
-  <pattern>
-   <ref name="ea"/>
-   <ref name="r"/>
-   <ref name="ea"/>
-   <ref name="seg"/>
-  </pattern>
-  <phrase>
-   <ref name="r"/>
-   <literal>,</literal><ws/>
-   <literal>DWORD PTR </literal>
-   <ref name="seg"/>
-   <literal>[</literal>
-   <ref name="ea"/>
    <literal>]</literal>
   </phrase>
   <effect>
-   <ref name="opcode">
-    <bind name="lhs" src="r"/>
-    <bind name="rhs">
-     <memory size="32">
-      <ref name="ea"/>
-     </memory>
-    </bind>
-   </ref>
+   <memory size="32">
+    <ref name="ea"/>
+   </memory>
   </effect>
  </fragment>
 
  <fragment>
-  <var name="r">
-   <ref name="r32"/>
-  </var>
   <var name="rm">
    <ref name="r32"/>
   </var>
   <pattern>
    <ref name="rm"/>
-   <ref name="r"/>
+  </pattern>
+  <pattern>
    <const>11</const>
   </pattern>
   <phrase>
-   <ref name="r"/>
-   <literal>,</literal><ws/>
    <ref name="rm"/>
   </phrase>
   <effect>
-   <ref name="opcode">
-    <bind name="lhs" src="r"/>
-    <bind name="rhs" src="rm"/>
-   </ref>
+   <ref name="rm"/>
   </effect>
  </fragment>
 </define>
 
-<define name="imm16-mode">
+<define name="rm32-16">
+ <require name="!osvp">
+  <ref name="rm32"/>
+ </require>
+ <require name="osvp">
+  <ref name="rm16"/>
+ </require>
+</define>
+
+<define name="imm16">
  <fragment>
   <var name="imm">
    <integer size="16" encoding="u"/>
@@ -1491,7 +1257,7 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="imm32-mode">
+<define name="imm32">
  <fragment>
   <var name="imm">
    <integer size="32" encoding="u"/>
@@ -1514,30 +1280,12 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="rm-r-mode">
+<define name="imm32-16">
  <require name="!osvp">
-  <ref name="rm32-r32-mode"/>
+  <ref name="imm32"/>
  </require>
  <require name="osvp">
-  <ref name="rm16-r16-mode"/>
- </require>
-</define>
-
-<define name="r-rm-mode">
- <require name="!osvp">
-  <ref name="r32-rm32-mode"/>
- </require>
- <require name="osvp">
-  <ref name="r16-rm16-mode"/>
- </require>
-</define>
-
-<define name="imm-mode">
- <require name="!osvp">
-  <ref name="imm32-mode"/>
- </require>
- <require name="osvp">
-  <ref name="imm16-mode"/>
+  <ref name="imm16"/>
  </require>
 </define>
 
@@ -1700,23 +1448,6 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="mov-instr">
- <fragment>
-  <pattern>
-   <const>100</const>
-  </pattern>
-  <phrase>
-   <literal>MOV</literal>
-  </phrase>
-  <effect>
-   <assign>
-    <ref name="lhs"/>
-    <ref name="rhs"/>
-   </assign>
-  </effect>
- </fragment>
-</define>
-
 <start>
  <prefix name="osvp">01100110</prefix>
  <prefix name="asvp">11100110</prefix>
@@ -1738,24 +1469,32 @@ GNU General Public License (version 3 or any later version).
    <ref name="xor-instr"/>
    <ref name="cmp-instr"/>
   </var>
+  <var name="r">
+   <ref name="r8"/>
+  </var>
   <var name="operand">
-   <ref name="rm8-r8-mode"/>
+   <ref name="rm8"/>
   </var>
   <pattern>
    <const>000</const>
    <ref name="opcode"/>
    <const>00</const>
    <ref name="operand"/>
+   <ref name="r"/>
+   <ref name="operand"/>
   </pattern>
   <phrase>
    <ref name="opcode"/>
   </phrase>
   <phrase>
    <ref name="operand"/>
+   <literal>,</literal><ws/>
+   <ref name="r"/>
   </phrase>
   <effect>
-   <ref name="operand">
-    <bind name="opcode" ref="opcode"/>
+   <ref name="opcode">
+    <bind name="lhs" ref="operand"/>
+    <bind name="rhs" ref="r"/>
    </ref>
   </effect>
  </fragment>
@@ -1771,24 +1510,32 @@ GNU General Public License (version 3 or any later version).
    <ref name="xor-instr"/>
    <ref name="cmp-instr"/>
   </var>
+  <var name="r">
+   <ref name="r32-16"/>
+  </var>
   <var name="operand">
-   <ref name="rm-r-mode"/>
+   <ref name="rm32-16"/>
   </var>
   <pattern>
    <const>100</const>
    <ref name="opcode"/>
    <const>00</const>
    <ref name="operand"/>
+   <ref name="r"/>
+   <ref name="operand"/>
   </pattern>
   <phrase>
    <ref name="opcode"/>
   </phrase>
   <phrase>
    <ref name="operand"/>
+   <literal>,</literal><ws/>
+   <ref name="r"/>
   </phrase>
   <effect>
-   <ref name="operand">
-    <bind name="opcode" ref="opcode"/>
+   <ref name="opcode">
+    <bind name="lhs" ref="operand"/>
+    <bind name="rhs" ref="r"/>
    </ref>
   </effect>
  </fragment>
@@ -1804,24 +1551,32 @@ GNU General Public License (version 3 or any later version).
    <ref name="xor-instr"/>
    <ref name="cmp-instr"/>
   </var>
+  <var name="r">
+   <ref name="r8"/>
+  </var>
   <var name="operand">
-   <ref name="r8-rm8-mode"/>
+   <ref name="rm8"/>
   </var>
   <pattern>
    <const>010</const>
    <ref name="opcode"/>
    <const>00</const>
    <ref name="operand"/>
+   <ref name="r"/>
+   <ref name="operand"/>
   </pattern>
   <phrase>
    <ref name="opcode"/>
   </phrase>
   <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
    <ref name="operand"/>
   </phrase>
   <effect>
-   <ref name="operand">
-    <bind name="opcode" ref="opcode"/>
+   <ref name="opcode">
+    <bind name="lhs" src="r"/>
+    <bind name="rhs" src="operand"/>
    </ref>
   </effect>
  </fragment>
@@ -1837,24 +1592,32 @@ GNU General Public License (version 3 or any later version).
    <ref name="xor-instr"/>
    <ref name="cmp-instr"/>
   </var>
+  <var name="r">
+   <ref name="r32-16"/>
+  </var>
   <var name="operand">
-   <ref name="r-rm-mode"/>
+   <ref name="rm32-16"/>
   </var>
   <pattern>
    <const>110</const>
    <ref name="opcode"/>
    <const>00</const>
    <ref name="operand"/>
+   <ref name="r"/>
+   <ref name="operand"/>
   </pattern>
   <phrase>
    <ref name="opcode"/>
   </phrase>
   <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
    <ref name="operand"/>
   </phrase>
   <effect>
-   <ref name="operand">
-    <bind name="opcode" ref="opcode"/>
+   <ref name="opcode">
+    <bind name="lhs" src="r"/>
+    <bind name="rhs" src="operand"/>
    </ref>
   </effect>
  </fragment>
@@ -1908,7 +1671,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="cmp-instr"/>
   </var>
   <var name="operand">
-   <ref name="imm-mode"/>
+   <ref name="imm32-16"/>
   </var>
   <pattern>
    <const>101</const>
@@ -1930,106 +1693,118 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 
  <fragment>
-  <var name="opcode">
-   <ref name="mov-instr"/>
+  <var name="r">
+   <ref name="r8"/>
   </var>
   <var name="operand">
-   <ref name="rm8-r8-mode"/>
+   <ref name="rm8"/>
   </var>
   <pattern>
-   <const>000</const>
-   <ref name="opcode"/>
-   <const>01</const>
+   <const>00010001</const>
+   <ref name="operand"/>
+   <ref name="r"/>
    <ref name="operand"/>
   </pattern>
   <phrase>
-   <ref name="opcode"/>
+   <literal>MOV</literal>
   </phrase>
   <phrase>
    <ref name="operand"/>
+   <literal>,</literal><ws/>
+   <ref name="r"/>
   </phrase>
   <effect>
-   <ref name="operand">
-    <bind name="opcode" ref="opcode"/>
-   </ref>
+   <assign>
+    <ref name="operand"/>
+    <ref name="r"/>
+   </assign>
   </effect>
  </fragment>
 
  <fragment>
-  <var name="opcode">
-   <ref name="mov-instr"/>
+  <var name="r">
+   <ref name="r32-16"/>
   </var>
   <var name="operand">
-   <ref name="rm-r-mode"/>
+   <ref name="rm32-16"/>
   </var>
   <pattern>
-   <const>100</const>
-   <ref name="opcode"/>
-   <const>01</const>
+   <const>10010001</const>
+   <ref name="operand"/>
+   <ref name="r"/>
    <ref name="operand"/>
   </pattern>
   <phrase>
-   <ref name="opcode"/>
+   <literal>MOV</literal>
   </phrase>
   <phrase>
    <ref name="operand"/>
+   <literal>,</literal><ws/>
+   <ref name="r"/>
   </phrase>
   <effect>
-   <ref name="operand">
-    <bind name="opcode" ref="opcode"/>
-   </ref>
+   <assign>
+    <ref name="operand"/>
+    <ref name="r"/>
+   </assign>
   </effect>
  </fragment>
 
  <fragment>
-  <var name="opcode">
-   <ref name="mov-instr"/>
+  <var name="r">
+   <ref name="r8"/>
   </var>
   <var name="operand">
-   <ref name="r8-rm8-mode"/>
+   <ref name="rm8"/>
   </var>
   <pattern>
-   <const>010</const>
-   <ref name="opcode"/>
-   <const>01</const>
+   <const>01010001</const>
+   <ref name="operand"/>
+   <ref name="r"/>
    <ref name="operand"/>
   </pattern>
   <phrase>
-   <ref name="opcode"/>
+   <literal>MOV</literal>
   </phrase>
   <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
    <ref name="operand"/>
   </phrase>
   <effect>
-   <ref name="operand">
-    <bind name="opcode" ref="opcode"/>
-   </ref>
+   <assign>
+    <ref name="r"/>
+    <ref name="operand"/>
+   </assign>
   </effect>
  </fragment>
 
  <fragment>
-  <var name="opcode">
-   <ref name="mov-instr"/>
+  <var name="r">
+   <ref name="r32-16"/>
   </var>
   <var name="operand">
-   <ref name="r-rm-mode"/>
+   <ref name="rm32-16"/>
   </var>
   <pattern>
-   <const>110</const>
-   <ref name="opcode"/>
-   <const>01</const>
+   <const>11010001</const>
+   <ref name="operand"/>
+   <ref name="r"/>
    <ref name="operand"/>
   </pattern>
   <phrase>
-   <ref name="opcode"/>
+   <literal>MOV</literal>
   </phrase>
   <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
    <ref name="operand"/>
   </phrase>
   <effect>
-   <ref name="operand">
-    <bind name="opcode" ref="opcode"/>
-   </ref>
+   <assign>
+    <ref name="r"/>
+    <ref name="operand"/>
+   </assign>
   </effect>
  </fragment>
 </start>
