@@ -1926,5 +1926,53 @@ GNU General Public License (version 3 or any later version).
    </assign>
   </effect>
  </fragment>
+
+ <fragment>
+  <var name="acc">
+   <ref name="acc32-16"/>
+  </var>
+  <var name="r">
+   <ref name="r32-16"/>
+  </var>
+  <pattern>
+   <ref name="r"/>
+   <const>01001</const>
+   <ref name="acc"/>
+  </pattern>
+  <phrase>
+   <literal>XCHG</literal>
+  </phrase>
+  <phrase>
+   <ref name="acc"/>
+   <literal>,</literal><ws/>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <temp name="acc">
+    <ref name="acc"/>
+   </temp>
+   <assign>
+    <ref name="acc"/>
+    <ref name="r"/>
+   </assign>
+   <assign>
+    <ref name="r"/>
+    <temp name="acc"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <priority level="1">
+  <fragment>
+   <pattern>
+    <const>00001001</const>
+   </pattern>
+   <phrase>
+    <literal>NOP</literal>
+   </phrase>
+   <phrase></phrase>
+   <effect></effect>
+  </fragment>
+ </priority>
 </start>
 </cpudl>
