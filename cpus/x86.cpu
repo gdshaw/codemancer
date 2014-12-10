@@ -1439,6 +1439,46 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="inc-instr">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>INC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <add>
+     <ref name="operand"/>
+     <const>1</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="dec-instr">
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>DEC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <sub>
+     <ref name="operand"/>
+     <const>1</const>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <prefix name="osvp">01100110</prefix>
  <prefix name="asvp">11100110</prefix>
@@ -1685,6 +1725,32 @@ GNU General Public License (version 3 or any later version).
   <effect>
    <ref name="operand">
     <bind name="opcode" ref="opcode"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="inc-instr"/>
+   <ref name="dec-instr"/>
+  </var>
+  <var name="r">
+   <ref name="r32-16"/>
+  </var>
+  <pattern>
+   <ref name="r"/>
+   <ref name="opcode"/>
+   <const>0010</const>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="r"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="r"/>
    </ref>
   </effect>
  </fragment>
