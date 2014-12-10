@@ -1468,6 +1468,52 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="imm16-mode">
+ <fragment>
+  <var name="imm">
+   <integer size="16" encoding="u"/>
+  </var>
+  <pattern>
+   <ref name="imm"/>
+  </pattern>
+  <phrase>
+   <literal>AX,</literal><ws/>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <register name="AX"/>
+    </bind>
+    <bind name="rhs" src="imm"/>
+   </ref>
+  </effect>
+ </fragment>
+</define>
+
+<define name="imm32-mode">
+ <fragment>
+  <var name="imm">
+   <integer size="32" encoding="u"/>
+  </var>
+  <pattern>
+   <ref name="imm"/>
+  </pattern>
+  <phrase>
+   <literal>EAX,</literal><ws/>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <register name="EAX"/>
+    </bind>
+    <bind name="rhs" src="imm"/>
+   </ref>
+  </effect>
+ </fragment>
+</define>
+
 <define name="rm-r-mode">
  <require name="!osvp">
   <ref name="rm32-r32-mode"/>
@@ -1483,6 +1529,15 @@ GNU General Public License (version 3 or any later version).
  </require>
  <require name="osvp">
   <ref name="r16-rm16-mode"/>
+ </require>
+</define>
+
+<define name="imm-mode">
+ <require name="!osvp">
+  <ref name="imm32-mode"/>
+ </require>
+ <require name="osvp">
+  <ref name="imm16-mode"/>
  </require>
 </define>
 
@@ -1733,6 +1788,39 @@ GNU General Public License (version 3 or any later version).
    <ref name="cmp-instr"/>
   </var>
   <var name="operand">
+   <ref name="r8-rm8-mode"/>
+  </var>
+  <pattern>
+   <const>010</const>
+   <ref name="opcode"/>
+   <const>00</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="operand">
+    <bind name="opcode" ref="opcode"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="add-instr"/>
+   <ref name="or-instr"/>
+   <ref name="adc-instr"/>
+   <ref name="sbb-instr"/>
+   <ref name="and-instr"/>
+   <ref name="sub-instr"/>
+   <ref name="xor-instr"/>
+   <ref name="cmp-instr"/>
+  </var>
+  <var name="operand">
    <ref name="r-rm-mode"/>
   </var>
   <pattern>
@@ -1765,11 +1853,48 @@ GNU General Public License (version 3 or any later version).
    <ref name="xor-instr"/>
    <ref name="cmp-instr"/>
   </var>
-  <var name="operand">
-   <ref name="r8-rm8-mode"/>
+  <var name="imm">
+   <integer size="8" encoding="u"/>
   </var>
   <pattern>
-   <const>010</const>
+   <const>001</const>
+   <ref name="opcode"/>
+   <const>00</const>
+   <ref name="imm"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <literal>AL,</literal><ws/>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs">
+     <register name="AL"/>
+    </bind>
+    <bind name="rhs" ref="imm"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="add-instr"/>
+   <ref name="or-instr"/>
+   <ref name="adc-instr"/>
+   <ref name="sbb-instr"/>
+   <ref name="and-instr"/>
+   <ref name="sub-instr"/>
+   <ref name="xor-instr"/>
+   <ref name="cmp-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="imm-mode"/>
+  </var>
+  <pattern>
+   <const>101</const>
    <ref name="opcode"/>
    <const>00</const>
    <ref name="operand"/>
