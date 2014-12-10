@@ -1700,6 +1700,23 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="mov-instr">
+ <fragment>
+  <pattern>
+   <const>100</const>
+  </pattern>
+  <phrase>
+   <literal>MOV</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="lhs"/>
+    <ref name="rhs"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <prefix name="osvp">01100110</prefix>
  <prefix name="asvp">11100110</prefix>
@@ -1897,6 +1914,110 @@ GNU General Public License (version 3 or any later version).
    <const>101</const>
    <ref name="opcode"/>
    <const>00</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="operand">
+    <bind name="opcode" ref="opcode"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="mov-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="rm8-r8-mode"/>
+  </var>
+  <pattern>
+   <const>000</const>
+   <ref name="opcode"/>
+   <const>01</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="operand">
+    <bind name="opcode" ref="opcode"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="mov-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="rm-r-mode"/>
+  </var>
+  <pattern>
+   <const>100</const>
+   <ref name="opcode"/>
+   <const>01</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="operand">
+    <bind name="opcode" ref="opcode"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="mov-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="r8-rm8-mode"/>
+  </var>
+  <pattern>
+   <const>010</const>
+   <ref name="opcode"/>
+   <const>01</const>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="operand">
+    <bind name="opcode" ref="opcode"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="mov-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="r-rm-mode"/>
+  </var>
+  <pattern>
+   <const>110</const>
+   <ref name="opcode"/>
+   <const>01</const>
    <ref name="operand"/>
   </pattern>
   <phrase>
