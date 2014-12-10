@@ -1234,58 +1234,49 @@ GNU General Public License (version 3 or any later version).
  </require>
 </define>
 
-<define name="imm16">
+<define name="acc16">
  <fragment>
-  <var name="imm">
-   <integer size="16" encoding="u"/>
-  </var>
-  <pattern>
-   <ref name="imm"/>
-  </pattern>
+  <pattern></pattern>
   <phrase>
-   <literal>AX,</literal><ws/>
-   <ref name="imm"/>
+   <literal>AX</literal>
   </phrase>
   <effect>
-   <ref name="opcode">
-    <bind name="lhs">
-     <register name="AX"/>
-    </bind>
-    <bind name="rhs" src="imm"/>
-   </ref>
+   <register name="AX"/>
   </effect>
  </fragment>
 </define>
 
-<define name="imm32">
+<define name="acc32">
  <fragment>
-  <var name="imm">
-   <integer size="32" encoding="u"/>
-  </var>
-  <pattern>
-   <ref name="imm"/>
-  </pattern>
+  <pattern></pattern>
   <phrase>
-   <literal>EAX,</literal><ws/>
-   <ref name="imm"/>
+   <literal>EAX</literal>
   </phrase>
   <effect>
-   <ref name="opcode">
-    <bind name="lhs">
-     <register name="EAX"/>
-    </bind>
-    <bind name="rhs" src="imm"/>
-   </ref>
+   <register name="EAX"/>
   </effect>
  </fragment>
+</define>
+
+<define name="acc32-16">
+ <require name="!osvp">
+  <ref name="acc32"/>
+ </require>
+ <require name="osvp">
+  <ref name="acc16"/>
+ </require>
+</define>
+
+<define name="imm8">
+ <integer size="8" encoding="u"/>
 </define>
 
 <define name="imm32-16">
  <require name="!osvp">
-  <ref name="imm32"/>
+  <integer size="32" encoding="u"/>
  </require>
  <require name="osvp">
-  <ref name="imm16"/>
+  <integer size="16" encoding="u"/>
  </require>
 </define>
 
@@ -1634,7 +1625,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="cmp-instr"/>
   </var>
   <var name="imm">
-   <integer size="8" encoding="u"/>
+   <ref name="imm8"/>
   </var>
   <pattern>
    <const>001</const>
@@ -1670,6 +1661,9 @@ GNU General Public License (version 3 or any later version).
    <ref name="xor-instr"/>
    <ref name="cmp-instr"/>
   </var>
+  <var name="acc">
+   <ref name="acc32-16"/>
+  </var>
   <var name="operand">
    <ref name="imm32-16"/>
   </var>
@@ -1677,12 +1671,15 @@ GNU General Public License (version 3 or any later version).
    <const>101</const>
    <ref name="opcode"/>
    <const>00</const>
+   <ref name="acc"/>
    <ref name="operand"/>
   </pattern>
   <phrase>
    <ref name="opcode"/>
   </phrase>
   <phrase>
+   <ref name="acc"/>
+   <literal>,</literal><ws/>
    <ref name="operand"/>
   </phrase>
   <effect>
@@ -1804,6 +1801,62 @@ GNU General Public License (version 3 or any later version).
    <assign>
     <ref name="r"/>
     <ref name="operand"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="r8"/>
+  </var>
+  <var name="imm">
+   <ref name="imm8"/>
+  </var>
+  <pattern>
+   <ref name="r"/>
+   <const>01101</const>
+   <ref name="imm"/>
+  </pattern>
+  <phrase>
+   <literal>MOV</literal>
+  </phrase>
+  <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="r"/>
+    <ref name="imm"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="r">
+   <ref name="r32-16"/>
+  </var>
+  <var name="imm">
+   <ref name="imm32-16"/>
+  </var>
+  <pattern>
+   <ref name="r"/>
+   <const>11101</const>
+   <ref name="imm"/>
+  </pattern>
+  <phrase>
+   <literal>MOV</literal>
+  </phrase>
+  <phrase>
+   <ref name="r"/>
+   <literal>,</literal><ws/>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="r"/>
+    <ref name="imm"/>
    </assign>
   </effect>
  </fragment>
