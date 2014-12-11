@@ -24,6 +24,7 @@ import org.codemancer.cpudl.expr.Reference;
 import org.codemancer.cpudl.expr.Constant;
 import org.codemancer.cpudl.expr.Register;
 import org.codemancer.cpudl.expr.Temporary;
+import org.codemancer.cpudl.expr.SizeOf;
 import org.codemancer.cpudl.expr.Memory;
 import org.codemancer.cpudl.expr.Extension;
 import org.codemancer.cpudl.expr.Addition;
@@ -146,6 +147,8 @@ public class Context {
 			return Memory.make(this, el);
 		} else if (tagName.equals("temp")) {
 			return Temporary.make(this, el);
+		} else if (tagName.equals("sizeof")) {
+			return SizeOf.make(this, el);
 		} else if (tagName.equals("extend")) {
 			return Extension.make(this, el);
 		} else if (tagName.equals("add")) {
