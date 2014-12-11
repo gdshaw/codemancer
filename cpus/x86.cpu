@@ -1271,6 +1271,10 @@ GNU General Public License (version 3 or any later version).
  <integer size="8" encoding="u"/>
 </define>
 
+<define name="imm8x">
+ <integer size="8" encoding="2c"/>
+</define>
+
 <define name="imm32-16">
  <require name="!osvp">
   <integer size="32" encoding="u"/>
@@ -1725,6 +1729,126 @@ GNU General Public License (version 3 or any later version).
   <effect>
    <ref name="operand">
     <bind name="opcode" ref="opcode"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="add-instr"/>
+   <ref name="or-instr"/>
+   <ref name="adc-instr"/>
+   <ref name="sbb-instr"/>
+   <ref name="and-instr"/>
+   <ref name="sub-instr"/>
+   <ref name="xor-instr"/>
+   <ref name="cmp-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="rm8"/>
+  </var>
+  <var name="imm">
+   <ref name="imm8"/>
+  </var>
+  <pattern>
+   <const>00000001</const>
+   <ref name="operand"/>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+   <ref name="imm"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+   <literal>,</literal><ws/>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs" ref="operand"/>
+    <bind name="rhs" ref="imm"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="add-instr"/>
+   <ref name="or-instr"/>
+   <ref name="adc-instr"/>
+   <ref name="sbb-instr"/>
+   <ref name="and-instr"/>
+   <ref name="sub-instr"/>
+   <ref name="xor-instr"/>
+   <ref name="cmp-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="rm32-16"/>
+  </var>
+  <var name="imm">
+   <ref name="imm32-16"/>
+  </var>
+  <pattern>
+   <const>10000001</const>
+   <ref name="operand"/>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+   <ref name="imm"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+   <literal>,</literal><ws/>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs" ref="operand"/>
+    <bind name="rhs" ref="imm"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="add-instr"/>
+   <ref name="or-instr"/>
+   <ref name="adc-instr"/>
+   <ref name="sbb-instr"/>
+   <ref name="and-instr"/>
+   <ref name="sub-instr"/>
+   <ref name="xor-instr"/>
+   <ref name="cmp-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="rm32-16"/>
+  </var>
+  <var name="imm">
+   <ref name="imm8x"/>
+  </var>
+  <pattern>
+   <const>11000001</const>
+   <ref name="operand"/>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+   <ref name="imm"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+   <literal>,</literal><ws/>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="lhs" ref="operand"/>
+    <bind name="rhs" ref="imm"/>
    </ref>
   </effect>
  </fragment>
