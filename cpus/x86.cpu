@@ -2052,6 +2052,66 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 
  <fragment>
+  <var name="operand">
+   <ref name="rm8"/>
+  </var>
+  <var name="imm">
+   <ref name="imm8"/>
+  </var>
+  <pattern>
+   <const>01100011</const>
+   <ref name="operand"/>
+   <const>000</const>
+   <ref name="operand"/>
+   <ref name="imm"/>
+  </pattern>
+  <phrase>
+   <literal>MOV</literal>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+   <literal>,</literal><ws/>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <ref name="imm"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="operand">
+   <ref name="rm32-16"/>
+  </var>
+  <var name="imm">
+   <ref name="imm32-16"/>
+  </var>
+  <pattern>
+   <const>11100011</const>
+   <ref name="operand"/>
+   <const>000</const>
+   <ref name="operand"/>
+   <ref name="imm"/>
+  </pattern>
+  <phrase>
+   <literal>MOV</literal>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+   <literal>,</literal><ws/>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <ref name="imm"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
   <var name="acc">
    <ref name="acc32-16"/>
   </var>
