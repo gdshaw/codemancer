@@ -15,11 +15,12 @@ import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.CpudlReferenceException;
 import org.codemancer.cpudl.type.Type;
+import org.codemancer.cpudl.type.IntegerType;
 
 /** An expression class to represent a reference to a memory location. */
 public class Memory extends Expression {
 	/** The address of the memory location. */
-	public final Expression address;
+	private final Expression address;
 
 	/** Construct reference to memory location
 	 * @param type the required type of this reference
@@ -65,22 +66,22 @@ public class Memory extends Expression {
 	 * @return the reference as an object
 	 */
 	public static Memory make(Context ctx, Element element) throws CpudlParseException {
-		Expression address = null;
-		Node child = element.getFirstChild();
-		while (child != null) {
-			Expression operand = ctx.makeExpression(child);
-			if (operand != null) {
-				if (address == null) {
-					address = operand;
-				} else {
-					throw new CpudlParseException(element, "single address argument expected to <memory> element");
-				}
+		Type type = null;
+		String sizeStr = element.getAttribute("size");
+		if (sizeStr.length() != 0) {
+			try {
+				int size = Integer.parseInt(sizeStr);
+				int encoding = IntegerType.UNSIGNED;
+				boolean bigEndian = ctx.getArchitecture().isBigEndian();
+				Style style = null;
+				type = new IntegerType(size, encoding, bigEndian, style);
+			} catch (NumberFormatException ex) {
+				throw new CpudlParseException(element,
+					"invalid size attribute in <memory> element");
 			}
-			child = child.getNextSibling();
 		}
-		if (address == null) {
-			throw new CpudlParseException(element, "address attribute missing in <memory> element");
-		}
-		return new Memory(null, address);
+
+		Expression address = Sequence.make(ctx, element);
+		return new Memory(type, address);
 	}
 }
