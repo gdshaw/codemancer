@@ -22,15 +22,68 @@ GNU General Public License (version 3 or any later version).
  <select class="ext">
   <property name="width" value="4"/>
  </select>
+ <select class="addr">
+  <property name="width" value="4"/>
+ </select>
+ <select class="bit">
+  <property name="base" value="10"/>
+  <property name="prefix" value=""/>
+ </select>
 </style>
 
 <register name="A" size="8"/>
 <register name="X" size="8"/>
 <register name="SP" size="8"/>
+<register name="CC" size="8"/>
 <register name="PC" size="16"/>
 <register name="PC+" size="16"/>
 
 <register name="C" size="1"/>
+
+<define name="bit-mask">
+ <fragment>
+  <var name="n">
+   <integer class="bit" size="3"/>
+  </var>
+  <pattern>
+   <ref name="n"/>
+  </pattern>
+  <phrase>
+   <ref name="n"/>
+  </phrase>
+  <effect>
+   <shift width="8" mode="logical">
+    <ref name="n"/>
+   </shift>
+  </effect>
+ </fragment>
+</define>
+
+<define name="bit-value">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>SET</literal>
+  </phrase>
+  <effect>
+   <const>0xFF</const>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>CLR</literal>
+  </phrase>
+  <effect>
+   <const>0xFF</const>
+  </effect>
+ </fragment>
+</define>
 
 <define name="imm-mode">
  <fragment>
@@ -845,6 +898,104 @@ GNU General Public License (version 3 or any later version).
    <ref name="opcode">
     <bind name="operand" src="operand"/>
    </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="value">
+   <ref name="bit-value"/>
+  </var>
+  <var name="mask">
+   <ref name="bit-mask"/>
+  </var>
+  <var name="mem-addr">
+   <integer class="dir" size="8"/>
+  </var>
+  <var name="branch-addr">
+   <integer class="addr" size="16" encoding="u"/>
+  </var>
+  <var name="branch-offset">
+   <integer size="8" encoding="2c"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="branch-addr"/>
+    <add>
+     <register name="PC+"/>
+     <ref name="branch-offset"/>
+    </add>
+   </equals>
+  </where>
+  <pattern>
+   <const>0000</const>
+   <ref name="mask"/>
+   <ref name="value"/>
+   <ref name="mem-addr"/>
+   <ref name="branch-offset"/>
+  </pattern>
+  <phrase>
+   <literal>BR</literal>
+   <ref name="value"/>
+   <ref name="mask"/>
+  </phrase>
+  <phrase>
+   <ref name="mem-addr"/>
+   <literal>,</literal><ws/>
+   <ref name="branch-addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <ref name="branch-addr"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="value">
+   <ref name="bit-value"/>
+  </var>
+  <var name="mask">
+   <ref name="bit-mask"/>
+  </var>
+  <var name="addr">
+   <integer class="dir" size="8"/>
+  </var>
+  <pattern>
+   <const>0001</const>
+   <ref name="mask"/>
+   <ref name="value"/>
+   <ref name="addr"/>
+  </pattern>
+  <phrase>
+   <literal>B</literal>
+   <ref name="value"/>
+   <ref name="mask"/>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <ref name="addr"/>
+    </memory>
+    <or>
+     <and>
+      <memory size="8">
+       <ref name="addr"/>
+      </memory>
+      <xor>
+       <ref name="mask"/>
+       <const>0xFF</const>
+      </xor>
+     </and>
+     <and>
+      <ref name="value"/>
+      <ref name="mask"/>
+     </and>
+    </or>
+   </assign>
   </effect>
  </fragment>
 </start>
