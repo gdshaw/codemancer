@@ -1,0 +1,567 @@
+<!--
+This file is part of Codemancer.
+Copyright 2014 Graham Shaw.
+Distribution and modification are permitted within the terms of the
+GNU General Public License (version 3 or any later version).
+-->
+
+<cpudl endian="big">
+<cpu name="6805"/>
+
+<style>
+ <property name="base" value="16"/>
+ <property name="prefix" value="$"/>
+ <property name="suffix" value=""/>
+ <property name="whitespace" value=""/>
+ <select class="imm">
+  <property name="width" value="2"/>
+ </select>
+ <select class="dir">
+  <property name="width" value="2"/>
+ </select>
+ <select class="ext">
+  <property name="width" value="4"/>
+ </select>
+</style>
+
+<register name="A" size="8"/>
+<register name="X" size="8"/>
+<register name="SP" size="16"/>
+<register name="PC" size="16"/>
+<register name="PC+" size="16"/>
+
+<register name="C" size="1"/>
+
+<define name="imm-mode">
+ <fragment>
+  <var name="imm">
+   <integer class="imm" size="8"/>
+  </var>
+  <pattern>
+   <const>010</const>
+  </pattern>
+  <pattern>
+   <ref name="imm"/>
+  </pattern>
+  <phrase></phrase>
+  <phrase>
+   <literal>#</literal>
+   <ref name="imm"/>
+  </phrase>
+  <effect>
+   <ref name="imm"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="dir-mode">
+ <fragment>
+  <var name="addr">
+   <integer class="dir" size="8"/>
+  </var>
+  <pattern>
+   <const>011</const>
+  </pattern>
+  <pattern>
+   <ref name="addr"/>
+  </pattern>
+  <phrase></phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <memory size="8">
+    <ref name="addr"/>
+   </memory>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ext-mode">
+ <fragment>
+  <var name="addr">
+   <integer class="ext" size="16"/>
+  </var>
+  <pattern>
+   <const>100</const>
+  </pattern>
+  <pattern>
+   <ref name="addr"/>
+  </pattern>
+  <phrase></phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <memory size="8">
+    <ref name="addr"/>
+   </memory>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ix2-mode">
+ <fragment>
+  <var name="addr">
+   <integer class="ext" size="16"/>
+  </var>
+  <pattern>
+   <const>101</const>
+  </pattern>
+  <pattern>
+   <ref name="addr"/>
+  </pattern>
+  <phrase></phrase>
+  <phrase>
+   <ref name="addr"/>
+   <literal>,</literal><ws/>
+   <literal>X</literal>
+  </phrase>
+  <effect>
+   <memory size="8">
+    <add>
+     <ref name="addr"/>
+     <register name="X"/>
+    </add>
+   </memory>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ix1-mode">
+ <fragment>
+  <var name="addr">
+   <integer class="dir" size="8"/>
+  </var>
+  <pattern>
+   <const>110</const>
+  </pattern>
+  <pattern>
+   <ref name="addr"/>
+  </pattern>
+  <phrase></phrase>
+  <phrase>
+   <ref name="addr"/>
+   <literal>,</literal><ws/>
+   <literal>X</literal>
+  </phrase>
+  <effect>
+   <memory size="8">
+    <add>
+     <ref name="addr"/>
+     <register name="X"/>
+    </add>
+   </memory>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ix-mode">
+ <fragment>
+  <pattern>
+   <const>111</const>
+  </pattern>
+  <pattern></pattern>
+  <phrase></phrase>
+  <phrase>
+   <literal>,</literal><ws/>
+   <literal>X</literal>
+  </phrase>
+  <effect>
+   <memory size="8">
+    <register name="X"/>
+   </memory>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sub-instr">
+ <fragment>
+  <pattern>
+   <const>0000</const>
+  </pattern>
+  <phrase>
+   <literal>SUB</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <sub>
+     <register name="A"/>
+     <ref name="operand"/>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cmp-instr">
+ <fragment>
+  <pattern>
+   <const>0001</const>
+  </pattern>
+  <phrase>
+   <literal>CMP</literal>
+  </phrase>
+  <effect>
+   <sub>
+    <register name="A"/>
+    <ref name="operand"/>
+   </sub>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sbc-instr">
+ <fragment>
+  <pattern>
+   <const>0010</const>
+  </pattern>
+  <phrase>
+   <literal>SBC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <sub>
+     <register name="A"/>
+     <ref name="operand"/>
+     <register name="C"/>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cpx-instr">
+ <fragment>
+  <pattern>
+   <const>0011</const>
+  </pattern>
+  <phrase>
+   <literal>CPX</literal>
+  </phrase>
+  <effect>
+   <sub>
+    <register name="X"/>
+    <ref name="operand"/>
+   </sub>
+  </effect>
+ </fragment>
+</define>
+
+<define name="and-instr">
+ <fragment>
+  <pattern>
+   <const>0100</const>
+  </pattern>
+  <phrase>
+   <literal>AND</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <and>
+     <register name="A"/>
+     <ref name="operand"/>
+    </and>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="bit-instr">
+ <fragment>
+  <pattern>
+   <const>0101</const>
+  </pattern>
+  <phrase>
+   <literal>BIT</literal>
+  </phrase>
+  <effect>
+   <and>
+    <register name="A"/>
+    <ref name="operand"/>
+   </and>
+  </effect>
+ </fragment>
+</define>
+
+<define name="lda-instr">
+ <fragment>
+  <pattern>
+   <const>0110</const>
+  </pattern>
+  <phrase>
+   <literal>LDA</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <ref name="operand"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sta-instr">
+ <fragment>
+  <pattern>
+   <const>0111</const>
+  </pattern>
+  <phrase>
+   <literal>STA</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <register name="A"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="eor-instr">
+ <fragment>
+  <pattern>
+   <const>1000</const>
+  </pattern>
+  <phrase>
+   <literal>EOR</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <xor>
+     <register name="A"/>
+     <ref name="operand"/>
+    </xor>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="adc-instr">
+ <fragment>
+  <pattern>
+   <const>1001</const>
+  </pattern>
+  <phrase>
+   <literal>ADC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <add>
+     <register name="A"/>
+     <ref name="operand"/>
+     <register name="C"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ora-instr">
+ <fragment>
+  <pattern>
+   <const>1010</const>
+  </pattern>
+  <phrase>
+   <literal>ORA</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <or>
+     <register name="A"/>
+     <ref name="operand"/>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="add-instr">
+ <fragment>
+  <pattern>
+   <const>1011</const>
+  </pattern>
+  <phrase>
+   <literal>ADD</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <add>
+     <register name="A"/>
+     <ref name="operand"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="jmp-instr">
+ <fragment>
+  <pattern>
+   <const>1100</const>
+  </pattern>
+  <phrase>
+   <literal>JMP</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <ref name="operand"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="jsr-instr">
+ <fragment>
+  <pattern>
+   <const>1101</const>
+  </pattern>
+  <phrase>
+   <literal>JSR</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="16">
+     <sub>
+      <register name="SP"/>
+      <const>1</const>
+     </sub>
+    </memory>
+    <register name="PC+"/>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>2</const>
+    </sub>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <ref name="operand"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="ldx-instr">
+ <fragment>
+  <pattern>
+   <const>1110</const>
+  </pattern>
+  <phrase>
+   <literal>LDX</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="X"/>
+    <ref name="operand"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="stx-instr">
+ <fragment>
+  <pattern>
+   <const>1111</const>
+  </pattern>
+  <phrase>
+   <literal>STX</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="operand"/>
+    <register name="X"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<start>
+ <fragment>
+  <var name="opcode">
+   <ref name="sub-instr"/>
+   <ref name="cmp-instr"/>
+   <ref name="sbc-instr"/>
+   <ref name="cpx-instr"/>
+   <ref name="and-instr"/>
+   <ref name="bit-instr"/>
+   <ref name="lda-instr"/>
+   <ref name="eor-instr"/>
+   <ref name="adc-instr"/>
+   <ref name="ora-instr"/>
+   <ref name="add-instr"/>
+   <ref name="ldx-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="imm-mode"/>
+   <ref name="dir-mode"/>
+   <ref name="ext-mode"/>
+   <ref name="ix2-mode"/>
+   <ref name="ix1-mode"/>
+   <ref name="ix-mode"/>
+  </var>
+  <pattern>
+   <const>1</const>
+   <ref name="operand"/>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="operand"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="sta-instr"/>
+   <ref name="jmp-instr"/>
+   <ref name="jsr-instr"/>
+   <ref name="stx-instr"/>
+  </var>
+  <var name="operand">
+   <ref name="dir-mode"/>
+   <ref name="ext-mode"/>
+   <ref name="ix2-mode"/>
+   <ref name="ix1-mode"/>
+   <ref name="ix-mode"/>
+  </var>
+  <pattern>
+   <const>1</const>
+   <ref name="operand"/>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+  </phrase>
+  <phrase>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="operand" src="operand"/>
+   </ref>
+  </effect>
+ </fragment>
+</start>
+</cpudl>
