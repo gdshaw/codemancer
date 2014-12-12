@@ -151,8 +151,10 @@ public class CpuTest {
 		assertTrue(didDecode == shouldDecode);
 		if (!shouldDecode) return;
 
+		long nextPc = pc + (reader.tell() / 8);
 		Map<String, Expression> registers = new HashMap<String, Expression>();
 		registers.put("PC", new Constant(null, pc));
+		registers.put("PC+", new Constant(null, nextPc));
 		expr = expr.resolveRegisters(registers).simplify();
 
 		Context ctx = new Context(arch);
