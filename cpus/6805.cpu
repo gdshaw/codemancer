@@ -1042,6 +1042,375 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="rti-instr">
+ <fragment>
+  <pattern>
+   <const>10000000</const>
+  </pattern>
+  <phrase>
+   <literal>RTI</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="CC"/>
+    <memory size="8">
+     <add>
+      <register name="SP"/>
+      <const>1</const>
+     </add>
+    </memory>
+   </assign>
+   <assign>
+    <register name="A"/>
+    <memory size="8">
+     <add>
+      <register name="SP"/>
+      <const>2</const>
+     </add>
+    </memory>
+   </assign>
+   <assign>
+    <register name="X"/>
+    <memory size="8">
+     <add>
+      <register name="SP"/>
+      <const>3</const>
+     </add>
+    </memory>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <memory size="16">
+     <add>
+      <register name="SP"/>
+      <const>4</const>
+     </add>
+    </memory>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>5</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="rts-instr">
+ <fragment>
+  <pattern>
+   <const>10000001</const>
+  </pattern>
+  <phrase>
+   <literal>RTS</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <memory size="16">
+     <add>
+      <register name="SP"/>
+      <const>1</const>
+     </add>
+    </memory>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>2</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="swi-instr">
+ <fragment>
+  <pattern>
+   <const>10000011</const>
+  </pattern>
+  <phrase>
+   <literal>SWI</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <memory size="16">
+     <sub>
+      <register name="SP"/>
+      <const>1</const>
+     </sub>
+    </memory>
+    <register name="PC+"/>
+   </assign>
+   <assign>
+    <memory size="8">
+     <sub>
+      <register name="SP"/>
+      <const>2</const>
+     </sub>
+    </memory>
+    <register name="X"/>
+   </assign>
+   <assign>
+    <memory size="8">
+     <sub>
+      <register name="SP"/>
+      <const>3</const>
+     </sub>
+    </memory>
+    <register name="A"/>
+   </assign>
+   <assign>
+    <memory size="8">
+     <sub>
+      <register name="SP"/>
+      <const>4</const>
+     </sub>
+    </memory>
+    <register name="CC"/>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>5</const>
+    </sub>
+   </assign>
+   <assign>
+    <register name="I"/>
+    <const>1</const>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <memory size="16">
+     <const>0xFFFC</const>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="stop-instr">
+ <fragment>
+  <pattern>
+   <const>10001110</const>
+  </pattern>
+  <phrase>
+   <literal>STOP</literal>
+  </phrase>
+  <phrase></phrase>
+ </fragment>
+</define>
+
+<define name="wait-instr">
+ <fragment>
+  <pattern>
+   <const>10001111</const>
+  </pattern>
+  <phrase>
+   <literal>WAIT</literal>
+  </phrase>
+  <phrase></phrase>
+ </fragment>
+</define>
+
+<define name="tax-instr">
+ <fragment>
+  <pattern>
+   <const>10010111</const>
+  </pattern>
+  <phrase>
+   <literal>TAX</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="X"/>
+    <register name="A"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="clc-instr">
+ <fragment>
+  <pattern>
+   <const>10011000</const>
+  </pattern>
+  <phrase>
+   <literal>CLC</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="C"/>
+    <const>0</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sec-instr">
+ <fragment>
+  <pattern>
+   <const>10011001</const>
+  </pattern>
+  <phrase>
+   <literal>SEC</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="C"/>
+    <const>1</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cli-instr">
+ <fragment>
+  <pattern>
+   <const>10011010</const>
+  </pattern>
+  <phrase>
+   <literal>CLI</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="I"/>
+    <const>0</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sei-instr">
+ <fragment>
+  <pattern>
+   <const>10011011</const>
+  </pattern>
+  <phrase>
+   <literal>SEI</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="I"/>
+    <const>1</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="rsp-instr">
+ <fragment>
+  <pattern>
+   <const>10011100</const>
+  </pattern>
+  <phrase>
+   <literal>RSP</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="SP"/>
+    <const>0x7F</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="nop-instr">
+ <fragment>
+  <pattern>
+   <const>10011101</const>
+  </pattern>
+  <phrase>
+   <literal>NOP</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect></effect>
+ </fragment>
+</define>
+
+<define name="txa-instr">
+ <fragment>
+  <pattern>
+   <const>10011111</const>
+  </pattern>
+  <phrase>
+   <literal>TXA</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="A"/>
+    <register name="X"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="bsr-instr">
+ <fragment>
+  <var name="offset">
+   <integer size="8" encoding="2c"/>
+  </var>
+  <var name="addr">
+   <integer class="addr" size="16" encoding="u"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="addr"/>
+    <add>
+     <register name="PC+"/>
+     <ref name="offset"/>
+    </add>
+   </equals>
+  </where>
+  <pattern>
+   <const>10101101</const>
+   <ref name="offset"/>
+  </pattern>
+  <phrase>
+   <literal>BSR</literal>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="16">
+     <sub>
+      <register name="SP"/>
+      <const>1</const>
+     </sub>
+    </memory>
+    <register name="PC+"/>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>2</const>
+    </sub>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <ref name="addr"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -1297,5 +1666,20 @@ GNU General Public License (version 3 or any later version).
    </assign>
   </effect>
  </fragment>
+
+ <ref name="rti-instr"/>
+ <ref name="rts-instr"/>
+ <ref name="swi-instr"/>
+ <ref name="stop-instr"/>
+ <ref name="wait-instr"/>
+ <ref name="tax-instr"/>
+ <ref name="clc-instr"/>
+ <ref name="sec-instr"/>
+ <ref name="cli-instr"/>
+ <ref name="sei-instr"/>
+ <ref name="rsp-instr"/>
+ <ref name="nop-instr"/>
+ <ref name="txa-instr"/>
+ <ref name="bsr-instr"/>
 </start>
 </cpudl>
