@@ -38,7 +38,267 @@ GNU General Public License (version 3 or any later version).
 <register name="PC" size="16"/>
 <register name="PC+" size="16"/>
 
+<register name="H" size="1"/>
+<register name="I" size="1"/>
+<register name="N" size="1"/>
+<register name="Z" size="1"/>
 <register name="C" size="1"/>
+
+<register name="INT" size="1"/>
+
+<define name="cc">
+ <fragment>
+  <pattern>
+   <const>0000</const>
+  </pattern>
+  <phrase>
+   <literal>RA</literal>
+  </phrase>
+  <effect>
+   <const>1</const>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0001</const>
+  </pattern>
+  <phrase>
+   <literal>RN</literal>
+  </phrase>
+  <effect>
+   <const>0</const>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0010</const>
+  </pattern>
+  <phrase>
+   <literal>HI</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <xor>
+     <register name="C"/>
+     <register name="Z"/>
+    </xor>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0011</const>
+  </pattern>
+  <phrase>
+   <literal>LS</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <xor>
+     <register name="C"/>
+     <register name="Z"/>
+    </xor>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0100</const>
+  </pattern>
+  <phrase>
+   <literal>CC</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="C"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0101</const>
+  </pattern>
+  <phrase>
+   <literal>CS</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="C"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0110</const>
+  </pattern>
+  <phrase>
+   <literal>NE</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="Z"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0111</const>
+  </pattern>
+  <phrase>
+   <literal>EQ</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="Z"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1000</const>
+  </pattern>
+  <phrase>
+   <literal>HCC</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="H"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1001</const>
+  </pattern>
+  <phrase>
+   <literal>HCS</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="H"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1010</const>
+  </pattern>
+  <phrase>
+   <literal>PL</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="N"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1011</const>
+  </pattern>
+  <phrase>
+   <literal>MI</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="N"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1100</const>
+  </pattern>
+  <phrase>
+   <literal>MC</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="I"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1101</const>
+  </pattern>
+  <phrase>
+   <literal>MS</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="I"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1110</const>
+  </pattern>
+  <phrase>
+   <literal>IL</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="INT"/>
+    <const>0</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1111</const>
+  </pattern>
+  <phrase>
+   <literal>IH</literal>
+  </phrase>
+  <effect>
+   <equals>
+    <register name="INT"/>
+    <const>1</const>
+   </equals>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>0000</const>
+  </pattern>
+  <phrase>
+   <literal>A</literal>
+  </phrase>
+  <effect>
+   <const>1</const>
+  </effect>
+ </fragment>
+</define>
 
 <define name="bit-mask">
  <fragment>
@@ -995,6 +1255,45 @@ GNU General Public License (version 3 or any later version).
       <ref name="mask"/>
      </and>
     </or>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="cc">
+   <ref name="cc"/>
+  </var>
+  <var name="offset">
+   <integer size="8" encoding="2c"/>
+  </var>
+  <var name="addr">
+   <integer class="addr" size="16" encoding="u"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="addr"/>
+    <add>
+     <register name="PC+"/>
+     <ref name="offset"/>
+    </add>
+   </equals>
+  </where>
+  <pattern>
+   <const>0010</const>
+   <ref name="cc"/>
+   <ref name="offset"/>
+  </pattern>
+  <phrase>
+   <literal>B</literal>
+   <ref name="cc"/>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <ref name="addr"/>
    </assign>
   </effect>
  </fragment>
