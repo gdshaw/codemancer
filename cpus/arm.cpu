@@ -3083,7 +3083,14 @@ GNU General Public License (version 3 or any later version).
    <ref name="opcode"/>
   </phrase>
   <effect>
-   <ref name="opcode"/>
+   <if>
+    <test>
+     <ref name="cc"/>
+    </test>
+    <then>
+     <ref name="opcode"/>
+    </then>
+   </if>
   </effect>
  </fragment>
 </start>
