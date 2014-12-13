@@ -35,6 +35,7 @@ import org.codemancer.cpudl.expr.BitwiseOr;
 import org.codemancer.cpudl.expr.BitwiseXor;
 import org.codemancer.cpudl.expr.Shift;
 import org.codemancer.cpudl.expr.Equality;
+import org.codemancer.cpudl.expr.Conditional;
 import org.codemancer.cpudl.expr.Assignment;
 import org.codemancer.cpudl.expr.Sequence;
 
@@ -167,6 +168,8 @@ public class Context {
 			return Shift.make(this, el);
 		} else if (tagName.equals("equals")) {
 			return Equality.make(this, el);
+		} else if (tagName.equals("if")) {
+			return Conditional.make(this, el);
 		} else if (tagName.equals("assign")) {
 			return Assignment.make(this, el);
 		} else if (tagName.equals("sequence")) {
