@@ -1119,38 +1119,38 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <literal>LD</literal>
   </phrase>
- </fragment>
- <effect>
-  <assign>
-   <memory size="8">
+  <effect>
+   <assign>
+    <memory size="8">
+     <register name="DE"/>
+    </memory>
+    <memory size="8">
+     <register name="HL"/>
+    </memory>
+   </assign>
+   <assign>
     <register name="DE"/>
-   </memory>
-   <memory size="8">
+    <add>
+     <register name="DE"/>
+     <ref name="step"/>
+    </add>
+   </assign>
+   <assign>
     <register name="HL"/>
-   </memory>
-  </assign>
-  <assign>
-   <register name="DE"/>
-   <add>
-    <register name="DE"/>
-    <ref name="step"/>
-   </add>
-  </assign>
-  <assign>
-   <register name="HL"/>
-   <add>
-    <register name="HL"/>
-    <ref name="step"/>
-   </add>
-  </assign>
-  <assign>
-   <register name="BC"/>
-   <sub>
+    <add>
+     <register name="HL"/>
+     <ref name="step"/>
+    </add>
+   </assign>
+   <assign>
     <register name="BC"/>
-    <const>1</const>
-   </sub>
-  </assign>
- </effect>
+    <sub>
+     <register name="BC"/>
+     <const>1</const>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
 </define>
 
 <define name="cp-op">
@@ -1161,28 +1161,28 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <literal>CP</literal>
   </phrase>
- <effect>
-  <sub>
-   <register name="A"/>
-   <memory size="8">
-    <register name="HL"/>
-   </memory>
-  </sub>
-  <assign>
-   <register name="HL"/>
-   <add>
-    <register name="HL"/>
-    <ref name="step"/>
-   </add>
-  </assign>
-  <assign>
-   <register name="BC"/>
+  <effect>
    <sub>
-    <register name="BC"/>
-    <const>1</const>
+    <register name="A"/>
+    <memory size="8">
+     <register name="HL"/>
+    </memory>
    </sub>
-  </assign>
- </effect>
+   <assign>
+    <register name="HL"/>
+    <add>
+     <register name="HL"/>
+     <ref name="step"/>
+    </add>
+   </assign>
+   <assign>
+    <register name="BC"/>
+    <sub>
+     <register name="BC"/>
+     <const>1</const>
+    </sub>
+   </assign>
+  </effect>
  </fragment>
 </define>
 
@@ -1505,6 +1505,14 @@ GNU General Public License (version 3 or any later version).
    <literal>),</literal><ws/>
    <ref name="dd"/>
   </phrase>
+  <effect>
+   <assign>
+    <memory size="16">
+     <ref name="addr"/>
+    </memory> 
+    <ref name="dd"/>
+   </assign>
+  </effect>
  </fragment>
 
  <fragment>
@@ -1531,6 +1539,14 @@ GNU General Public License (version 3 or any later version).
    <ref name="addr"/>
    <literal>)</literal>
   </phrase>
+  <effect>
+   <assign>
+    <ref name="dd"/>
+    <memory size="16">
+     <ref name="addr"/>
+    </memory> 
+   </assign>
+  </effect>
  </fragment>
 </define>
 
@@ -2198,10 +2214,23 @@ GNU General Public License (version 3 or any later version).
      <const>1</const>
     </sub>
    </assign>
-   <assign>
-    <register name="PC"/>
-    <ref name="addr"/>
-   </assign>
+   <if>
+    <test>
+     <xor>
+      <equals>
+       <register name="B"/>
+       <const>0</const>
+      </equals>
+      <const>1</const>
+     </xor>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <ref name="addr"/>
+     </assign>
+    </then>
+   </if>
   </effect>
  </fragment>
 
@@ -2275,10 +2304,17 @@ GNU General Public License (version 3 or any later version).
    <ref name="addr"/>
   </phrase>
   <effect>
-   <assign>
-    <register name="PC"/>
-    <ref name="addr"/>
-   </assign>
+   <if>
+    <test>
+     <ref name="cc"/>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <ref name="addr"/>
+     </assign>
+    </then>
+   </if>
   </effect>
  </fragment>
 </define>
@@ -2325,19 +2361,26 @@ GNU General Public License (version 3 or any later version).
    <ref name="cc"/>
   </phrase>
   <effect>
-   <assign>
-    <register name="PC"/>
-    <memory size="16">
-     <register name="SP"/>
-    </memory>
-   </assign>
-   <assign>
-    <register name="SP"/>
-    <add>
-     <register name="SP"/>
-     <const>2</const>
-    </add>
-   </assign>
+   <if>
+    <test>
+     <ref name="cc"/>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <memory size="16">
+       <register name="SP"/>
+      </memory>
+     </assign>
+     <assign>
+      <register name="SP"/>
+      <add>
+       <register name="SP"/>
+       <const>2</const>
+      </add>
+     </assign>
+    </then>
+   </if>
   </effect>
  </fragment>
 </define>
@@ -2387,10 +2430,17 @@ GNU General Public License (version 3 or any later version).
    <ref name="nn"/>
   </phrase>
   <effect>
-   <assign>
-    <register name="PC"/>
-    <ref name="nn"/>
-   </assign>
+   <if>
+    <test>
+     <ref name="cc"/>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <ref name="nn"/>
+     </assign>
+    </then>
+   </if>
   </effect>
  </fragment>
 </define>
@@ -2483,23 +2533,30 @@ GNU General Public License (version 3 or any later version).
    <ref name="nn"/>
   </phrase>
   <effect>
-   <assign>
-    <register name="SP"/>
-    <sub>
-     <register name="SP"/>
-     <const>2</const>
-    </sub>
-   </assign>
-   <assign>
-    <memory size="16">
-     <register name="SP"/>
-    </memory>
-    <register name="PC+"/>
-   </assign>
-   <assign>
-    <register name="PC"/>
-    <ref name="nn"/>
-   </assign>
+   <if>
+    <test>
+     <ref name="cc"/>
+    </test>
+    <then>
+     <assign>
+      <register name="SP"/>
+      <sub>
+       <register name="SP"/>
+       <const>2</const>
+      </sub>
+     </assign>
+     <assign>
+      <memory size="16">
+       <register name="SP"/>
+      </memory>
+      <register name="PC+"/>
+     </assign>
+     <assign>
+      <register name="PC"/>
+      <ref name="nn"/>
+     </assign>
+    </then>
+   </if>
   </effect>
  </fragment>
 
