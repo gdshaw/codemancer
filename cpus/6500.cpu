@@ -1533,6 +1533,12 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <ref name="addr"/>
   </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <ref name="addr"/>
+   </assign>
+  </effect>
  </fragment>
 </define>
 
@@ -1591,6 +1597,19 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <ref name="addr"/>
   </phrase>
+  <effect>
+   <if>
+    <test>
+     <ref name="cc"/>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <ref name="addr"/>
+     </assign>
+    </then>
+   </if>
+  </effect>
  </fragment>
 
  <fragment>
