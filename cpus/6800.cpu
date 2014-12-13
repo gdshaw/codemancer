@@ -1689,10 +1689,17 @@ GNU General Public License (version 3 or any later version).
    <ref name="addr"/>
   </phrase>
   <effect>
-   <assign>
-    <register name="PC"/>
-    <ref name="addr"/>
-   </assign>
+   <if>
+    <test>
+     <ref name="cc"/>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <ref name="addr"/>
+     </assign>
+    </then>
+   </if>
   </effect>
  </fragment>
 </define>
