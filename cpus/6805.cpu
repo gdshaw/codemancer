@@ -313,6 +313,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <shift width="8" mode="logical">
+    <const>1</const>
     <ref name="n"/>
    </shift>
   </effect>
@@ -340,7 +341,7 @@ GNU General Public License (version 3 or any later version).
    <literal>CLR</literal>
   </phrase>
   <effect>
-   <const>0xFF</const>
+   <const>0</const>
   </effect>
  </fragment>
 </define>
@@ -1573,10 +1574,28 @@ GNU General Public License (version 3 or any later version).
    <ref name="branch-addr"/>
   </phrase>
   <effect>
-   <assign>
-    <register name="PC"/>
-    <ref name="branch-addr"/>
-   </assign>
+   <if>
+    <test>
+     <equals>
+      <and>
+       <xor>
+        <memory size="8">
+         <ref name="addr"/>
+        </memory>
+        <ref name="value"/>
+       </xor>
+       <ref name="mask"/>
+      </and>
+      <const>0</const>
+     </equals>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <ref name="branch-addr"/>
+     </assign>
+    </then>
+   </if>
   </effect>
  </fragment>
 
@@ -1660,10 +1679,17 @@ GNU General Public License (version 3 or any later version).
    <ref name="addr"/>
   </phrase>
   <effect>
-   <assign>
-    <register name="PC"/>
-    <ref name="addr"/>
-   </assign>
+   <if>
+    <test>
+     <ref name="cc"/>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <ref name="addr"/>
+     </assign>
+    </then>
+   </if>
   </effect>
  </fragment>
 
