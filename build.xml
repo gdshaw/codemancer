@@ -13,7 +13,12 @@
 
  <target name="compile">
   <mkdir dir="build/classes"/>
-  <javac srcdir="src" destdir="build/classes" debug="true" debuglevel="lines,vars,source"/>
+  <javac srcdir="src" destdir="build/classes" debug="true" debuglevel="lines,vars,source">
+   <classpath location="lib/hibernate3.jar"/>
+   <classpath location="lib/hibernate-jpa-2.0-api-1.0.1.Final.jar"/>
+  </javac>
+  <mkdir dir="build/classes/META-INF"/>
+  <copy file="META-INF/persistence.xml" tofile="build/classes/META-INF/persistence.xml"/>
  </target>
 
  <target name="jar" depends="compile">
