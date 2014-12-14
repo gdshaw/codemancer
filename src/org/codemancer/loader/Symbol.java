@@ -25,6 +25,11 @@ public interface Symbol {
 	 */
 	public long getSize();
 
+	/** Test whether this symbol is known to be a pointer to code.
+	 * @return true if known to be a pointer to code, otherwise false
+	 */
+	public boolean isCode();
+
 	/** Dump the metadata for this symbol to a stream in human-readable form.
 	 * @param out the stream to be written to
 	 */

@@ -49,6 +49,10 @@ public class AofSymbol implements Symbol {
 		return 0;
 	}
 
+	public boolean isCode() {
+		return false;
+	}
+
 	public void dump(PrintWriter out) throws IOException {
 		out.printf("%08x %08x %08x %s\n", value, attributes, area, name);
 	}

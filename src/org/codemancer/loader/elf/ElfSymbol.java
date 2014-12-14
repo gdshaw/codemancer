@@ -104,6 +104,10 @@ public class ElfSymbol implements Symbol {
 		return st_size;
 	}
 
+	public final boolean isCode() {
+		return (st_type == STT_FUNC);
+	}
+
 	/** Get the type of this ELF symbol.
 	 * @return the symbol type
 	 */

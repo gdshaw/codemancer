@@ -245,6 +245,10 @@ public class CoffSymbol implements Symbol {
 		return 0;
 	}
 
+	public final boolean isCode() {
+		return (((e_type >> 4) & 0x3) == DT_FCN);
+	}
+
 	/** Get the base type of this symbol.
 	 * @return the base type
 	 */
@@ -256,7 +260,7 @@ public class CoffSymbol implements Symbol {
 	 * @return the derived type
 	 */
 	public final int getCoffDerivedType() {
-		return (e_type >> 4) & 0xf;
+		return (e_type >> 4) & 0x3;
 	}
 
 	/** Get the base type of this COFF symbol as a string.
