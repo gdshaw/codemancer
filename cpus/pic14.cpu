@@ -1,0 +1,531 @@
+<!--
+This file is part of Codemancer.
+Copyright 2014 Graham Shaw.
+Distribution and modification are permitted within the terms of the
+GNU General Public License (version 3 or any later version).
+-->
+
+<cpudl endian="big">
+<cpu name="pic14"/>
+
+<style>
+ <property name="base" value="16"/>
+ <property name="prefix" value="0x"/>
+ <property name="suffix" value=""/>
+ <property name="whitespace" value=" "/>
+</style>
+
+<register name="W" size="8"/>
+<register name="PC" size="12"/>
+
+<define name="movwf-op">
+ <fragment>
+  <pattern>
+   <const>00001</const>
+  </pattern>
+  <phrase>
+   <literal>MOVWF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <register name="W"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="clrf-op">
+ <fragment>
+  <pattern>
+   <const>00011</const>
+  </pattern>
+  <phrase>
+   <literal>CLRF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <const>0</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="subwf-op">
+ <fragment>
+  <pattern>
+   <const>0010</const>
+  </pattern>
+  <phrase>
+   <literal>SUBWF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <sub>
+     <register name="W"/>
+     <ref name="src"/>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="decf-op">
+ <fragment>
+  <pattern>
+   <const>0011</const>
+  </pattern>
+  <phrase>
+   <literal>DECF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <sub>
+     <ref name="src"/>
+     <const>1</const>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="iorwf-op">
+ <fragment>
+  <pattern>
+   <const>0100</const>
+  </pattern>
+  <phrase>
+   <literal>IORWF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <or>
+     <register name="W"/>
+     <ref name="src"/>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="andwf-op">
+ <fragment>
+  <pattern>
+   <const>0101</const>
+  </pattern>
+  <phrase>
+   <literal>ANDWF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <and>
+     <register name="W"/>
+     <ref name="src"/>
+    </and>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="xorwf-op">
+ <fragment>
+  <pattern>
+   <const>0110</const>
+  </pattern>
+  <phrase>
+   <literal>XORWF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <xor>
+     <register name="W"/>
+     <ref name="src"/>
+    </xor>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="addwf-op">
+ <fragment>
+  <pattern>
+   <const>0111</const>
+  </pattern>
+  <phrase>
+   <literal>ADDWF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <add>
+     <register name="W"/>
+     <ref name="src"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="movf-op">
+ <fragment>
+  <pattern>
+   <const>1000</const>
+  </pattern>
+  <phrase>
+   <literal>MOVF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <ref name="src"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="comf-op">
+ <fragment>
+  <pattern>
+   <const>1001</const>
+  </pattern>
+  <phrase>
+   <literal>COMF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <xor>
+     <ref name="src"/>
+     <const>0xFF</const>
+    </xor>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="incf-op">
+ <fragment>
+  <pattern>
+   <const>1010</const>
+  </pattern>
+  <phrase>
+   <literal>INCF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <add>
+     <ref name="src"/>
+     <const>1</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="decfsz-op">
+ <fragment>
+  <pattern>
+   <const>1011</const>
+  </pattern>
+  <phrase>
+   <literal>DECFSZ</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <sub>
+     <ref name="src"/>
+     <const>1</const>
+    </sub>
+   </assign>
+   <if>
+    <test>
+     <equals>
+      <ref name="dst"/>
+      <const>0</const>
+     </equals>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <add>
+       <register name="PC"/>
+       <const>2</const>
+      </add>
+     </assign>
+    </then>
+   </if>
+  </effect>
+ </fragment>
+</define>
+
+<define name="rrf-op">
+ <fragment>
+  <pattern>
+   <const>1100</const>
+  </pattern>
+  <phrase>
+   <literal>RRF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <shift width="8" method="extended">
+     <ref name="src"/>
+     <const>-1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="rlf-op">
+ <fragment>
+  <pattern>
+   <const>1101</const>
+  </pattern>
+  <phrase>
+   <literal>RLF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <shift width="8" method="extended">
+     <ref name="src"/>
+     <const>1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="swapf-op">
+ <fragment>
+  <pattern>
+   <const>1110</const>
+  </pattern>
+  <phrase>
+   <literal>SWAPF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <or>
+     <shift width="8" method="logical">
+      <and>
+       <ref name="src"/>
+       <const>0x0F</const>
+      </and>
+      <const>4</const>
+     </shift>
+     <shift width="8" method="logical">
+      <and>
+       <ref name="src"/>
+       <const>0xF0</const>
+      </and>
+      <const>-4</const>
+     </shift>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="incfsz-op">
+ <fragment>
+  <pattern>
+   <const>1111</const>
+  </pattern>
+  <phrase>
+   <literal>INCFSZ</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <add>
+     <ref name="src"/>
+     <const>1</const>
+    </add>
+   </assign>
+   <if>
+    <test>
+     <equals>
+      <ref name="dst"/>
+      <const>0</const>
+     </equals>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <add>
+       <register name="PC"/>
+       <const>2</const>
+      </add>
+     </assign>
+    </then>
+   </if>
+  </effect>
+ </fragment>
+</define>
+
+<start>
+ <fragment>
+  <var name="opcode">
+   <ref name="movwf-op"/>
+   <ref name="clrf-op"/>
+  </var>
+  <var name="f">
+   <integer size="7" encoding="u"/>
+  </var>
+  <pattern>
+   <const>0000</const>
+   <ref name="opcode"/>
+   <ref name="f"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="f"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="dst">
+     <memory size="8">
+      <ref name="f"/>
+     </memory>
+    </bind>
+    <bind name="src">
+     <memory size="8">
+      <ref name="f"/>
+     </memory>
+    </bind>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="f">
+   <integer size="7" encoding="u"/>
+  </var>
+  <pattern>
+   <const>0000</const>
+   <const>00010</const>
+   <ref name="f"/>
+  </pattern>
+  <phrase>
+   <literal>CLRW</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <const>0</const>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="subwf-op"/>
+   <ref name="decf-op"/>
+   <ref name="iorwf-op"/>
+   <ref name="andwf-op"/>
+   <ref name="xorwf-op"/>
+   <ref name="addwf-op"/>
+   <ref name="movf-op"/>
+   <ref name="comf-op"/>
+   <ref name="incf-op"/>
+   <ref name="decfsz-op"/>
+   <ref name="rrf-op"/>
+   <ref name="rlf-op"/>
+   <ref name="swapf-op"/>
+   <ref name="incfsz-op"/>
+  </var>
+  <var name="f">
+   <integer size="7" encoding="u"/>
+  </var>
+  <pattern>
+   <const>0000</const>
+   <ref name="opcode"/>
+   <const>0</const>
+   <ref name="f"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="f"/>
+   <literal>,</literal><ws/>
+   <literal>0</literal>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="dst">
+     <register name="W"/>
+    </bind>
+    <bind name="src">
+     <memory size="8">
+      <ref name="f"/>
+     </memory>
+    </bind>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="subwf-op"/>
+   <ref name="decf-op"/>
+   <ref name="iorwf-op"/>
+   <ref name="andwf-op"/>
+   <ref name="xorwf-op"/>
+   <ref name="addwf-op"/>
+   <ref name="movf-op"/>
+   <ref name="comf-op"/>
+   <ref name="incf-op"/>
+   <ref name="decfsz-op"/>
+   <ref name="rrf-op"/>
+   <ref name="rlf-op"/>
+   <ref name="swapf-op"/>
+   <ref name="incfsz-op"/>
+  </var>
+  <var name="f">
+   <integer size="7" encoding="u"/>
+  </var>
+  <pattern>
+   <const>0000</const>
+   <ref name="opcode"/>
+   <const>1</const>
+   <ref name="f"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="f"/>
+   <literal>,</literal><ws/>
+   <literal>1</literal>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="dst">
+     <register name="W"/>
+    </bind>
+    <bind name="src">
+     <memory size="8">
+      <ref name="f"/>
+     </memory>
+    </bind>
+   </ref>
+  </effect>
+ </fragment>
+</start>
+</cpudl>
