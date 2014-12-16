@@ -3,6 +3,11 @@
 ; Distribution and modification are permitted within the terms of the
 ; GNU General Public License (version 3 or any later version).
 
+0008	RETURN
+0009	RETFIE
+0063	SLEEP
+0064	CLRWDT
+
 0092	MOVWF	0x12
 0100	CLRW
 017F	CLRW
