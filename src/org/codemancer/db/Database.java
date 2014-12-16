@@ -5,6 +5,7 @@
 
 package org.codemancer.db;
 
+import java.util.List;
 import java.util.Properties;
 import javax.persistence.EntityTransaction;
 import javax.persistence.EntityManagerFactory;
@@ -17,7 +18,7 @@ public class Database {
 	private final EntityManager em;
 
 	/** Open database.
-	 * @param url the url for this database
+	 * @param url the url of the database to be opened.
 	 */
 	public Database(String url) {
 		Properties props = new Properties();
@@ -39,5 +40,14 @@ public class Database {
 	 */
 	public final EntityTransaction getTransaction() {
 		return em.getTransaction();
+	}
+
+	/** Get references.
+	 * @return a list of references
+	 */
+	public final List<Reference> getReferences() {
+		return em.createQuery(
+			"FROM Reference ORDER BY dstAddr", Reference.class)
+			.getResultList();
 	}
 }
