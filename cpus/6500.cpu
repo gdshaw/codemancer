@@ -1384,7 +1384,9 @@ GNU General Public License (version 3 or any later version).
    </assign>
    <assign>
     <register name="PC"/>
-    <const>65534</const>
+    <memory size="16" encoding="u">
+     <const>0xFFFE</const>
+    </memory>
    </assign>
   </effect>
  </fragment>
