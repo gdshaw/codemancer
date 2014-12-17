@@ -104,6 +104,11 @@ public class Reference extends Expression {
 			}
 		}
 
+		// For fragments it is the effect which is wanted (not the instruction).
+		if (result instanceof Fragment) {
+			result = ((Fragment)result).getEffect();
+		}
+
 		// If the name was resolved then resolve the associated value.
 		if (result != null) {
 			result = result.resolveReferences(frag, resolvedArgs);
