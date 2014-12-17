@@ -65,7 +65,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <equals>
-    <ref name="N"/>
+    <register name="N"/>
     <const>0</const>
    </equals>
   </effect>
@@ -80,7 +80,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <equals>
-    <ref name="N"/>
+    <register name="N"/>
     <const>1</const>
    </equals>
   </effect>
@@ -95,7 +95,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <equals>
-    <ref name="V"/>
+    <register name="V"/>
     <const>0</const>
    </equals>
   </effect>
@@ -110,7 +110,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <equals>
-    <ref name="V"/>
+    <register name="V"/>
     <const>1</const>
    </equals>
   </effect>
@@ -125,7 +125,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <equals>
-    <ref name="C"/>
+    <register name="C"/>
     <const>0</const>
    </equals>
   </effect>
@@ -140,7 +140,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <equals>
-    <ref name="C"/>
+    <register name="C"/>
     <const>1</const>
    </equals>
   </effect>
@@ -155,7 +155,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <equals>
-    <ref name="Z"/>
+    <register name="Z"/>
     <const>0</const>
    </equals>
   </effect>
@@ -170,7 +170,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <equals>
-    <ref name="Z"/>
+    <register name="Z"/>
     <const>1</const>
    </equals>
   </effect>
