@@ -5,6 +5,7 @@
 
 package org.codemancer.cpudl.expr;
 
+import java.util.List;
 import java.util.Map;
 
 import org.codemancer.cpudl.State;
@@ -74,6 +75,11 @@ public abstract class BinaryExpression extends Expression {
 		Expression evaluatedLhs = lhs.evaluate(state);
 		Expression evaluatedRhs = rhs.evaluate(state);
 		return partialClone(evaluatedLhs, evaluatedRhs);
+	}
+
+	public void listAssignments(List<Assignment> uncond, List<Assignment> cond, boolean isCond) {
+		lhs.listAssignments(uncond, cond, isCond);
+		rhs.listAssignments(uncond, cond, isCond);
 	}
 
 	public String unparse(Style style) {

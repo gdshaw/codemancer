@@ -5,6 +5,7 @@
 
 package org.codemancer.cpudl.expr;
 
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import org.w3c.dom.Node;
@@ -121,6 +122,10 @@ public class Reference extends Expression {
 			return placeholder;
 		}
 		return null;
+	}
+
+	public void listAssignments(List<Assignment> uncond, List<Assignment> cond, boolean isCond) {
+		throw new UnsupportedOperationException("unresolved reference '" + name + "'");
 	}
 
 	/** Make reference from XML element.

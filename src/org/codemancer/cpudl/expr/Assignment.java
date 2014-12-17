@@ -5,6 +5,7 @@
 
 package org.codemancer.cpudl.expr;
 
+import java.util.List;
 import java.util.ArrayList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
@@ -36,6 +37,16 @@ public class Assignment extends BinaryExpression {
 		Expression evalRhs = getRhs().evaluate(state).simplify();
 		getLhs().assign(state, evalRhs);
 		return evalRhs;
+	}
+
+	public void listAssignments(List<Assignment> uncond, List<Assignment> cond, boolean isCond) {
+		if (!isCond) {
+			uncond.add(this);
+		} else {
+			cond.add(this);
+		}
+		getLhs().listAssignments(uncond, cond, isCond);
+		getRhs().listAssignments(uncond, cond, isCond);
 	}
 
 	/** Make assignment operation from XML element.

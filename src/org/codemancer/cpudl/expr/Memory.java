@@ -5,6 +5,7 @@
 
 package org.codemancer.cpudl.expr;
 
+import java.util.List;
 import java.util.Map;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
@@ -58,6 +59,10 @@ public class Memory extends Expression {
 		Expression value = state.get(this);
 		if (value != null) return value;
 		return this;
+	}
+
+	public void listAssignments(List<Assignment> uncond, List<Assignment> cond, boolean isCond) {
+		address.listAssignments(uncond, cond, isCond);
 	}
 
 	/** Make memory reference from XML element.

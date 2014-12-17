@@ -5,6 +5,7 @@
 
 package org.codemancer.cpudl.expr;
 
+import java.util.List;
 import java.util.Map;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
@@ -104,6 +105,17 @@ public abstract class Expression {
 	public Expression solve(Reference solveFor, Expression placeholder) {
 		return null;
 	}
+
+	/** List assignments within this expression.
+	 * A conditional expression is any expression which might not be evaluated
+	 * (including loops, if the number of iterations could be zero).
+	 * @param uncond a list of unconditional assignments to add to
+	 * @param cond a list of conditional assignments to add to
+	 * @param isCond true if this expression is part of a conditional expression,
+	 *  otherwise false
+	 */
+	public void listAssignments(List<Assignment> uncond,
+		List<Assignment> cond, boolean isCond) {}
 
 	/** Add the terms of this expression to an accumulator.
 	 * By default this expression is added whole, but if it can be broken

@@ -5,6 +5,7 @@
 
 package org.codemancer.cpudl.expr;
 
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -98,10 +99,16 @@ public class Fragment extends Expression {
 		return simplifiedFragment;
 	}
 
+	public void listAssignments(List<Assignment> uncond, List<Assignment> cond, boolean isCond) {
+		effect.listAssignments(uncond, cond, isCond);
+	}
+
 	public String unparse(Style style) {
 		StringBuffer result = new StringBuffer();
 		result.append("{");
+		boolean first = true;
 		for (Map.Entry<String, Expression> entry: members.entrySet()) {
+			if (first) first = false; else result.append(";");
 			result.append(entry.getKey());
 			result.append(":");
 			result.append(entry.getValue().unparse(style));

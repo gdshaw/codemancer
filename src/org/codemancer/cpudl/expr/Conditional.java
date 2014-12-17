@@ -5,6 +5,7 @@
 
 package org.codemancer.cpudl.expr;
 
+import java.util.List;
 import java.util.Map;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
@@ -59,6 +60,12 @@ public class Conditional extends Expression {
 		Expression resolvedWhenTrue = whenTrue.resolveRegisters(registers);
 		Expression resolvedWhenFalse = whenFalse.resolveRegisters(registers);
 		return new Conditional(resolvedCondition, resolvedWhenTrue, resolvedWhenFalse);
+	}
+
+	public void listAssignments(List<Assignment> uncond, List<Assignment> cond, boolean isCond) {
+		condition.listAssignments(uncond, cond, isCond);
+		whenTrue.listAssignments(uncond, cond, true);
+		whenFalse.listAssignments(uncond, cond, true);
 	}
 
 	/** Make conditional expression from XML element.
