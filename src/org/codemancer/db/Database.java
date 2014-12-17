@@ -50,4 +50,13 @@ public class Database {
 			"FROM Reference ORDER BY dstAddr", Reference.class)
 			.getResultList();
 	}
+
+	/** Get lines of disassembled code.
+	 * @return a list of lines
+	 */
+	public final List<Line> getLines() {
+		return em.createQuery(
+			"FROM Line ORDER BY minAddr", Line.class)
+			.getResultList();
+	}
 }
