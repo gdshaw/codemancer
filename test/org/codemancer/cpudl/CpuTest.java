@@ -71,7 +71,7 @@ public class CpuTest {
 			long addr = Long.parseLong(s.substring(1, s.length() - 1), 16);
 			return new Memory(null, new Constant(null, addr));
 		} else {
-			return Register.make(ctx, s);
+			return Register.make(ctx.getArchitecture(), s);
 		}
 	}
 

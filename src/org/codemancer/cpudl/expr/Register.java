@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.HashMap;
 import org.w3c.dom.Element;
 
+import org.codemancer.cpudl.Architecture;
 import org.codemancer.cpudl.Context;
 import org.codemancer.cpudl.State;
 import org.codemancer.cpudl.Style;
@@ -59,12 +60,12 @@ public class Register extends Expression {
 	/** Make register reference from register name.
 	 * References to a given register obtained using this method
 	 * are guaranteed to refer to the same object.
-	 * @param ctx the context of this expression
+	 * @param arch the architecture to which the register belongs
 	 * @param name the register name
 	 * @return the register reference
 	 */
-	public static Register make(Context ctx, String name) {
-		Register register = ctx.getArchitecture().getRegister(name);
+	public static Register make(Architecture arch, String name) {
+		Register register = arch.getRegister(name);
 		if (register == null) {
 			throw new IllegalArgumentException("undefined register '" + name + "'");
 		}
@@ -81,6 +82,6 @@ public class Register extends Expression {
 		if (name == null) {
 			throw new CpudlParseException(element, "register name not specified");
 		}
-		return make(ctx, name);
+		return make(ctx.getArchitecture(), name);
 	}
 }
