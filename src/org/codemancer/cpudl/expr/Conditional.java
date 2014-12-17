@@ -5,6 +5,7 @@
 
 package org.codemancer.cpudl.expr;
 
+import java.util.Map;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
@@ -44,6 +45,20 @@ public class Conditional extends Expression {
 		result.append(":");
 		result.append(whenFalse.unparse(style));
 		return result.toString();
+	}
+
+	public Expression resolveReferences(Fragment frag, Map<String, Expression> args) {
+		Expression resolvedCondition = condition.resolveReferences(frag, args);
+		Expression resolvedWhenTrue = whenTrue.resolveReferences(frag, args);
+		Expression resolvedWhenFalse = whenFalse.resolveReferences(frag, args);
+		return new Conditional(resolvedCondition, resolvedWhenTrue, resolvedWhenFalse);
+	}
+
+	public Expression resolveRegisters(Map<String, Expression> registers) {
+		Expression resolvedCondition = condition.resolveRegisters(registers);
+		Expression resolvedWhenTrue = whenTrue.resolveRegisters(registers);
+		Expression resolvedWhenFalse = whenFalse.resolveRegisters(registers);
+		return new Conditional(resolvedCondition, resolvedWhenTrue, resolvedWhenFalse);
 	}
 
 	/** Make conditional expression from XML element.
