@@ -95,6 +95,13 @@ Running Codemancer
 
   The resulting assembly language listing is written to stdout.
 
+Interface stability
+
+  Neither the API nor the markup language should be considered stable
+  at present. It is intended that both should become stable, but the
+  current rate of change is such that this would seriously hamper
+  progress if attempted now.
+
 Limitations
 
   Whilst the disassembler is now technically usable, taken at face value
