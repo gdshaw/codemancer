@@ -36,6 +36,9 @@ public class Reference extends Fact {
 	/** True if there is evidence that this is a reference to code, otherwise false. */
 	private boolean codeRef;
 
+	/** True if there is evidence that this is a reference to a subroutine, otherwise false. */
+	private boolean subRef;
+
 	/** Construct empty reference.
 	 * A default constructor is required by the JPA.
 	 */
@@ -46,6 +49,7 @@ public class Reference extends Fact {
 		this.internal = false;
 		this.dataRef = false;
 		this.codeRef = false;
+		this.subRef = false;
 	}
 
 	/** Construct reference.
@@ -56,15 +60,17 @@ public class Reference extends Fact {
 	 * @param dstAddr the address to which this reference refers
 	 * @param dataRef true if there is evidence that this is a reference to data, otherwise false
 	 * @param codeRef true if there is evidence that this is a reference to code, otherwise false
+	 * @param subRef true if there is evidence that this is a reference to a subroutine, otherwise false
 	 */
 	public Reference(long minRev, long maxRev, long srcAddr, long dstAddr, boolean internal,
-		boolean dataRef, boolean codeRef) {
+		boolean dataRef, boolean codeRef, boolean subRef) {
 		super(minRev, maxRev);
 		this.srcAddr = srcAddr;
 		this.dstAddr = dstAddr;
 		this.internal = internal;
 		this.dataRef = dataRef;
 		this.codeRef = codeRef;
+		this.subRef = subRef;
 	}
 
 	/** Get the address from which this reference originates.
@@ -100,5 +106,12 @@ public class Reference extends Fact {
 	 */
 	public boolean isCodeRef() {
 		return codeRef;
+	}
+
+	/** Test whether this is a subroutine reference.
+	 * @return true if there is evidence that this is a reference to a subroutine, otherwise false
+	 */
+	public boolean isSubRef() {
+		return subRef;
 	}
 }
