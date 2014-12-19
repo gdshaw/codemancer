@@ -31,16 +31,20 @@ Current status
   Disassembler
 
   - plain disassembly: working
-  - semantic modelling: working, but accessible only via API
+  - semantic modelling: working, but untested and accessible only via API
   - control flow analysis: not started
   - data flow analysis: not started
   - interactive user interface: not started
 
   Architectures
 
-  - 6502: complete, but not including variants such as the 65C02
-  - z80: incomplete
-  - more to follow
+  - 6500: complete, including 65C00, R65C00 and W65C00S
+  - 6800: complete
+  - 6805: complete
+  - ARM: complete to armv3 but not beyond
+  - PIC (14-bit core): complete
+  - x86: incomplete
+  - Z80: complete
 
   Object file formats:
 
@@ -104,17 +108,26 @@ Interface stability
 
 Limitations
 
-  Whilst the disassembler is now technically usable, taken at face value
-  its current capabilities are neither novel nor conspicuously useful.
-  However, it does demonstrate that a real CPU architecture can be
-  described using a relatively small set of generic primitives.
+  Only a small part of the planned funcionality for Codemancer has
+  been implemented thus far. Most notably it is only usable as a
+  plain disassembler at present, and then only for a small number
+  of architectures.
 
-  Specific known limitations at present include the following:
+  Use of the semantic modelling capability, which is in any event
+  only possible via the API, is not recommended for anything other
+  than experimental purposes at present due to lack of testing and
+  some missing features.
 
-  - Status flags are not properly supported.
+  Other limitations include the following:
+
+  - Status flags are not properly modelled.
   - There is no easy way to handle registers which are part of larger
-    registers.
-  - There will be a need to support register bitmaps, for example as
-    used by ARM LDM and STM instructions.
-  - There will be a need to support instruction prefixes, for example
-    as used by the x86 family and to a lesser extent the Z80.
+    registers (for example H, L and HL on the Z80). Current practice
+    is to treat them as separate registers, which will not accurately
+    reflect the behaviour of the program.
+  - The <memory> element is limited to a single linear address space.
+  - Repetition (for example, the Z80 LDIR instruction) is not
+    modelled.
+  - Architectures where the instruction width is not a multiple of
+    8 bits (for example, the PIC 12- and 14-bit architectures) could
+    be handled more elegantly.
