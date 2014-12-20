@@ -42,12 +42,12 @@ public class Database {
 		return em.getTransaction();
 	}
 
-	/** Get references.
-	 * @return a list of references
+	/** Get unprocessed references.
+	 * @return a list of unprocessed references
 	 */
-	public final List<Reference> getReferences() {
+	public final List<Reference> getUnprocessedReferences() {
 		return em.createQuery(
-			"FROM Reference ORDER BY dstAddr", Reference.class)
+			"FROM Reference WHERE processed = false", Reference.class)
 			.getResultList();
 	}
 
