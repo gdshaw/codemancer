@@ -1624,14 +1624,17 @@ GNU General Public License (version 3 or any later version).
    <ref name="offset"/>
   </phrase>
   <effect>
-   <ref name="b">
-    <bind name="ea">
-     <add>
-      <ref name="rn"/>
-      <ref name="offset"/>
-     </add>
-    </bind>
-   </ref>
+   <temp name="ea">
+    <ref name="rn"/>
+   </temp>
+   <assign>
+    <ref name="rn"/>
+    <add>
+     <temp name="ea"/>
+     <ref name="offset"/>
+    </add>
+   </assign>
+   <temp name="ea"/>
   </effect>
  </fragment>
 
@@ -1666,12 +1669,17 @@ GNU General Public License (version 3 or any later version).
    <ref name="offset"/>
   </phrase>
   <effect>
-   <memory>
+   <temp name="ea">
+    <ref name="rn"/>
+   </temp>
+   <assign>
+    <ref name="rn"/>
     <add>
-     <ref name="rn"/>
+     <temp name="ea"/>
      <ref name="offset"/>
     </add>
-   </memory>
+   </assign>
+   <temp name="ea"/>
   </effect>
  </fragment>
 
@@ -1709,12 +1717,17 @@ GNU General Public License (version 3 or any later version).
    <ref name="w"/>
   </phrase>
   <effect>
-   <memory>
+   <temp name="ea">
     <add>
      <ref name="rn"/>
      <ref name="offset"/>
     </add>
-   </memory>
+   </temp>
+   <assign>
+    <ref name="rn"/>
+    <temp name="ea"/>
+   </assign>
+   <temp name="ea"/>
   </effect>
  </fragment>
 </define>
@@ -2245,8 +2258,8 @@ GNU General Public License (version 3 or any later version).
    <ref name="opcode">
     <bind name="rd" src="rd"/>
     <bind name="operand">
-     <ref name="operand">
-      <bind name="b" src="b"/>
+     <ref name="b">
+      <bind name="operand" ref="operand"/>
      </ref>
     </bind>
    </ref>
