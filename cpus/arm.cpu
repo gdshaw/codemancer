@@ -15,7 +15,10 @@ GNU General Public License (version 3 or any later version).
 <cpu name="armv3" extends="armv2">
  <feature name="armv3"/>
 </cpu>
-<cpu name="arm" extends="armv3">
+<cpu name="armv4" extends="armv3">
+ <feature name="armv4"/>
+</cpu>
+<cpu name="arm" extends="armv4">
 </cpu>
 
 <style>
@@ -939,6 +942,100 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="lsh-opcode">
+ <fragment>
+  <pattern>
+   <const>10</const>
+  </pattern>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>STR</literal>
+  </phrase>
+  <phrase>
+   <literal>H</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="16" encoding="u">
+     <ref name="operand"/>
+    </memory>
+    <ref name="rd"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10</const>
+  </pattern>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>LDR</literal>
+  </phrase>
+  <phrase>
+   <literal>H</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="rd"/>
+    <memory size="16" encoding="u">
+     <ref name="operand"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>01</const>
+  </pattern>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>LDR</literal>
+  </phrase>
+  <phrase>
+   <literal>SB</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="rd"/>
+    <memory size="8" encoding="2c">
+     <ref name="operand"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>11</const>
+  </pattern>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>LDR</literal>
+  </phrase>
+  <phrase>
+   <literal>SH</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="rd"/>
+    <memory size="16" encoding="2c">
+     <ref name="operand"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <define name="cpm-opcode">
  <choice>
   <fragment>
@@ -1031,7 +1128,7 @@ GNU General Public License (version 3 or any later version).
   <effect>
    <assign>
     <ref name="rn"/>
-    <ref name="wrn"/>
+    <ref name="ea"/>
    </assign>
   </effect>
  </fragment>
@@ -1515,59 +1612,10 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="ls-unsigned-offset">
+<define name="ls-offset">
  <fragment>
   <var name="offset">
-   <integer size="12" class="offset"/>
-  </var>
-  <pattern>
-   <ref name="offset"/>
-  </pattern>
-  <pattern>
-   <const>0</const>
-  </pattern>
-  <phrase>
-   <literal>#</literal>
-  </phrase>
-  <phrase>
-   <ref name="offset"/>
-  </phrase>
-  <effect>
-   <ref name="offset"/>
-  </effect>
- </fragment>
-
- <fragment>
-  <var name="rm">
-   <ref name="register"/>
-  </var>
-  <var name="shift">
-   <ref name="ls-shifted-offset"/>
-  </var>
-  <pattern>
-   <ref name="rm"/>
-   <ref name="shift"/>
-  </pattern>
-  <pattern>
-   <const>1</const>
-  </pattern>
-  <phrase></phrase>
-  <phrase>
-   <ref name="rm"/>
-   <ref name="shift"/>
-  </phrase>
-  <effect>
-   <ref name="shift">
-    <bind name="rm" src="rm"/>
-   </ref>
-  </effect>
- </fragment>
-</define>
-
-<define name="ls-signed-offset">
- <fragment>
-  <var name="offset">
-   <ref name="ls-unsigned-offset"/>
+   <integer class="offset" size="12"/>
   </var>
   <var name="u">
    <ref name="u-bit"/>
@@ -1579,16 +1627,52 @@ GNU General Public License (version 3 or any later version).
    <ref name="u"/>
   </pattern>
   <pattern>
-   <ref name="offset"/>
+   <const>0</const>
   </pattern>
   <phrase>
-   <ref name="offset"/>
+   <literal>#</literal>
    <ref name="u"/>
    <ref name="offset"/>
   </phrase>
   <effect>
    <ref name="u">
-    <bind name="offset" src="offset"/>
+    <bind name="offset" ref="offset"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <var name="shift">
+   <ref name="ls-shifted-offset"/>
+  </var>
+  <var name="u">
+   <ref name="u-bit"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <ref name="shift"/>
+  </pattern>
+  <pattern>
+   <ref name="u"/>
+  </pattern>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <ref name="u"/>
+   <ref name="rm"/>
+   <ref name="shift"/>
+  </phrase>
+  <effect>
+   <ref name="u">
+    <bind name="offset">
+     <ref name="shift">
+      <bind name="rm" src="rm"/>
+     </ref>
+    </bind>
    </ref>
   </effect>
  </fragment>
@@ -1597,7 +1681,7 @@ GNU General Public License (version 3 or any later version).
 <define name="ls-operand">
  <fragment>
   <var name="offset">
-   <ref name="ls-signed-offset"/>
+   <ref name="ls-offset"/>
   </var>
   <var name="rn">
    <ref name="register"/>
@@ -1640,7 +1724,7 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="offset">
-   <ref name="ls-signed-offset"/>
+   <ref name="ls-offset"/>
   </var>
   <var name="rn">
    <ref name="register"/>
@@ -1685,7 +1769,7 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="offset">
-   <ref name="ls-signed-offset"/>
+   <ref name="ls-offset"/>
   </var>
   <var name="rn">
    <ref name="register"/>
@@ -1723,10 +1807,182 @@ GNU General Public License (version 3 or any later version).
      <ref name="offset"/>
     </add>
    </temp>
+   <ref name="w">
+    <bind name="rn" src="rn"/>
+    <bind name="ea">
+     <temp name="ea"/>
+    </bind>
+   </ref>
+   <temp name="ea"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="lsh-offset">
+ <fragment>
+  <var name="offset">
+   <integer class="offset" size="8"/>
+  </var>
+  <var name="offset-lo">
+   <integer size="4"/>
+  </var>
+  <var name="offset-hi">
+   <integer size="4"/>
+  </var>
+  <var name="u">
+   <ref name="u-bit"/>
+  </var>
+  <where>
+   <equals>
+    <ref name="offset"/>
+    <or>
+     <ref name="offset-lo"/>
+     <shift width="8" method="logical">
+      <ref name="offset-hi"/>
+      <const>4</const>
+     </shift>
+    </or>
+   </equals>
+  </where>
+  <pattern>
+   <ref name="offset-lo"/>
+  </pattern>
+  <pattern>
+   <ref name="offset-hi"/>
+  </pattern>
+  <pattern>
+   <const>1</const>
+   <ref name="u"/>
+  </pattern>
+  <phrase>
+   <literal>#</literal>
+   <ref name="u"/>
+   <ref name="offset"/>
+  </phrase>
+  <effect>
+   <ref name="u">
+    <bind name="offset" ref="offset"/>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <var name="u">
+   <ref name="u-bit"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+  </pattern>
+  <pattern>
+   <const>0000</const>
+  </pattern>
+  <pattern>
+   <const>0</const>
+   <ref name="u"/>
+  </pattern>
+  <phrase>
+   <ref name="u"/>
+   <ref name="rm"/>
+  </phrase>
+  <effect>
+   <ref name="u">
+    <bind name="offset" ref="rm"/>
+   </ref>
+  </effect>
+ </fragment>
+</define>
+
+<define name="lsh-operand">
+ <fragment>
+  <var name="offset">
+   <ref name="lsh-offset"/>
+  </var>
+  <var name="rn">
+   <ref name="register"/>
+  </var>
+  <pattern>
+   <ref name="offset"/>
+  </pattern>
+  <pattern>
+   <ref name="offset"/>
+  </pattern>
+  <pattern>
+   <ref name="rn"/>
+  </pattern>
+  <pattern>
+   <const>0</const>
+   <ref name="offset"/>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>[</literal>
+   <ref name="rn"/>
+   <literal>],</literal><ws/>
+   <ref name="offset"/>
+  </phrase>
+  <effect>
+   <temp name="ea">
+    <ref name="rn"/>
+   </temp>
    <assign>
     <ref name="rn"/>
-    <temp name="ea"/>
+    <add>
+     <temp name="ea"/>
+     <ref name="offset"/>
+    </add>
    </assign>
+   <temp name="ea"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="offset">
+   <ref name="lsh-offset"/>
+  </var>
+  <var name="rn">
+   <ref name="register"/>
+  </var>
+  <var name="w">
+   <ref name="w-bit"/>
+  </var>
+  <pattern>
+   <ref name="offset"/>
+  </pattern>
+  <pattern>
+   <ref name="offset"/>
+  </pattern>
+  <pattern>
+   <ref name="rn"/>
+  </pattern>
+  <pattern>
+   <ref name="w"/>
+   <ref name="offset"/>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>[</literal>
+   <ref name="rn"/>
+   <literal>,</literal><ws/>
+   <ref name="offset"/>
+   <literal>]</literal>
+   <ref name="w"/>
+  </phrase>
+  <effect>
+   <temp name="ea">
+    <add>
+     <ref name="rn"/>
+     <ref name="offset"/>
+    </add>
+   </temp>
+   <ref name="w">
+    <bind name="rn" src="rn"/>
+    <bind name="ea">
+     <temp name="ea"/>
+    </bind>
+   </ref>
    <temp name="ea"/>
   </effect>
  </fragment>
@@ -3063,6 +3319,49 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="lsh-instr">
+ <fragment>
+  <var name="operand">
+   <ref name="lsh-operand"/>
+  </var>
+  <var name="opcode">
+   <ref name="lsh-opcode"/>
+  </var>
+  <var name="rd">
+   <ref name="register"/>
+  </var>
+  <pattern>
+   <ref name="operand"/>
+   <const>1</const>
+   <ref name="opcode"/>
+   <const>1</const>
+   <ref name="operand"/>
+   <ref name="rd"/>
+   <ref name="operand"/>
+   <ref name="opcode"/>
+   <ref name="operand"/>
+   <const>000</const>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="rd"/>
+   <literal>,</literal><ws/>
+   <ref name="operand"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="rd" src="rd"/>
+    <bind name="operand" src="operand"/>
+   </ref>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -3078,6 +3377,9 @@ GNU General Public License (version 3 or any later version).
    <require name="armv3">
     <ref name="status-instr"/>
     <ref name="swp-instr"/>
+   </require>
+   <require name="armv4">
+    <ref name="lsh-instr"/>
    </require>
   </var>
   <var name="cc">
