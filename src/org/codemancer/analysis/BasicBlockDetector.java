@@ -13,8 +13,8 @@ import java.nio.ByteBuffer;
 import javax.persistence.EntityManager;
 
 import org.codemancer.cpudl.expr.Expression;
-import org.codemancer.cpudl.expr.Constant;
 import org.codemancer.cpudl.expr.Register;
+import org.codemancer.cpudl.expr.Constant;
 import org.codemancer.cpudl.type.Type;
 import org.codemancer.cpudl.Architecture;
 import org.codemancer.cpudl.FeatureSet;
@@ -22,15 +22,13 @@ import org.codemancer.cpudl.BitString;
 import org.codemancer.cpudl.ShortBitString;
 import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.BitStringReader;
-import org.codemancer.cpudl.EphemeralState;
 import org.codemancer.db.Line;
 import org.codemancer.db.Reference;
+import org.codemancer.db.BasicBlock;
 import org.codemancer.db.Database;
 
-/** A class for iteratively disassembling a supplied binary image.
- * Usage is to repeatedly call process() until it returns true.
- */
-public class IterativeDisassembler {
+/** A class for detecting basic blocks. */
+public class BasicBlockDetector {
 	/** The binary image to be disassembled. */
 	private ByteBuffer image;
 
@@ -49,23 +47,22 @@ public class IterativeDisassembler {
 	/** The highest address that is part of the binary image. */
 	private long maxAddr;
 
-	/** A list of pending unprocessed references. */
-	private List<Reference> pendingList = new ArrayList<Reference>();
+	/** A list of pending unprocessed lines. */
+	private List<Line> pendingList = new ArrayList<Line>();
 
-	/** The index of the first unprocessed reference in the pending list.
-	 * If no references are pending then this is equal to the length of the list.
+	/** The index of the first unprocessed line in the pending list.
+	 * If no lines are pending then this is equal to the length of the list.
 	 */
 	private int pendingIndex = 0;
 
-	/** Construct iterative disassembler object.
+	/** Construct basic block detector.
 	 * @param image the binary image to be disassembled
 	 * @param db the database corresponding to the binary image
 	 * @param arch the architecture
 	 * @param minAddr the lowest address that is part of the binary image
 	 * @param maxAddr the highest address that is part of the binary image
 	 */
-	public IterativeDisassembler(ByteBuffer image, Database db, Architecture arch,
-		long minAddr, long maxAddr) {
+	public BasicBlockDetector(ByteBuffer image, Database db, Architecture arch, long minAddr, long maxAddr) {
 		this.image = image;
 		this.db = db;
 		this.arch = arch;
@@ -74,15 +71,12 @@ public class IterativeDisassembler {
 		this.maxAddr = maxAddr;
 	}
 
-	/** Disassemble from a given address.
-	 * The caller is responsible for embedding this operation within a transaction.
-	 * The sequence ends when an instruction is encountered which does not fall through,
-	 * or which cannot be decoded, or which has already been decoded.
-	 * @param addr the start address from which to disassemble
+	/** Make a basic block starting at a given address.
+	 * @param addr the start address for the block
 	 * @param pc the program counter
 	 * @param links a list of possible expressions for a subroutine return address
 	 */
-	private void disassemble(long addr, Register pc, List<Expression> links) {
+	public void detect(long addr, Register pc, List<Expression> links) {
 		EntityManager em = db.getEntityManager();
 		Type start = arch.getStart();
 
@@ -91,21 +85,23 @@ public class IterativeDisassembler {
 		BitString buffer = new ShortBitString();
 
 		// Determine address at which disassembly would stop as a result of
-		// reaching an address which has already been disassembled.
-		List<Line> existingLines = em.createQuery(
-			"FROM Line " +
+		// reaching the destination of a branch or call instruction.
+		List<Reference> existingLines = em.createQuery(
+			"FROM Reference " +
 			"WHERE maxRev = -1 " +
-			"AND minAddr >= :addr " +
-			"ORDER BY minAddr", Line.class)
+			"AND dstAddr > :addr " +
+			"ORDER BY dstAddr", Reference.class)
 			.setParameter("addr", addr)
 			.setMaxResults(1)
 			.getResultList();
 		long maxAddr = 0;
 		if (!existingLines.isEmpty()) {
-			maxAddr = existingLines.get(0).getMinAddr();
+			maxAddr = existingLines.get(0).getDstAddr();
 		}
 
 		// Disassemble until one of the termination conditions is met.
+		long startAddr = addr;
+		boolean fallThrough = false;
 		while ((addr < maxAddr) || (maxAddr == 0)) {
 			// Fill/refill buffer.
 			while ((buffer.length() < 64) && ((bufferAddr < maxAddr) || (maxAddr == 0))) {
@@ -130,13 +126,14 @@ public class IterativeDisassembler {
 			// Classify this instruction.
 			// This must be done /before/ resolving any registers.
 			InstructionClassifier classifier = new InstructionClassifier(instr, pc, links);
+			fallThrough = classifier.canFallThrough();
 
 			// Resolve the instruction counter.
 			Map<String, Expression> registers = new HashMap<String, Expression>();
 			registers.put("PC", new Constant(null, addr));
 			instr = instr.resolveRegisters(registers).simplify();
 
-			// Disassemble the instruction and calculate its length.
+			// Calculate the length of this instruction.
 			String asm = start.unparse(0, instr) + "\t" + start.unparse(1, instr);
 			long bitCount = codeReader.tell();
 			if ((bitCount & 7) != 0) {
@@ -144,47 +141,47 @@ public class IterativeDisassembler {
 			}
 			long byteCount = bitCount >> 3;
 
-			// Record the instruction as a line object.
-			Line line = new Line(0, -1, addr, addr + byteCount - 1, asm);
-			em.persist(line);
-
-			// Record branches and subroutine calls.
-			for (Expression dst: classifier.getDestinationAddresses()) {
-				dst = dst.resolveRegisters(registers).simplify();
-				if (dst instanceof Constant) {
-					Constant dstConstant = (Constant)dst;
-					long dstAddr = dstConstant.getValue();
-					boolean isSub = classifier.isCall();
-					boolean isCode = isSub | classifier.isBranch();
-					Reference ref = new Reference(0, -1, addr, dstAddr, true, false, isCode, isSub);
-					em.persist(ref);
-				}
-			}
-
 			// Advance the address to the next instruction.
 			// (The reader will already have been advanced while decoding the instruction.)
 			addr += byteCount;
 
-			// Break out of the loop of this instruction cannot fall through to the next one.
-			if (!classifier.canFallThrough()) {
+			// Detect instructions which would terminate the basic block.
+			if (classifier.isBranch() || classifier.isReturn()) {
 				break;
 			}
 
 			// Remove any bits which have been disassembled.
 			buffer = buffer.substring(bitCount, buffer.length());
 		}
+
+		if (addr > startAddr) {
+			BasicBlock block = new BasicBlock(0, -1, startAddr, addr - 1, fallThrough);
+			em.persist(block);
+
+			List<Line> lines = em.createQuery(
+				"FROM Line " +
+				"WHERE maxRev = -1 " +
+				"AND minAddr >= :minAddr " +
+				"AND minAddr <= :maxAddr " +
+				"ORDER BY minAddr", Line.class)
+				.setParameter("minAddr", block.getMinAddr())
+				.setParameter("maxAddr", block.getMaxAddr())
+				.getResultList();
+			for (Line line: lines) {
+				line.setProcessed(true);
+			}
+		}
 	}
 
-	/** Disassemble next unprocessed reference.
-	 * This function should be called repeatedly until it returns true.
+	/** Make a basic block starting at the first instruction that is not already part of one.
 	 * The caller is responsible for embedding this operation within a transaction.
 	 * @param pc the program counter
 	 * @param links a list of possible expressions for a subroutine return address
-	 * @return true if all pending references have been processed, otherwise false.
+	 * @return true if all pending instructions have been processed, otherwise false
 	 */
-	public boolean process(Register pc, List<Expression> links) {
+	public boolean detectNext(Register pc, List<Expression> links) {
 		if (pendingIndex == pendingList.size()) {
-			pendingList = db.getUnprocessedReferences();
+			pendingList = db.getUnprocessedLines();
 			pendingIndex = 0;
 		}
 
@@ -192,12 +189,11 @@ public class IterativeDisassembler {
 			return true;
 		}
 
-		Reference reference = pendingList.get(pendingIndex);
-		long addr = reference.getDstAddr();
-		if (reference.isCodeRef() && (addr >= minAddr) && (addr <= maxAddr)) {
-			disassemble(reference.getDstAddr(), pc, links);
+		Line line = pendingList.get(pendingIndex);
+		if (!line.isProcessed()) {
+			long addr = line.getMinAddr();
+			detect(addr, pc, links);
 		}
-		reference.setProcessed(true);
 		pendingIndex += 1;
 		return false;
 	}

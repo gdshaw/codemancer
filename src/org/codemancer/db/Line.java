@@ -19,6 +19,9 @@ public class Line extends Fact {
 	/** The disassembled instruction. */
 	private final String instruction;
 
+	/** True if this line has been processed by the basic block detector, otherwise false. */
+	private boolean processed = false;
+
 	/** Construct empty line.
 	 * A default constructor is required by the JPA.
 	 */
@@ -62,5 +65,19 @@ public class Line extends Fact {
 	 */
 	public final String getInstruction() {
 		return instruction;
+	}
+
+	/** Test whether this line has been processed by the basic block detector
+	 * @return true if processed, otherwise false
+	 */
+	public boolean isProcessed() {
+		return processed;
+	}
+
+	/** Set whether this line has been processed by the basic block detector
+	 * @param processed true if processed, otherwise false
+	 */
+	public void setProcessed(boolean processed) {
+		this.processed = processed;
 	}
 }

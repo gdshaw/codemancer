@@ -51,12 +51,47 @@ public class Database {
 			.getResultList();
 	}
 
-	/** Get lines of disassembled code.
+	/** Get unprocessed lines of disassembled code.
+	 * @return a list of unprocessed lines
+	 */
+	public final List<Line> getUnprocessedLines() {
+		return em.createQuery(
+			"FROM Line WHERE processed = false", Line.class)
+			.getResultList();
+	}
+
+	/** Get all references to a given address range.
+	 * @param minAddr the lowest address to include
+	 * @param maxAddr the highest address to include
+	 * @return a list of references
+	 */
+	public final List<Reference> getReferences(long minAddr, long maxAddr) {
+		return em.createQuery(
+			"FROM Reference WHERE (dstAddr >= :minAddr) AND (dstAddr <= :maxAddr) ORDER BY minAddr", Reference.class)
+			.setParameter("minAddr", minAddr)
+			.setParameter("maxAddr", maxAddr)
+			.getResultList();
+	}
+
+	/** Get all lines of disassembled code in given address range.
+	 * @param minAddr the lowest address to include
+	 * @param maxAddr the highest address to include
 	 * @return a list of lines
 	 */
-	public final List<Line> getLines() {
+	public final List<Line> getLines(long minAddr, long maxAddr) {
 		return em.createQuery(
-			"FROM Line ORDER BY minAddr", Line.class)
+			"FROM Line where (minAddr >= :minAddr) AND (maxAddr <= :maxAddr) ORDER BY minAddr", Line.class)
+			.setParameter("minAddr", minAddr)
+			.setParameter("maxAddr", maxAddr)
+			.getResultList();
+	}
+
+	/** Get all basic blocks.
+	 * @return a list of basic blocks
+	 */
+	public final List<BasicBlock> getBasicBlocks() {
+		return em.createQuery(
+			"FROM BasicBlock ORDER BY minAddr", BasicBlock.class)
 			.getResultList();
 	}
 }
