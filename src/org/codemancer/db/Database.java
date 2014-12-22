@@ -79,29 +79,35 @@ public class Database {
 	}
 
 	/** Get unprocessed references.
+	 * @param requiredLevel the required level of processing to be omitted from the result
 	 * @return a list of unprocessed references
 	 */
-	public final List<Reference> getUnprocessedReferences() {
+	public final List<Reference> getUnprocessedReferences(int requiredLevel) {
 		return em.createQuery(
-			"FROM Reference WHERE processed = false", Reference.class)
+			"FROM Reference WHERE processedLevel < :requiredLevel", Reference.class)
+			.setParameter("requiredLevel", requiredLevel)
 			.getResultList();
 	}
 
 	/** Get unprocessed lines of disassembled code.
+	 * @param requiredLevel the required level of processing to be omitted from the result
 	 * @return a list of unprocessed lines
 	 */
-	public final List<Line> getUnprocessedLines() {
+	public final List<Line> getUnprocessedLines(int requiredLevel) {
 		return em.createQuery(
-			"FROM Line WHERE processed = false", Line.class)
+			"FROM Line WHERE processedLevel < :requiredLevel", Line.class)
+			.setParameter("requiredLevel", requiredLevel)
 			.getResultList();
 	}
 
 	/** Get unprocessed basic blocks.
+	 * @param requiredLevel the required level of processing to be omitted from the result
 	 * @return a list of unprocessed basic blocks
 	 */
-	public final List<BasicBlock> getUnprocessedBasicBlocks() {
+	public final List<BasicBlock> getUnprocessedBasicBlocks(int requiredLevel) {
 		return em.createQuery(
-			"FROM BasicBlock WHERE processed = false", BasicBlock.class)
+			"FROM BasicBlock WHERE processedLevel < :requiredLevel", BasicBlock.class)
+			.setParameter("requiredLevel", requiredLevel)
 			.getResultList();
 	}
 

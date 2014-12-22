@@ -23,6 +23,7 @@ import org.codemancer.cpudl.ShortBitString;
 import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.BitStringReader;
 import org.codemancer.cpudl.EphemeralState;
+import org.codemancer.db.Fact;
 import org.codemancer.db.Line;
 import org.codemancer.db.Reference;
 import org.codemancer.db.Database;
@@ -184,7 +185,7 @@ public class IterativeDisassembler {
 	 */
 	public boolean process(Register pc, List<Expression> links) {
 		if (pendingIndex == pendingList.size()) {
-			pendingList = db.getUnprocessedReferences();
+			pendingList = db.getUnprocessedReferences(Fact.DONE_ITERATIVE_DISASSEMBLER);
 			pendingIndex = 0;
 		}
 
@@ -197,7 +198,7 @@ public class IterativeDisassembler {
 		if (reference.isCodeRef() && (addr >= minAddr) && (addr <= maxAddr)) {
 			disassemble(reference.getDstAddr(), pc, links);
 		}
-		reference.setProcessed(true);
+		reference.setProcessed(Fact.DONE_ITERATIVE_DISASSEMBLER);
 		pendingIndex += 1;
 		return false;
 	}

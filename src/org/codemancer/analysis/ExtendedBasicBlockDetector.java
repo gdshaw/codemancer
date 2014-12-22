@@ -14,6 +14,7 @@ import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Register;
 import org.codemancer.cpudl.Architecture;
 import org.codemancer.cpudl.BitReader;
+import org.codemancer.db.Fact;
 import org.codemancer.db.Line;
 import org.codemancer.db.Reference;
 import org.codemancer.db.BasicBlock;
@@ -74,14 +75,14 @@ public class ExtendedBasicBlockDetector {
 
 		if (pendingIndex == pendingList.size()) {
 			if (done) return true;
-			pendingList = db.getUnprocessedBasicBlocks();
+			pendingList = db.getUnprocessedBasicBlocks(Fact.DONE_EXTENDED_BASIC_BLOCK_DETECTOR);
 			pendingIndex = 0;
 			if (pendingList.size() == 0) return true;
 			done = true;
 		}
 
 		BasicBlock block = pendingList.get(pendingIndex);
-		if (!block.isProcessed()) {
+		if (!block.isProcessed(Fact.DONE_EXTENDED_BASIC_BLOCK_DETECTOR)) {
 			long addr = block.getMinAddr();
 			List<Reference> references = db.getReferences(addr, addr);
 
@@ -102,7 +103,7 @@ public class ExtendedBasicBlockDetector {
 				em.persist(ebb);
 			}
 			block.setExtendedBasicBlock(ebb);
-			block.setProcessed(true);
+			block.setProcessed(Fact.DONE_EXTENDED_BASIC_BLOCK_DETECTOR);
 			done = false;
 		}
 		pendingIndex += 1;

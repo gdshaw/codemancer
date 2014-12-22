@@ -39,9 +39,6 @@ public class Reference extends Fact {
 	/** True if there is evidence that this is a reference to a subroutine, otherwise false. */
 	private boolean subRef;
 
-	/** True if this reference has been processed by the iterative disassembler, otherwise false. */
-	private boolean processed = false;
-
 	/** Construct empty reference.
 	 * A default constructor is required by the JPA.
 	 */
@@ -116,19 +113,5 @@ public class Reference extends Fact {
 	 */
 	public boolean isSubRef() {
 		return subRef;
-	}
-
-	/** Test whether this reference has been processed by the iterative disassembler
-	 * @return true if processed, otherwise false
-	 */
-	public boolean isProcessed() {
-		return processed;
-	}
-
-	/** Set whether this reference has been processed by the iterative disassembler
-	 * @param processed true if processed, otherwise false
-	 */
-	public void setProcessed(boolean processed) {
-		this.processed = processed;
 	}
 }

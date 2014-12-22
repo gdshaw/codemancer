@@ -32,9 +32,6 @@ public class BasicBlock extends Fact {
 	/** True if execution can fall through to the next basic block, otherwise false. */
 	private boolean fallThrough;
 
-	/** True if this block has been processed by the extended basic block detector, otherwise false. */
-	private boolean processed = false;
-
 	/** The extended basic block to which this basic block belongs, or null if none. */
 	@ManyToOne(fetch=FetchType.EAGER)
 	private ExtendedBasicBlock ebb = null;
@@ -83,20 +80,6 @@ public class BasicBlock extends Fact {
 	 */
 	public boolean canFallThrough() {
 		return fallThrough;
-	}
-
-	/** Test whether this line has been processed by the extended basic block detector.
-	 * @return true if processed, otherwise false
-	 */
-	public boolean isProcessed() {
-		return processed;
-	}
-
-	/** Mark whether this block has been processed by the extended basic block detector.
-	 * @param processed true if processed, otherwise false
-	 */
-	public void setProcessed(boolean processed) {
-		this.processed = processed;
 	}
 
 	/** Get the extended basic block to which this basic block belongs.

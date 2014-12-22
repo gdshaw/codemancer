@@ -22,6 +22,7 @@ import org.codemancer.cpudl.BitString;
 import org.codemancer.cpudl.ShortBitString;
 import org.codemancer.cpudl.BitReader;
 import org.codemancer.cpudl.BitStringReader;
+import org.codemancer.db.Fact;
 import org.codemancer.db.Line;
 import org.codemancer.db.Reference;
 import org.codemancer.db.BasicBlock;
@@ -168,7 +169,7 @@ public class BasicBlockDetector {
 				.setParameter("maxAddr", block.getMaxAddr())
 				.getResultList();
 			for (Line line: lines) {
-				line.setProcessed(true);
+				line.setProcessed(Fact.DONE_BASIC_BLOCK_DETECTOR);
 			}
 		}
 	}
@@ -181,7 +182,7 @@ public class BasicBlockDetector {
 	 */
 	public boolean detectNext(Register pc, List<Expression> links) {
 		if (pendingIndex == pendingList.size()) {
-			pendingList = db.getUnprocessedLines();
+			pendingList = db.getUnprocessedLines(Fact.DONE_BASIC_BLOCK_DETECTOR);
 			pendingIndex = 0;
 		}
 
@@ -190,7 +191,7 @@ public class BasicBlockDetector {
 		}
 
 		Line line = pendingList.get(pendingIndex);
-		if (!line.isProcessed()) {
+		if (!line.isProcessed(Fact.DONE_BASIC_BLOCK_DETECTOR)) {
 			long addr = line.getMinAddr();
 			detect(addr, pc, links);
 		}
