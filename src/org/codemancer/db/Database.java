@@ -42,6 +42,42 @@ public class Database {
 		return em.getTransaction();
 	}
 
+	/** Get basic block containing a given address
+	 * @param addr an address within the requested basic block
+	 * @return the basic block, or null if none
+	 */
+	public final BasicBlock getBasicBlock(long addr) {
+		List<BasicBlock> blocks = em.createQuery(
+			"FROM BasicBlock WHERE minAddr <= :addr AND maxAddr >= :addr", BasicBlock.class)
+			.setParameter("addr", addr)
+			.getResultList();
+		if (blocks.size() == 0) {
+			return null;
+		} else if (blocks.size() == 1) {
+			return blocks.get(0);
+		} else {
+			throw new IllegalStateException("multiple basic blocks found ending at the same start address");
+		}
+	}
+
+	/** Get basic block ending immediately prior to a given address
+	 * @param addr the address immediately following the requested basic block
+	 * @return the basic block, or null if none
+	 */
+	public final BasicBlock getPreviousBasicBlock(long addr) {
+		List<BasicBlock> blocks = em.createQuery(
+			"FROM BasicBlock WHERE maxAddr = :maxAddr", BasicBlock.class)
+			.setParameter("maxAddr", addr - 1)
+			.getResultList();
+		if (blocks.size() == 0) {
+			return null;
+		} else if (blocks.size() == 1) {
+			return blocks.get(0);
+		} else {
+			throw new IllegalStateException("multiple basic blocks found ending at the same end address");
+		}
+	}
+
 	/** Get unprocessed references.
 	 * @return a list of unprocessed references
 	 */
@@ -57,6 +93,15 @@ public class Database {
 	public final List<Line> getUnprocessedLines() {
 		return em.createQuery(
 			"FROM Line WHERE processed = false", Line.class)
+			.getResultList();
+	}
+
+	/** Get unprocessed basic blocks.
+	 * @return a list of unprocessed basic blocks
+	 */
+	public final List<BasicBlock> getUnprocessedBasicBlocks() {
+		return em.createQuery(
+			"FROM BasicBlock WHERE processed = false", BasicBlock.class)
 			.getResultList();
 	}
 

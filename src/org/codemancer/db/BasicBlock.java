@@ -6,6 +6,8 @@
 package org.codemancer.db;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.FetchType;
 
 /** A class to represent a basic block.
  * A basic block is defined to be a sequence of instructions for which
@@ -29,6 +31,13 @@ public class BasicBlock extends Fact {
 
 	/** True if execution can fall through to the next basic block, otherwise false. */
 	private boolean fallThrough;
+
+	/** True if this block has been processed by the extended basic block detector, otherwise false. */
+	private boolean processed = false;
+
+	/** The extended basic block to which this basic block belongs, or null if none. */
+	@ManyToOne(fetch=FetchType.EAGER)
+	private ExtendedBasicBlock ebb = null;
 
 	/** Construct empty basic block.
 	 * A default constructor is required by the JPA.
@@ -74,5 +83,33 @@ public class BasicBlock extends Fact {
 	 */
 	public boolean canFallThrough() {
 		return fallThrough;
+	}
+
+	/** Test whether this line has been processed by the extended basic block detector.
+	 * @return true if processed, otherwise false
+	 */
+	public boolean isProcessed() {
+		return processed;
+	}
+
+	/** Mark whether this block has been processed by the extended basic block detector.
+	 * @param processed true if processed, otherwise false
+	 */
+	public void setProcessed(boolean processed) {
+		this.processed = processed;
+	}
+
+	/** Get the extended basic block to which this basic block belongs.
+	 * @return the extended basic block, or null if none
+	 */
+	public ExtendedBasicBlock getExtendedBasicBlock() {
+		return ebb;
+	}
+
+	/** Set the extended basic block to which this basic block belongs.
+	 * @param ebb the extended basic block, or null if none
+	 */
+	public void setExtendedBasicBlock(ExtendedBasicBlock ebb) {
+		this.ebb = ebb;
 	}
 }
