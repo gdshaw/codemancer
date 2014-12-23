@@ -15,7 +15,10 @@ GNU General Public License (version 3 or any later version).
 <cpu name="armv3" extends="armv2">
  <feature name="armv3"/>
 </cpu>
-<cpu name="armv4" extends="armv3">
+<cpu name="armv3m" extends="armv3">
+ <feature name="armv3m"/>
+</cpu>
+<cpu name="armv4" extends="armv3m">
  <feature name="armv4"/>
 </cpu>
 <cpu name="arm" extends="armv4">
@@ -3362,6 +3365,304 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="mull-instr">
+ <fragment>
+  <var name="rdhi">
+   <ref name="register"/>
+  </var>
+  <var name="rdlo">
+   <ref name="register"/>
+  </var>
+  <var name="rs">
+   <ref name="register"/>
+  </var>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <var name="s">
+   <ref name="s-bit"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>1001</const>
+   <ref name="rs"/>
+   <ref name="rdlo"/>
+   <ref name="rdhi"/>
+   <ref name="s"/>
+   <const>001</const>
+   <const>0000</const>
+  </pattern>
+  <phrase>
+   <literal>UMULL</literal>
+  </phrase>
+  <phrase>
+   <ref name="s"/>
+  </phrase>
+  <phrase>
+   <ref name="rdlo"/>
+   <literal>,</literal><ws/>
+   <ref name="rdhi"/>
+   <literal>,</literal><ws/>
+   <ref name="rm"/>
+   <literal>,</literal><ws/>
+   <ref name="rs"/>
+  </phrase>
+  <effect>
+   <temp name="rd">
+    <mul>
+     <extend size="64" encoding="u">
+      <ref name="rm"/>
+     </extend>
+     <ref name="rs"/>
+    </mul>
+   </temp>
+   <assign>
+    <ref name="rdlo"/>
+    <and>
+     <temp name="rd"/>
+     <const>0xFFFFFFFF</const>
+    </and>
+   </assign>
+   <assign>
+    <ref name="rdhi"/>
+    <and>
+     <shift width="64" method="logical">
+      <temp name="rd"/>
+      <const>-32</const>
+     </shift>
+     <const>0xFFFFFFFF</const>
+    </and>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rdhi">
+   <ref name="register"/>
+  </var>
+  <var name="rdlo">
+   <ref name="register"/>
+  </var>
+  <var name="rs">
+   <ref name="register"/>
+  </var>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <var name="s">
+   <ref name="s-bit"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>1001</const>
+   <ref name="rs"/>
+   <ref name="rdlo"/>
+   <ref name="rdhi"/>
+   <ref name="s"/>
+   <const>101</const>
+   <const>0000</const>
+  </pattern>
+  <phrase>
+   <literal>UMLAL</literal>
+  </phrase>
+  <phrase>
+   <ref name="s"/>
+  </phrase>
+  <phrase>
+   <ref name="rdlo"/>
+   <literal>,</literal><ws/>
+   <ref name="rdhi"/>
+   <literal>,</literal><ws/>
+   <ref name="rm"/>
+   <literal>,</literal><ws/>
+   <ref name="rs"/>
+  </phrase>
+  <effect>
+   <temp name="rd">
+    <add>
+     <mul>
+      <extend size="64" encoding="u">
+       <ref name="rm"/>
+      </extend>
+      <ref name="rs"/>
+     </mul>
+     <or>
+      <ref name="rdlo"/>
+      <shift width="8" method="logical">
+       <ref name="rdhi"/>
+      </shift>
+     </or>
+    </add>
+   </temp>
+   <assign>
+    <ref name="rdlo"/>
+    <and>
+     <temp name="rd"/>
+     <const>0xFFFFFFFF</const>
+    </and>
+   </assign>
+   <assign>
+    <ref name="rdhi"/>
+    <and>
+     <shift width="64" method="logical">
+      <temp name="rd"/>
+      <const>-32</const>
+     </shift>
+     <const>0xFFFFFFFF</const>
+    </and>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rdhi">
+   <ref name="register"/>
+  </var>
+  <var name="rdlo">
+   <ref name="register"/>
+  </var>
+  <var name="rs">
+   <ref name="register"/>
+  </var>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <var name="s">
+   <ref name="s-bit"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>1001</const>
+   <ref name="rs"/>
+   <ref name="rdlo"/>
+   <ref name="rdhi"/>
+   <ref name="s"/>
+   <const>011</const>
+   <const>0000</const>
+  </pattern>
+  <phrase>
+   <literal>SMULL</literal>
+  </phrase>
+  <phrase>
+   <ref name="s"/>
+  </phrase>
+  <phrase>
+   <ref name="rdlo"/>
+   <literal>,</literal><ws/>
+   <ref name="rdhi"/>
+   <literal>,</literal><ws/>
+   <ref name="rm"/>
+   <literal>,</literal><ws/>
+   <ref name="rs"/>
+  </phrase>
+  <effect>
+   <temp name="rd">
+    <mul>
+     <extend size="64" encoding="2c">
+      <ref name="rm"/>
+     </extend>
+     <ref name="rs"/>
+    </mul>
+   </temp>
+   <assign>
+    <ref name="rdlo"/>
+    <and>
+     <temp name="rd"/>
+     <const>0xFFFFFFFF</const>
+    </and>
+   </assign>
+   <assign>
+    <ref name="rdhi"/>
+    <and>
+     <shift width="64" method="logical">
+      <temp name="rd"/>
+      <const>-32</const>
+     </shift>
+     <const>0xFFFFFFFF</const>
+    </and>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="rdhi">
+   <ref name="register"/>
+  </var>
+  <var name="rdlo">
+   <ref name="register"/>
+  </var>
+  <var name="rs">
+   <ref name="register"/>
+  </var>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <var name="s">
+   <ref name="s-bit"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>1001</const>
+   <ref name="rs"/>
+   <ref name="rdlo"/>
+   <ref name="rdhi"/>
+   <ref name="s"/>
+   <const>111</const>
+   <const>0000</const>
+  </pattern>
+  <phrase>
+   <literal>SMLAL</literal>
+  </phrase>
+  <phrase>
+   <ref name="s"/>
+  </phrase>
+  <phrase>
+   <ref name="rdlo"/>
+   <literal>,</literal><ws/>
+   <ref name="rdhi"/>
+   <literal>,</literal><ws/>
+   <ref name="rm"/>
+   <literal>,</literal><ws/>
+   <ref name="rs"/>
+  </phrase>
+  <effect>
+   <temp name="rd">
+    <add>
+     <mul>
+      <extend size="64" encoding="2c">
+       <ref name="rm"/>
+      </extend>
+      <ref name="rs"/>
+     </mul>
+     <or>
+      <ref name="rdlo"/>
+      <shift width="8" method="logical">
+       <ref name="rdhi"/>
+      </shift>
+     </or>
+    </add>
+   </temp>
+   <assign>
+    <ref name="rdlo"/>
+    <and>
+     <temp name="rd"/>
+     <const>0xFFFFFFFF</const>
+    </and>
+   </assign>
+   <assign>
+    <ref name="rdhi"/>
+    <and>
+     <shift width="64" method="logical">
+      <temp name="rd"/>
+      <const>-32</const>
+     </shift>
+     <const>0xFFFFFFFF</const>
+    </and>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -3377,6 +3678,9 @@ GNU General Public License (version 3 or any later version).
    <require name="armv3">
     <ref name="status-instr"/>
     <ref name="swp-instr"/>
+   </require>
+   <require name="armv3m">
+    <ref name="mull-instr"/>
    </require>
    <require name="armv4">
     <ref name="lsh-instr"/>

@@ -76,7 +76,7 @@ public class Extension extends Expression {
 	 */
 	public static Expression make(Context ctx, Element element) throws CpudlParseException {
 		int size = Context.parseIntegerAttribute("size", element);
-		int encoding = IntegerType.UNSIGNED;
+		int encoding = Context.parseEncodingAttribute(element);
 		boolean bigEndian = ctx.getArchitecture().isBigEndian();
 		Style style = null;
 
