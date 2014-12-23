@@ -6,6 +6,8 @@
 package org.codemancer.db;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.FetchType;
 
 /** A class to represent an extended basic block.
  * An extended basic block is defined to be a sequence of instructions
@@ -24,6 +26,10 @@ public class ExtendedBasicBlock extends Fact {
 
 	/** True if execution can fall through to the next block, otherwise false. */
 	private boolean fallThrough;
+
+	/** The subroutine to which this block belongs, or null if none. */
+	@ManyToOne(fetch=FetchType.LAZY)
+	private Subroutine subroutine = null;
 
 	/** Construct empty extended basic block.
 	 * A default constructor is required by the JPA.
@@ -57,5 +63,19 @@ public class ExtendedBasicBlock extends Fact {
 	 */
 	public boolean canFallThrough() {
 		return fallThrough;
+	}
+
+	/** Get the subroutine to which this extended basic block belongs.
+	 * @return the subroutine, or null if none
+	 */
+	public Subroutine getSubroutine() {
+		return subroutine;
+	}
+
+	/** Set the subroutine to which this extended basic block belongs.
+	 * @param subroutine the subroutine, or null if none
+	 */
+	public void setSubroutine(Subroutine subroutine) {
+		this.subroutine = subroutine;
 	}
 }

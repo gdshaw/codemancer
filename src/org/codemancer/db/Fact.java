@@ -24,6 +24,9 @@ public class Fact {
 	/** A constant to indicate that this fact has been processed by the basic block detector. */
 	public static final int DONE_EXTENDED_BASIC_BLOCK_DETECTOR = 3;
 
+	/** A constant to indicate that this fact has been processed by the subroutine detector. */
+	public static final int DONE_SUBROUTINE_DETECTOR = 3;
+
 	/** The unique ID for this fact. */
 	@Id
 	@GeneratedValue

@@ -111,6 +111,28 @@ public class Database {
 			.getResultList();
 	}
 
+	/** Get unprocessed extended basic blocks.
+	 * @param requiredLevel the required level of processing to be omitted from the result
+	 * @return a list of unprocessed extended basic blocks
+	 */
+	public final List<ExtendedBasicBlock> getUnprocessedExtendedBasicBlocks(int requiredLevel) {
+		return em.createQuery(
+			"FROM ExtendedBasicBlock WHERE processedLevel < :requiredLevel", ExtendedBasicBlock.class)
+			.setParameter("requiredLevel", requiredLevel)
+			.getResultList();
+	}
+
+	/** Get extended basic blocks in a given subroutine.
+	 * @param sub the subroutine
+	 * @return a list of extended basic blocks
+	 */
+	public final List<ExtendedBasicBlock> getExtendedBasicBlocksIn(Subroutine sub) {
+		return em.createQuery(
+			"FROM ExtendedBasicBlock WHERE sub = :sub", ExtendedBasicBlock.class)
+			.setParameter("sub", sub)
+			.getResultList();
+	}
+
 	/** Get all references to a given address range.
 	 * @param minAddr the lowest address to include
 	 * @param maxAddr the highest address to include

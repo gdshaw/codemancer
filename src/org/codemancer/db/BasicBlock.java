@@ -95,4 +95,14 @@ public class BasicBlock extends Fact {
 	public void setExtendedBasicBlock(ExtendedBasicBlock ebb) {
 		this.ebb = ebb;
 	}
+
+	/** Get the subroutine to which this basic block belongs.
+	 * @return the subroutine, or null if none
+	 */
+	public Subroutine getSubroutine() {
+		if (this.ebb != null) {
+			return this.ebb.getSubroutine();
+		}
+		return null;
+	}
 }
