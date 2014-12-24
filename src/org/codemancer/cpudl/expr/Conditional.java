@@ -68,6 +68,21 @@ public class Conditional extends Expression {
 		whenFalse.listAssignments(uncond, cond, true);
 	}
 
+	public Expression simplify() {
+		Expression simpleCondition = condition.simplify();
+		Expression simpleWhenTrue = whenTrue.simplify();
+		Expression simpleWhenFalse = whenFalse.simplify();
+		if (simpleCondition instanceof Constant) {
+			Constant constCondition = (Constant)simpleCondition;
+			if (constCondition.getValue() != 0) {
+				return simpleWhenTrue;
+			} else {
+				return simpleWhenFalse;
+			}
+		}
+		return new Conditional(simpleCondition, simpleWhenTrue, simpleWhenFalse);
+	}
+
 	/** Make conditional expression from XML element.
 	 * @param ctx the context of this expression
 	 * @param the expression as an XML element
