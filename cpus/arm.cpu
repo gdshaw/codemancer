@@ -2518,7 +2518,7 @@ GNU General Public License (version 3 or any later version).
     <bind name="rd" src="rd"/>
     <bind name="operand">
      <ref name="b">
-      <bind name="operand" ref="operand"/>
+      <bind name="ea" ref="operand"/>
      </ref>
     </bind>
    </ref>
