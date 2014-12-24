@@ -69,18 +69,7 @@ public class IntegerType extends Type {
 			throw new CpudlParseException(element, "integer size attribute out of range");
 		}
 
-		// Parse encoding attribute.
-		String encodingString = element.getAttribute("encoding");
-		if (encodingString.length() == 0) {
-			this.encoding = UNSIGNED;
-		} else if (encodingString.equals("u")) {
-			this.encoding = UNSIGNED;
-		} else if (encodingString.equals("2c")) {
-			this.encoding = TWOS_COMPLEMENT;
-		} else {
-			throw new CpudlParseException(element, "invalid integer encoding attribute");
-		}
-
+		this.encoding = Context.parseEncodingAttribute(element);
 		this.bigEndian = ctx.getArchitecture().isBigEndian();
 		this.style = ctx.getStylesheet().getStyle(element.getAttribute("class"));
 	}

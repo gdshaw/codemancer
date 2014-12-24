@@ -179,8 +179,7 @@ public class Context {
 		}
 	}
 
-	public static String parseStringAttribute(String attrName, Element element)
-		throws CpudlParseException {
+	public static String parseStringAttribute(String attrName, Element element) throws CpudlParseException {
 
 		String attr = element.getAttribute(attrName);
 		if (attr.length() == 0) {
@@ -190,8 +189,7 @@ public class Context {
 		return attr;
 	}
 
-	public static int parseIntegerAttribute(String attrName, Element element)
-		throws CpudlParseException {
+	public static int parseIntegerAttribute(String attrName, Element element) throws CpudlParseException {
 
 		String attrStr = element.getAttribute(attrName);
 		if (attrStr.length() == 0) {
@@ -203,6 +201,19 @@ public class Context {
 		} catch (NumberFormatException ex) {
 			throw new CpudlParseException(element,
 				"invalid " + attrName + " attribute in <" + element.getTagName() + "> element");
+		}
+	}
+
+	public static int parseEncodingAttribute(Element element) throws CpudlParseException {
+		String encodingString = element.getAttribute("encoding");
+		if (encodingString.length() == 0) {
+			return IntegerType.UNSIGNED;
+		} else if (encodingString.equals("u")) {
+			return IntegerType.UNSIGNED;
+		} else if (encodingString.equals("2c")) {
+			return IntegerType.TWOS_COMPLEMENT;
+		} else {
+			throw new CpudlParseException(element, "invalid integer encoding attribute");
 		}
 	}
 }
