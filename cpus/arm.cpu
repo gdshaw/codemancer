@@ -3663,6 +3663,27 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="bx-instr">
+ <fragment>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>10001111</const>
+   <const>11111111</const>
+   <const>01001000</const>
+  </pattern>
+  <phrase>
+   <literal>BX</literal>
+  </phrase>
+  <phrase></phrase>
+  <phrase>
+   <ref name="rm"/>
+  </phrase>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -3684,6 +3705,7 @@ GNU General Public License (version 3 or any later version).
    </require>
    <require name="armv4">
     <ref name="lsh-instr"/>
+    <ref name="bx-instr"/>
    </require>
   </var>
   <var name="cc">
