@@ -1381,6 +1381,9 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <ref name="rm"/>
   </phrase>
+  <effect>
+   <ref name="rm"/>
+  </effect>
  </fragment>
 
  <fragment>
@@ -2427,7 +2430,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="opcode">
-    <bind name="rn" src="rd"/>
+    <bind name="rn" src="rn"/>
     <bind name="operand" src="operand"/>
    </ref>
   </effect>
@@ -2693,7 +2696,7 @@ GNU General Public License (version 3 or any later version).
    </ref>
    <ref name="w">
     <bind name="rn" src="rn"/>
-    <bind name="wrn">
+    <bind name="ea">
      <add>
       <ref name="rn"/>
       <ref name="mode">
@@ -2754,21 +2757,21 @@ GNU General Public License (version 3 or any later version).
   <phrase>
    <ref name="addr"/>
   </phrase>
- </fragment>
- <effect>
-  <ref name="l"/>
-  <assign>
-   <register name="PC"/>
-   <add>
+  <effect>
+   <ref name="l"/>
+   <assign>
     <register name="PC"/>
-    <mul>
-     <ref name="offset"/>
-     <const>4</const>
-    </mul>
-    <const>8</const>
-   </add>
-  </assign>
- </effect>
+    <add>
+     <register name="PC"/>
+     <mul>
+      <ref name="offset"/>
+      <const>4</const>
+     </mul>
+     <const>8</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
 </define>
 
 <define name="swi-instr">
