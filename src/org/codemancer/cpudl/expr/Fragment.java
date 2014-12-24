@@ -67,7 +67,7 @@ public class Fragment extends Expression {
 			resolvedFragment.put(entry.getKey(), resolvedValue);
 		}
 		if (effect != null) {
-			Expression resolvedEffect = effect.resolveReferences(this, args);
+			Expression resolvedEffect = effect.resolveReferences(resolvedFragment, args);
 			resolvedFragment.setEffect(resolvedEffect);
 		}
 		return resolvedFragment;
