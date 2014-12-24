@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
-import java.nio.ByteBuffer;
+import java.io.IOException;
 import javax.persistence.EntityManager;
 
+import org.codemancer.loader.ObjectFile;
+import org.codemancer.loader.ObjectFileReader;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Constant;
 import org.codemancer.cpudl.expr.Register;
@@ -28,14 +30,17 @@ import org.codemancer.db.Line;
 import org.codemancer.db.Reference;
 import org.codemancer.db.Database;
 
-/** A class for iteratively disassembling a supplied binary image.
+/** A class for iteratively disassembling a supplied object file.
  * Usage is to repeatedly call process() until it returns true.
  */
 public class IterativeDisassembler {
-	/** The binary image to be disassembled. */
-	private ByteBuffer image;
+	/** The object file to be disassembled. */
+	private ObjectFile obj;
 
-	/** A database corresponding to the binary image. */
+	/** A reader for the object file. */
+	private ObjectFileReader reader;
+
+	/** A database corresponding to the object file. */
 	private Database db;
 
 	/** The architecture to be used when disassembling. */
@@ -43,12 +48,6 @@ public class IterativeDisassembler {
 
 	/** The feature set to be used when disassembling. */
 	private FeatureSet features;
-
-	/** The lowest address that is part of the binary image. */
-	private long minAddr;
-
-	/** The highest address that is part of the binary image. */
-	private long maxAddr;
 
 	/** A list of pending unprocessed references. */
 	private List<Reference> pendingList = new ArrayList<Reference>();
@@ -59,20 +58,16 @@ public class IterativeDisassembler {
 	private int pendingIndex = 0;
 
 	/** Construct iterative disassembler object.
-	 * @param image the binary image to be disassembled
-	 * @param db the database corresponding to the binary image
+	 * @param obj the object file to be disassembled
+	 * @param db the database corresponding to the object file
 	 * @param arch the architecture
-	 * @param minAddr the lowest address that is part of the binary image
-	 * @param maxAddr the highest address that is part of the binary image
 	 */
-	public IterativeDisassembler(ByteBuffer image, Database db, Architecture arch,
-		long minAddr, long maxAddr) {
-		this.image = image;
+	public IterativeDisassembler(ObjectFile obj, Database db, Architecture arch) throws IOException {
+		this.obj = obj;
+		this.reader = new ObjectFileReader(obj);
 		this.db = db;
 		this.arch = arch;
 		this.features = new FeatureSet(arch);
-		this.minAddr = minAddr;
-		this.maxAddr = maxAddr;
 	}
 
 	/** Disassemble from a given address.
@@ -88,10 +83,10 @@ public class IterativeDisassembler {
 		Type start = arch.getStart();
 
 		// Initialise buffer.
-		long bufferAddr = addr;
 		BitString buffer = new ShortBitString();
+		reader.seek(addr);
 
-		// Determine address at which disassembly would stop as a result of
+		// Determine address at which disassembly should stop as a result of
 		// reaching an address which has already been disassembled.
 		List<Line> existingLines = em.createQuery(
 			"FROM Line " +
@@ -101,19 +96,18 @@ public class IterativeDisassembler {
 			.setParameter("addr", addr)
 			.setMaxResults(1)
 			.getResultList();
-		long maxAddr = 0;
+		long stopAddr = 0;
 		if (!existingLines.isEmpty()) {
-			maxAddr = existingLines.get(0).getMinAddr();
+			stopAddr = existingLines.get(0).getMinAddr();
 		}
 
 		// Disassemble until one of the termination conditions is met.
-		while ((addr < maxAddr) || (maxAddr == 0)) {
+		while ((addr < stopAddr) || (stopAddr == 0)) {
 			// Fill/refill buffer.
-			while ((buffer.length() < 64) && ((bufferAddr < maxAddr) || (maxAddr == 0))) {
-				byte newByte = image.get((int)(bufferAddr - minAddr));
+			while ((buffer.length() < 64) && ((reader.tell() < stopAddr) || (stopAddr == 0))) {
+				byte newByte = reader.get();
 				BitString newBits = new ShortBitString(newByte, 8, arch.isBigEndian());
 				buffer = buffer.concat(newBits);
-				bufferAddr += 1;
 			}
 
 			// Decode the next instruction.
@@ -188,14 +182,12 @@ public class IterativeDisassembler {
 			pendingList = db.getUnprocessedReferences(Fact.DONE_ITERATIVE_DISASSEMBLER);
 			pendingIndex = 0;
 		}
-
 		if (pendingIndex == pendingList.size()) {
 			return true;
 		}
-
 		Reference reference = pendingList.get(pendingIndex);
 		long addr = reference.getDstAddr();
-		if (reference.isCodeRef() && (addr >= minAddr) && (addr <= maxAddr)) {
+		if (reference.isCodeRef() && reader.isMapped(addr)) {
 			disassemble(reference.getDstAddr(), pc, links);
 		}
 		reference.setProcessed(Fact.DONE_ITERATIVE_DISASSEMBLER);

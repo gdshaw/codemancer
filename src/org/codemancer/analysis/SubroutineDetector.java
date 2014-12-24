@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.ArrayList;
 import javax.persistence.EntityManager;
 
+import org.codemancer.loader.ObjectFile;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Register;
 import org.codemancer.cpudl.Architecture;
@@ -23,20 +24,14 @@ import org.codemancer.db.Database;
 
 /** A class for detecting subroutines. */
 public class SubroutineDetector {
-	/** The binary image to be disassembled. */
-	private ByteBuffer image;
+	/** The object file to be disassembled. */
+	private ObjectFile obj;
 
-	/** A database corresponding to the binary image. */
+	/** A database corresponding to the object file. */
 	private Database db;
 
 	/** The architecture to be used when disassembling. */
 	private Architecture arch;
-
-	/** The lowest address within the binary image. */
-	private long minAddr;
-
-	/** The highest address within the binary image. */
-	private long maxAddr;
 
 	/** A list of pending unprocessed blocks. */
 	private List<ExtendedBasicBlock> pendingList = new ArrayList<ExtendedBasicBlock>();
@@ -51,19 +46,14 @@ public class SubroutineDetector {
 	private boolean done = false;
 
 	/** Construct subroutine detector.
-	 * @param image the binary image to be disassembled
-	 * @param db the database corresponding to the binary image
+	 * @param obj the object file to be disassembled
+	 * @param db the database corresponding to the object file
 	 * @param arch the architecture
-	 * @param minAddr the lowest address within the binary image
-	 * @param maxAddr the highest address within the binary image
 	 */
-	public SubroutineDetector(ByteBuffer image, Database db, Architecture arch,
-		long minAddr, long maxAddr) {
-		this.image = image;
+	public SubroutineDetector(ObjectFile obj, Database db, Architecture arch) {
+		this.obj = obj;
 		this.db = db;
 		this.arch = arch;
-		this.minAddr = minAddr;
-		this.maxAddr = maxAddr;
 	}
 
 

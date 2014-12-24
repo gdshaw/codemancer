@@ -69,6 +69,7 @@ public class InstructionClassifier {
 		if (effect instanceof Fragment) {
 			effect = ((Fragment)effect).getEffect();
 		}
+		effect = effect.simplify();
 		List<Assignment> uncond = new ArrayList<Assignment>();
 		List<Assignment> cond = new ArrayList<Assignment>();
 		effect.listAssignments(uncond, cond, false);

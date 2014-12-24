@@ -9,9 +9,12 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import javax.persistence.EntityManager;
 
+import org.codemancer.loader.ObjectFile;
+import org.codemancer.loader.ObjectFileReader;
 import org.codemancer.cpudl.expr.Expression;
 import org.codemancer.cpudl.expr.Register;
 import org.codemancer.cpudl.expr.Constant;
@@ -30,10 +33,13 @@ import org.codemancer.db.Database;
 
 /** A class for detecting basic blocks. */
 public class BasicBlockDetector {
-	/** The binary image to be disassembled. */
-	private ByteBuffer image;
+	/** The object file to be disassembled. */
+	private ObjectFile obj;
 
-	/** A database corresponding to the binary image. */
+	/** A reader for the object file. */
+	private ObjectFileReader reader;
+
+	/** A database corresponding to the object file. */
 	private Database db;
 
 	/** The architecture to be used when disassembling. */
@@ -41,12 +47,6 @@ public class BasicBlockDetector {
 
 	/** The feature set to be used when disassembling. */
 	private FeatureSet features;
-
-	/** The lowest address that is part of the binary image. */
-	private long minAddr;
-
-	/** The highest address that is part of the binary image. */
-	private long maxAddr;
 
 	/** A list of pending unprocessed lines. */
 	private List<Line> pendingList = new ArrayList<Line>();
@@ -57,19 +57,16 @@ public class BasicBlockDetector {
 	private int pendingIndex = 0;
 
 	/** Construct basic block detector.
-	 * @param image the binary image to be disassembled
-	 * @param db the database corresponding to the binary image
+	 * @param obj the object file to be disassembled
+	 * @param db the database corresponding to the object file
 	 * @param arch the architecture
-	 * @param minAddr the lowest address that is part of the binary image
-	 * @param maxAddr the highest address that is part of the binary image
 	 */
-	public BasicBlockDetector(ByteBuffer image, Database db, Architecture arch, long minAddr, long maxAddr) {
-		this.image = image;
+	public BasicBlockDetector(ObjectFile obj, Database db, Architecture arch) throws IOException {
+		this.obj = obj;
+		this.reader = new ObjectFileReader(obj);
 		this.db = db;
 		this.arch = arch;
 		this.features = new FeatureSet(arch);
-		this.minAddr = minAddr;
-		this.maxAddr = maxAddr;
 	}
 
 	/** Make a basic block starting at a given address.
@@ -82,8 +79,8 @@ public class BasicBlockDetector {
 		Type start = arch.getStart();
 
 		// Initialise buffer.
-		long bufferAddr = addr;
 		BitString buffer = new ShortBitString();
+		reader.seek(addr);
 
 		// Determine address at which disassembly would stop as a result of
 		// reaching the destination of a branch or call instruction.
@@ -95,21 +92,20 @@ public class BasicBlockDetector {
 			.setParameter("addr", addr)
 			.setMaxResults(1)
 			.getResultList();
-		long maxAddr = 0;
+		long stopAddr = 0;
 		if (!existingLines.isEmpty()) {
-			maxAddr = existingLines.get(0).getDstAddr();
+			stopAddr = existingLines.get(0).getDstAddr();
 		}
 
 		// Disassemble until one of the termination conditions is met.
 		long startAddr = addr;
 		boolean fallThrough = false;
-		while ((addr < maxAddr) || (maxAddr == 0)) {
+		while ((addr < stopAddr) || (stopAddr == 0)) {
 			// Fill/refill buffer.
-			while ((buffer.length() < 64) && ((bufferAddr < maxAddr) || (maxAddr == 0))) {
-				byte newByte = image.get((int)(bufferAddr - minAddr));
+			while ((buffer.length() < 64) && ((reader.tell() < stopAddr) || (stopAddr == 0))) {
+				byte newByte = reader.get();
 				BitString newBits = new ShortBitString(newByte, 8, arch.isBigEndian());
 				buffer = buffer.concat(newBits);
-				bufferAddr += 1;
 			}
 
 			// Decode the next instruction.
