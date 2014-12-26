@@ -36,8 +36,8 @@ public class ExtendedBasicBlockDetector {
 	/** A list of pending unprocessed blocks. */
 	private List<BasicBlock> pendingList = new ArrayList<BasicBlock>();
 
-	/** The index of the first unprocessed line in the pending list.
-	 * If no lines are pending then this is equal to the length of the list.
+	/** The index of the first unprocessed block in the pending list.
+	 * If no blocks are pending then this is equal to the length of the list.
 	 */
 	private int pendingIndex = 0;
 

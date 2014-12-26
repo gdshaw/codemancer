@@ -131,7 +131,6 @@ public class BasicBlockDetector {
 			instr = instr.resolveRegisters(registers).simplify();
 
 			// Calculate the length of this instruction.
-			String asm = start.unparse(0, instr) + "\t" + start.unparse(1, instr);
 			long bitCount = codeReader.tell();
 			if ((bitCount & 7) != 0) {
 				throw new IllegalArgumentException("instruction not a whole number of bytes");

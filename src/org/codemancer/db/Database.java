@@ -122,6 +122,17 @@ public class Database {
 			.getResultList();
 	}
 
+	/** Get basic blocks in a given extended basic block.
+	 * @param ebb the extended basic block
+	 * @return a list of basic blocks
+	 */
+	public final List<BasicBlock> getBasicBlocksIn(ExtendedBasicBlock ebb) {
+		return em.createQuery(
+			"FROM BasicBlock WHERE ebb = :ebb", BasicBlock.class)
+			.setParameter("ebb", ebb)
+			.getResultList();
+	}
+
 	/** Get extended basic blocks in a given subroutine.
 	 * @param sub the subroutine
 	 * @return a list of extended basic blocks
@@ -165,6 +176,24 @@ public class Database {
 	public final List<BasicBlock> getBasicBlocks() {
 		return em.createQuery(
 			"FROM BasicBlock ORDER BY minAddr", BasicBlock.class)
+			.getResultList();
+	}
+
+	/** Get all extended basic blocks.
+	 * @return a list of extended basic blocks
+	 */
+	public final List<ExtendedBasicBlock> getExtendedBasicBlocks() {
+		return em.createQuery(
+			"FROM ExtendedBasicBlock ORDER BY minAddr", ExtendedBasicBlock.class)
+			.getResultList();
+	}
+
+	/** Get all subroutines.
+	 * @return a list of subroutines
+	 */
+	public final List<Subroutine> getSubroutines() {
+		return em.createQuery(
+			"FROM Subroutine ORDER BY minAddr", Subroutine.class)
 			.getResultList();
 	}
 }
