@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.codemancer.cpudl.State;
 import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.CpudlReferenceException;
 import org.codemancer.cpudl.type.Type;
@@ -84,6 +85,10 @@ public class Fragment extends Expression {
 			resolvedFragment.setEffect(resolvedEffect);
 		}
 		return resolvedFragment;
+	}
+
+	public Expression evaluate(State state) {
+		return (effect != null) ? effect.evaluate(state) : null;
 	}
 
 	public Expression simplify() {

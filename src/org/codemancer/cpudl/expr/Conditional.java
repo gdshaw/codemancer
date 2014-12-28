@@ -11,6 +11,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
 import org.codemancer.cpudl.Context;
+import org.codemancer.cpudl.State;
 import org.codemancer.cpudl.Style;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.type.Type;
@@ -60,6 +61,31 @@ public class Conditional extends Expression {
 		Expression resolvedWhenTrue = whenTrue.resolveRegisters(registers);
 		Expression resolvedWhenFalse = whenFalse.resolveRegisters(registers);
 		return new Conditional(resolvedCondition, resolvedWhenTrue, resolvedWhenFalse);
+	}
+
+	public Expression evaluate(State state) {
+		Expression evalCondition = condition.evaluate(state).simplify();
+		if (evalCondition instanceof Constant) {
+			// If the condition can be reduced to a constant
+			// then evaluate the branch indicated and disregard
+			// the other one.
+			Constant constCondition = (Constant)evalCondition;
+			if (constCondition.getValue() != 0) {
+				return whenTrue.evaluate(state);
+			} else {
+				return whenFalse.evaluate(state);
+			}
+		} else {
+			// If the condition cannot be reduced to a constant
+			// then it is uncertain which branch should be evaluated.
+			// A future representation of the machine state will
+			// allow this uncertainty to be recorded. Until then,
+			// both possibilities are evaluated but neither is
+			// returned.
+			whenTrue.evaluate(state);
+			whenFalse.evaluate(state);
+			return null;
+		}
 	}
 
 	public void listAssignments(List<Assignment> uncond, List<Assignment> cond, boolean isCond) {

@@ -9,6 +9,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
 import org.codemancer.cpudl.Context;
+import org.codemancer.cpudl.State;
 import org.codemancer.cpudl.CpudlParseException;
 import org.codemancer.cpudl.type.Type;
 
@@ -32,6 +33,11 @@ public class Sequence extends BinaryExpression {
 
 	public String getSymbol() {
 		return ",";
+	}
+
+	public Expression evaluate(State state) {
+		getLhs().evaluate(state);
+		return getRhs().evaluate(state);
 	}
 
 	/** Make sequence operation from XML element.
