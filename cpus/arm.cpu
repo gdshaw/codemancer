@@ -2386,7 +2386,7 @@ GNU General Public License (version 3 or any later version).
   <effect>
    <ref name="opcode">
     <bind name="rd" src="rd"/>
-    <bind name="rn" src="rd"/>
+    <bind name="rn" src="rn"/>
     <bind name="operand" src="operand"/>
    </ref>
   </effect>
