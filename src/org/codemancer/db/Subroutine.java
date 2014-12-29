@@ -13,6 +13,9 @@ public class Subroutine extends Fact {
 	/** The entry point for this subroutine. */
 	private long entryAddr;
 
+	/** The numerical suffix to use when naming the next local SSA expression. */
+	private long nextSsaName = 0;
+
 	/** Construct empty subroutine.
 	 * A default constructor is required by the JPA.
 	 */
@@ -36,5 +39,14 @@ public class Subroutine extends Fact {
 	 */
 	public long getEntryAddr() {
 		return entryAddr;
+	}
+
+	/** Allocate SSA expression name.
+	 * @return the name
+	 */
+	public String allocateSsaName() {
+		String name = String.format("v%d", nextSsaName);
+		nextSsaName += 1;
+		return name;
 	}
 }
