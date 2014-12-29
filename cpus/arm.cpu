@@ -1642,7 +1642,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="u">
-    <bind name="offset" ref="offset"/>
+    <bind name="offset" src="offset"/>
    </ref>
   </effect>
  </fragment>
@@ -1867,7 +1867,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="u">
-    <bind name="offset" ref="offset"/>
+    <bind name="offset" src="offset"/>
    </ref>
   </effect>
  </fragment>
@@ -1895,7 +1895,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="u">
-    <bind name="offset" ref="rm"/>
+    <bind name="offset" src="rm"/>
    </ref>
   </effect>
  </fragment>
@@ -2521,7 +2521,7 @@ GNU General Public License (version 3 or any later version).
     <bind name="rd" src="rd"/>
     <bind name="operand">
      <ref name="b">
-      <bind name="ea" ref="operand"/>
+      <bind name="ea" src="operand"/>
      </ref>
     </bind>
    </ref>
