@@ -70,12 +70,14 @@ public class Temporary extends Expression {
 		return this;
 	}
 
-	/** Make temporary reference from XML element.
+	/** Make temporary reference or assignment from XML element.
+	 * If this is the defining instance then the result is an assignment,
+	 * otherwise it is a temporary reference.
 	 * @param ctx the context of this expression
 	 * @param element the temporary value reference as XML
-	 * @return the temporary value reference as an object
+	 * @return the temporary value reference or assignment as an object
 	 */
-	public static Temporary make(Context ctx, Element element) throws CpudlParseException {
+	public static Expression make(Context ctx, Element element) throws CpudlParseException {
 		String name = element.getAttribute("name");
 		if (name == null) {
 			throw new CpudlParseException(element, "temporary name not specified");
@@ -104,7 +106,7 @@ public class Temporary extends Expression {
 			}
 			Temporary temporary = new Temporary(value.getType(), name);
 			ctx.registerTemporary(temporary);
-			return temporary;
+			return new Assignment(temporary, value);
 		} else {
 			// This is a reference to a previously-defined temporary.
 			Temporary temporary = ctx.getTemporary(name);
