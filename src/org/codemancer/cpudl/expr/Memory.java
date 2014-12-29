@@ -56,9 +56,11 @@ public class Memory extends Expression {
 	}
 
 	public Expression evaluate(State state) {
-		Expression value = state.get(this);
+		Expression evalAddr = address.evaluate(state);
+		Memory mem = new Memory(getType(), evalAddr);
+		Expression value = state.get(mem);
 		if (value != null) return value;
-		return this;
+		return mem;
 	}
 
 	public void listAssignments(List<Assignment> uncond, List<Assignment> cond, boolean isCond) {
