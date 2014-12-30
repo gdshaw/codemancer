@@ -156,7 +156,7 @@ public class SubroutineDetector {
 
 					// Disregard jumps originating from a block which as not yet been
 					// assigned to a subroutine.
-					if (refBlock.getExtendedBasicBlock().getSubroutine() == null) continue;
+					if (refBlock.getSubroutine() == null) continue;
 
 					// Either make this part of the same subroutine or declare a conflict.
 					if (subroutine == null) {

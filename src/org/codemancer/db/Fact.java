@@ -28,7 +28,7 @@ public class Fact {
 	public static final int DONE_SUBROUTINE_DETECTOR = 4;
 
 	/** A constant to indicate that this fact has been processed by the subroutine detector. */
-	public static final int DONE_REGISTER_LIFETIME = 5;
+	public static final int DONE_SSA_MAPPER = 5;
 
 	/** The unique ID for this fact. */
 	@Id

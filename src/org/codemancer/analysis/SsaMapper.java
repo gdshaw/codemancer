@@ -31,20 +31,29 @@ import org.codemancer.cpudl.BitStringReader;
 import org.codemancer.db.Fact;
 import org.codemancer.db.BasicBlock;
 import org.codemancer.db.ExtendedBasicBlock;
+import org.codemancer.db.Subroutine;
 import org.codemancer.db.Database;
 
-/** A class for tracking the lifetimes of register values. */
-public class RegisterLifetimeTracker {
+/** A class for mapping registers to SSA expressions. */
+public class SsaMapper {
 	/** A class to represent an unexplored path that the flow of control can take. */
 	private static class ControlPath {
 		/** The basic block at which the path begins. */
 		public BasicBlock block;
 
+		/** The machine state to use when following this path.
+		 * This may contain live registers from previous basic blocks
+		 * within the same extended basic block.
+		 */
+		public SsaState state;
+
 		/** Construct path.
 		 * @param block the basic block at which the path begins
+		 * @param state the machine state to use when following this path
 		 */
-		public ControlPath(BasicBlock block) {
+		public ControlPath(BasicBlock block, SsaState state) {
 			this.block = block;
+			this.state = state;
 		}
 	}
 
@@ -56,6 +65,9 @@ public class RegisterLifetimeTracker {
 
 	/** A database corresponding to the object file. */
 	private Database db;
+
+	/** The entity manager for the database. */
+	EntityManager em;
 
 	/** The architecture to be used when disassembling. */
 	private Architecture arch;
@@ -73,26 +85,34 @@ public class RegisterLifetimeTracker {
 	/** A queue of unprocessed extended basic blocks. */
 	private Queue<ExtendedBasicBlock> pendingBlocks = new ArrayDeque<ExtendedBasicBlock>();
 
-	/** Construct register lifetime tracker.
-	 * @param obj the object file to be tracked
+	/** The current basic block. */
+	BasicBlock curBlock;
+
+	/** The address of the current instruction. */
+	long curAddr;
+
+	/** Construct SSA mapper.
+	 * @param obj the object file to be mapped
 	 * @param db the database corresponding to the object file
 	 * @param arch the architecture
 	 */
-	public RegisterLifetimeTracker(ObjectFile obj, Database db, Architecture arch) throws IOException {
+	public SsaMapper(ObjectFile obj, Database db, Architecture arch) throws IOException {
 		this.obj = obj;
 		this.reader = new ObjectFileReader(obj);
 		this.db = db;
+		this.em = db.getEntityManager();
 		this.arch = arch;
 		this.features = new FeatureSet(arch);
 	}
 
-	/** Track registers values in a given basic block
-	 * @param block the basic block to be tracked
+	/** Map registers values for a given path of control
+	 * @param path the path to be followed
 	 * @param pc the program counter
 	 * @param links a list of possible expressions for a subroutine return address
 	 */
-	public void track(BasicBlock block, Register pc, List<Expression> links) {
-		EntityManager em = db.getEntityManager();
+	private void map(ControlPath path, Register pc, List<Expression> links) {
+		BasicBlock block = path.block;
+		SsaState state = path.state;
 		Type start = arch.getStart();
 
 		// Initialise buffer.
@@ -132,6 +152,17 @@ public class RegisterLifetimeTracker {
 			}
 			long byteCount = bitCount >> 3;
 
+			// Evaluate the effect of this instruction.
+			state.setAddr(addr, addr + byteCount);
+			instr.evaluate(state);
+
+			// For subroutine call instructions, invalidate all registers.
+			// It will normally be possible to do better than this if information
+			// about the calling convention is available.
+			if (classifier.isCall()) {
+				state.invalidate();
+			}
+
 			// For branches to basic blocks with this extended basic block,
 			// create a path record if this has not already been done
 			// then add it to the queue.
@@ -146,7 +177,8 @@ public class RegisterLifetimeTracker {
 						long dstAddr = dstConstant.getValue();
 						if (unencounteredBlocks.contains(dstAddr)) {
 							BasicBlock newBlock = db.getBasicBlock(dstAddr);
-							ControlPath newPath = new ControlPath(newBlock);
+							SsaState newState = new SsaState(state);
+							ControlPath newPath = new ControlPath(newBlock, newState);
 							pendingPaths.add(newPath);
 							unencounteredBlocks.remove(dstAddr);
 						}
@@ -156,30 +188,37 @@ public class RegisterLifetimeTracker {
 
 			// Advance the address to the next instruction.
 			addr += byteCount;
+
+			// Remove any bits which have been disassembled.
+			buffer = buffer.substring(bitCount, buffer.length());
 		}
 
 		// If this block can fall through, and if the next block is part of the current
 		// extended basic block that has not been encountered yet, then add it to the queue.
 		if (block.canFallThrough() && unencounteredBlocks.contains(addr)) {
 			BasicBlock newBlock = db.getBasicBlock(addr);
-			ControlPath newPath = new ControlPath(newBlock);
+			SsaState newState = new SsaState(state);
+			ControlPath newPath = new ControlPath(newBlock, newState);
 			pendingPaths.add(newPath);
 			unencounteredBlocks.remove(addr);
 		}
+
+		// Finish creating mappings for any registers which are still live.
+		state.invalidate();
 	}
 
-	/** Track the next unprocessed basic block.
+	/** Map the next unprocessed basic block.
 	 * @param pc the program counter
 	 * @param links a list of possible expressions for a subroutine return address
 	 * @return true if all pending blocks have been processed, otherwise false
 	 */
-	public boolean trackNext(Register pc, List<Expression> links) {
+	public boolean mapNext(Register pc, List<Expression> links) {
 		EntityManager em = db.getEntityManager();
 
 		// If the pending blocks queue is empty then attempt to refill it.
 		if (pendingBlocks.isEmpty()) {
 			// Attempt to refill the blocks queue.
-			pendingBlocks.addAll(db.getUnprocessedExtendedBasicBlocks(Fact.DONE_REGISTER_LIFETIME));
+			pendingBlocks.addAll(db.getUnprocessedExtendedBasicBlocks(Fact.DONE_SSA_MAPPER));
 
 			// If the queue is still empty then stop because there is nothing to do.
 			if (pendingBlocks.isEmpty()) return true;
@@ -199,7 +238,8 @@ public class RegisterLifetimeTracker {
 			BasicBlock firstBlock = db.getBasicBlock(addr);
 
 			// Add this path to the queue.
-			ControlPath path = new ControlPath(firstBlock);
+			SsaState state = new SsaState(db, firstBlock.getSubroutine());
+			ControlPath path = new ControlPath(firstBlock, state);
 			pendingPaths.add(path);
 
 			// Record the addresses of the other basic blocks which are part of this EBB.
@@ -213,13 +253,13 @@ public class RegisterLifetimeTracker {
 		// If the pending paths queue is now non-empty then process one path.
 		if (!pendingPaths.isEmpty()) {
 			ControlPath path = pendingPaths.remove();
-			track(path.block, pc, links);
+			map(path, pc, links);
 
 			// If the pending paths queue is now empty as a result of processing a path
 			// then the corresponding EBB can be removed from the queue and marked as done.
 			if (pendingPaths.isEmpty()) {
 				ExtendedBasicBlock ebb = pendingBlocks.remove();
-				ebb.setProcessed(Fact.DONE_REGISTER_LIFETIME);
+				ebb.setProcessed(Fact.DONE_SSA_MAPPER);
 			}
 		}
 		return false;

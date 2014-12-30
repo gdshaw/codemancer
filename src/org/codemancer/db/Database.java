@@ -42,7 +42,7 @@ public class Database {
 		return em.getTransaction();
 	}
 
-	/** Get basic block containing a given address
+	/** Get basic block containing a given address.
 	 * @param addr an address within the requested basic block
 	 * @return the basic block, or null if none
 	 */
@@ -60,7 +60,7 @@ public class Database {
 		}
 	}
 
-	/** Get basic block ending immediately prior to a given address
+	/** Get basic block ending immediately prior to a given address.
 	 * @param addr the address immediately following the requested basic block
 	 * @return the basic block, or null if none
 	 */
@@ -76,6 +76,17 @@ public class Database {
 		} else {
 			throw new IllegalStateException("multiple basic blocks found ending at the same end address");
 		}
+	}
+
+	/** Get SSA mappings for a given address.
+	 * @param addr the address for which mappings are required
+	 * @return a list of mappings
+	 */
+	public final List<SsaMapping> getSsaMappings(long addr) {
+		return em.createQuery(
+			"FROM SsaMapping WHERE addr = :addr", SsaMapping.class)
+			.setParameter("addr", addr)
+			.getResultList();
 	}
 
 	/** Get unprocessed references.
@@ -184,7 +195,7 @@ public class Database {
 	 */
 	public final List<ExtendedBasicBlock> getExtendedBasicBlocks() {
 		return em.createQuery(
-			"FROM ExtendedBasicBlock ORDER BY minAddr", ExtendedBasicBlock.class)
+			"FROM ExtendedBasicBlock ORDER BY entryAddr", ExtendedBasicBlock.class)
 			.getResultList();
 	}
 
@@ -193,7 +204,7 @@ public class Database {
 	 */
 	public final List<Subroutine> getSubroutines() {
 		return em.createQuery(
-			"FROM Subroutine ORDER BY minAddr", Subroutine.class)
+			"FROM Subroutine ORDER BY entryAddr", Subroutine.class)
 			.getResultList();
 	}
 }
