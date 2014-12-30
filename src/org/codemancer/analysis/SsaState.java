@@ -44,8 +44,8 @@ public class SsaState implements State {
 	/** The subroutine that will allocate any machine-generated SSA expression names. */
 	private Subroutine subroutine;
 
-	/** The set of current live register mappings. */
-	private HashMap<String, SsaMapping> liveMappings;
+	/** The set of current live expressions. */
+	private HashMap<String, SsaExpression> liveExpressions;
 
 	/** The set of current live temporary values. */
 	private HashMap<String, Expression> liveTemporaries;
@@ -56,56 +56,26 @@ public class SsaState implements State {
 	/** The address of the next instruction. */
 	private long nextAddr;
 
-	/** The address following the instruction which most recently invalidated all registers. */
-	private long invalidationAddr;
-
-	/** Finalise the mapping of a given register, if live.
-	 * @param regName the name of the register to be finalised
-	 */
-	private void finaliseRegister(String regName) {
-		SsaMapping oldMapping = liveMappings.get(regName);
-		if (oldMapping != null) {
-			SsaMapping newMapping = new SsaMapping(0, -1, oldMapping.getMinAddr(), nextAddr,
-				oldMapping.getName(), oldMapping.getValue());
-			em.persist(newMapping);
-			liveMappings.remove(regName);
-		}
-	}
-
-	/** Finalise the mapping of all registers. */
-	private void finaliseAllRegisters() {
-		for (Map.Entry<String, SsaMapping> entry: liveMappings.entrySet()) {
-			String name = entry.getKey();
-			SsaMapping oldMapping = liveMappings.get(name);
-			SsaMapping newMapping = new SsaMapping(0, -1, oldMapping.getMinAddr(), nextAddr,
-				oldMapping.getName(), oldMapping.getValue());
-			em.persist(newMapping);
-		}
-		liveMappings.clear();
-	}
-
 	/** Construct empty SSA state representation.
 	 * @param db the database in which mappings are to be recorded
 	 * @param subroutine the subroutine used to allocate any SSA names
-	 * @param addr the initial invalidation address
 	 */
-	public SsaState(Database db, Subroutine subroutine, long addr) {
+	public SsaState(Database db, Subroutine subroutine) {
 		this.db = db;
 		this.em = db.getEntityManager();
 		this.subroutine = subroutine;
-		this.invalidationAddr = addr;
-		this.liveMappings = new HashMap<String, SsaMapping>();
+		this.liveExpressions = new HashMap<String, SsaExpression>();
 		this.liveTemporaries = new HashMap<String, Expression>();
 	}
 
 	/** Copy SSA state representation.
-	 * @param subroutine the subroutine used to allocate any SSA names
 	 * @param state the state to copy
 	 */
-	public SsaState(Subroutine subroutine, SsaState state) {
+	public SsaState(SsaState state) {
 		this.db = state.db;
+		this.em = state.em;
 		this.subroutine = state.subroutine;
-		this.liveMappings = (HashMap<String, SsaMapping>)state.liveMappings.clone();
+		this.liveExpressions = (HashMap<String, SsaExpression>)state.liveExpressions.clone();
 		this.liveTemporaries = new HashMap<String, Expression>();
 	}
 
@@ -120,8 +90,7 @@ public class SsaState implements State {
 
 	/** Invalidate all registers with effect from the current instruction. */
 	public void invalidate() {
-		finaliseAllRegisters();
-		invalidationAddr = nextAddr;
+		liveExpressions.clear();
 	}
 
 	public final Expression get(Register register) {
@@ -130,26 +99,27 @@ public class SsaState implements State {
 		// register roles.
 		String regName = register.getName();
 		if (noTrack.contains(regName)) return null;
-		SsaMapping mapping = liveMappings.get(regName);
-		if (mapping == null) {
+		SsaExpression expr = liveExpressions.get(regName);
+		if (expr == null) {
 			String ssaName = subroutine.allocateSsaName();
-			SsaExpression ssaValue = new SsaExpression(0, -1, ssaName);
-			em.persist(ssaValue);
-			mapping = new SsaMapping(0, -1, invalidationAddr, -1, regName, ssaValue);
-			liveMappings.put(regName, mapping);
+			expr = new SsaExpression(0, -1, ssaName);
+			em.persist(expr);
+			liveExpressions.put(regName, expr);
 		}
-		return new NamedValue(register.getType(), mapping.getValue().getName());
+		SsaMapping mapping = new SsaMapping(0, -1, curAddr, true, regName, expr);
+		em.persist(mapping);
+		return new NamedValue(register.getType(), expr.getName());
 	}
 
 	public final void put(Register register, Expression value) {
 		String regName = register.getName();
 		if (noTrack.contains(regName)) return;
-		finaliseRegister(regName);
 		String ssaName = subroutine.allocateSsaName();
-		SsaExpression ssaValue = new SsaExpression(0, -1, ssaName);
-		em.persist(ssaValue);
-		SsaMapping mapping = new SsaMapping(0, -1, nextAddr, -1, regName, ssaValue);
-		liveMappings.put(regName, mapping);
+		SsaExpression expr = new SsaExpression(0, -1, ssaName);
+		em.persist(expr);
+		liveExpressions.put(regName, expr);
+		SsaMapping mapping = new SsaMapping(0, -1, curAddr, false, regName, expr);
+		em.persist(mapping);
 	}
 
 	public final Expression get(Memory memory) {

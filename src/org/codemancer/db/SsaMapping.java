@@ -13,19 +13,16 @@ import javax.persistence.FetchType;
 /** A class for mapping a register to a given SSA expression. */
 @Entity
 public class SsaMapping extends Fact {
-	/** The address of the first instruction for which this mapping applies on entry. */
-	private long minAddr;
+	/** The address of the instruction to which this mapping applies. */
+	private long addr;
 
-	/** The address of the first instruction for which this mapping does not apply on exit.
-	 * If it applies to all instructions in a basic block then this is the address
-	 * of the first memory location after the end of the basic block.
-	 */
-	private long maxAddr;
+	/** True if this mapping applies on entry to the instruction, false if on exit. */
+	private boolean inbound;
 
-	/** The name of the register containing the variable mapped. */
+	/** The name of the register containing the value mapped. */
 	private String name;
 
-	/** The SSA expression to which the variable is mapped. */
+	/** The SSA expression to which the register is mapped. */
 	@ManyToOne(fetch=FetchType.EAGER)
 	private SsaExpression value;
 
@@ -34,8 +31,8 @@ public class SsaMapping extends Fact {
 	 */
 	protected SsaMapping() {
 		super();
-		this.minAddr = -1;
-		this.maxAddr = -1;
+		this.addr = 0;
+		this.inbound = false;
 		this.name = null;
 		this.value = null;
 	}
@@ -45,32 +42,31 @@ public class SsaMapping extends Fact {
 	 * set to the address of the first memory location after the end of the basic block.
 	 * @param minRev the lowest revision number for which this mapping applies
 	 * @param maxRev the highest revision number for which this mapping applies
-	 * @param minAddr the address of the first instruction for which this mapping applies on entry
-	 * @param maxAddr the address of the first instruction for which this mapping does not apply on exit
+	 * @param addr the address to which this mapping applies
+	 * @param inbound true if this mapping applies on entry, false if on exit
 	 * @param name the name of the register containing the variable mapped
-	 * @param value the SSA expression to which the variable is mapped
+	 * @param value the SSA expression to which the register is mapped
 	 */
-	public SsaMapping(long minRev, long maxRev, long minAddr, long maxAddr,
-		String name, SsaExpression value) {
+	public SsaMapping(long minRev, long maxRev, long addr, boolean inbound, String name, SsaExpression value) {
 		super(minRev, maxRev);
-		this.minAddr = minAddr;
-		this.maxAddr = maxAddr;
+		this.addr = addr;
+		this.inbound = inbound;
 		this.name = name;
 		this.value = value;
 	}
 
-	/** Get the address of the first instruction for which this mapping applies on entry.
-	 * @return the address of the first instruction
+	/** Get the address to which this mapping applies.
+	 * @return the address
 	 */
-	public long getMinAddr() {
-		return minAddr;
+	public long getAddr() {
+		return addr;
 	}
 
-	/** Get the address of the first instruction for which this mapping does not apply on exit.
-	 * @return the address of the last instruction
+	/** Check whether this mapping applies on entry or exit.
+	 * @return true on entry, false on exit
 	 */
-	public long getMaxAddr() {
-		return maxAddr;
+	public boolean isInbound() {
+		return inbound;
 	}
 
 	/** Get the name of the register or address space containing the variable mapped.
