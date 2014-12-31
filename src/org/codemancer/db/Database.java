@@ -89,6 +89,17 @@ public class Database {
 			.getResultList();
 	}
 
+	/** Get comments for a given address.
+	 * @param addr the address for which comments are required
+	 * @return a list of comments
+	 */
+	public final List<Comment> getComments(long addr) {
+		return em.createQuery(
+			"FROM Comment WHERE addr = :addr", Comment.class)
+			.setParameter("addr", addr)
+			.getResultList();
+	}
+
 	/** Get unprocessed references.
 	 * @param requiredLevel the required level of processing to be omitted from the result
 	 * @return a list of unprocessed references
