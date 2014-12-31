@@ -563,17 +563,17 @@ GNU General Public License (version 3 or any later version).
   </bit>
   <effect name="foreach">
    <assign>
-    <ref name="rd"/>
+    <ref name="psr"/>
     <or>
      <and>
-      <ref name="rd"/>
+      <ref name="psr"/>
       <xor>
-       <ref name="rd"/>
+       <ref name="mask"/>
        <const>0xffffffff</const>
       </xor>
      </and>
      <and>
-      <ref name="psr"/>
+      <ref name="operand"/>
       <ref name="mask"/>
      </and>
     </or>
@@ -3223,7 +3223,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="fields">
-    <bind name="rm" src="rm"/>
+    <bind name="operand" src="imm2"/>
     <bind name="psr" src="psr"/>
    </ref>
   </effect>
@@ -3260,7 +3260,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="fields">
-    <bind name="rm" src="rm"/>
+    <bind name="operand" src="rm"/>
     <bind name="psr" src="psr"/>
    </ref>
   </effect>

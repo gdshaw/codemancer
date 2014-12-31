@@ -1528,8 +1528,8 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="opcode">
-    <bind name="lhs" ref="operand"/>
-    <bind name="rhs" ref="r"/>
+    <bind name="lhs" src="operand"/>
+    <bind name="rhs" src="r"/>
    </ref>
   </effect>
  </fragment>
@@ -1569,8 +1569,8 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="opcode">
-    <bind name="lhs" ref="operand"/>
-    <bind name="rhs" ref="r"/>
+    <bind name="lhs" src="operand"/>
+    <bind name="rhs" src="r"/>
    </ref>
   </effect>
  </fragment>
@@ -1689,7 +1689,7 @@ GNU General Public License (version 3 or any later version).
     <bind name="lhs">
      <register name="AL"/>
     </bind>
-    <bind name="rhs" ref="imm"/>
+    <bind name="rhs" src="imm"/>
    </ref>
   </effect>
  </fragment>
@@ -1728,7 +1728,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="operand">
-    <bind name="opcode" ref="opcode"/>
+    <bind name="opcode" src="opcode"/>
    </ref>
   </effect>
  </fragment>
@@ -1767,8 +1767,8 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="opcode">
-    <bind name="lhs" ref="operand"/>
-    <bind name="rhs" ref="imm"/>
+    <bind name="lhs" src="operand"/>
+    <bind name="rhs" src="imm"/>
    </ref>
   </effect>
  </fragment>
@@ -1807,8 +1807,8 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="opcode">
-    <bind name="lhs" ref="operand"/>
-    <bind name="rhs" ref="imm"/>
+    <bind name="lhs" src="operand"/>
+    <bind name="rhs" src="imm"/>
    </ref>
   </effect>
  </fragment>
@@ -1847,8 +1847,8 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <ref name="opcode">
-    <bind name="lhs" ref="operand"/>
-    <bind name="rhs" ref="imm"/>
+    <bind name="lhs" src="operand"/>
+    <bind name="rhs" src="imm"/>
    </ref>
   </effect>
  </fragment>
