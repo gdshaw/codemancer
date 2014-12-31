@@ -26,7 +26,7 @@ import org.codemancer.db.SsaMapping;
 import org.codemancer.db.Database;
 
 /** A class to represent the state of the machine in terms of live SSA expressions. */
-public class SsaState implements State {
+public class SsaStateRecorder implements State {
 	/** Registers which should not be tracked.
 	 * These are hardcoded as a temporary measure until the
 	 * CPU descriptions provide a means to classify registers
@@ -60,7 +60,7 @@ public class SsaState implements State {
 	 * @param db the database in which mappings are to be recorded
 	 * @param subroutine the subroutine used to allocate any SSA names
 	 */
-	public SsaState(Database db, Subroutine subroutine) {
+	public SsaStateRecorder(Database db, Subroutine subroutine) {
 		this.db = db;
 		this.em = db.getEntityManager();
 		this.subroutine = subroutine;
@@ -71,7 +71,7 @@ public class SsaState implements State {
 	/** Copy SSA state representation.
 	 * @param state the state to copy
 	 */
-	public SsaState(SsaState state) {
+	public SsaStateRecorder(SsaStateRecorder state) {
 		this.db = state.db;
 		this.em = state.em;
 		this.subroutine = state.subroutine;

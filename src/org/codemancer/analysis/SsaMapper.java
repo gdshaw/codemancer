@@ -45,13 +45,13 @@ public class SsaMapper {
 		 * This may contain live registers from previous basic blocks
 		 * within the same extended basic block.
 		 */
-		public SsaState state;
+		public SsaStateRecorder state;
 
 		/** Construct path.
 		 * @param block the basic block at which the path begins
 		 * @param state the machine state to use when following this path
 		 */
-		public ControlPath(BasicBlock block, SsaState state) {
+		public ControlPath(BasicBlock block, SsaStateRecorder state) {
 			this.block = block;
 			this.state = state;
 		}
@@ -112,7 +112,7 @@ public class SsaMapper {
 	 */
 	private void map(ControlPath path, Register pc, List<Expression> links) {
 		BasicBlock block = path.block;
-		SsaState state = path.state;
+		SsaStateRecorder state = path.state;
 		Type start = arch.getStart();
 
 		// Initialise buffer.
@@ -177,7 +177,7 @@ public class SsaMapper {
 						long dstAddr = dstConstant.getValue();
 						if (unencounteredBlocks.contains(dstAddr)) {
 							BasicBlock newBlock = db.getBasicBlock(dstAddr);
-							SsaState newState = new SsaState(state);
+							SsaStateRecorder newState = new SsaStateRecorder(state);
 							ControlPath newPath = new ControlPath(newBlock, newState);
 							pendingPaths.add(newPath);
 							unencounteredBlocks.remove(dstAddr);
@@ -197,7 +197,7 @@ public class SsaMapper {
 		// extended basic block that has not been encountered yet, then add it to the queue.
 		if (block.canFallThrough() && unencounteredBlocks.contains(addr)) {
 			BasicBlock newBlock = db.getBasicBlock(addr);
-			SsaState newState = new SsaState(state);
+			SsaStateRecorder newState = new SsaStateRecorder(state);
 			ControlPath newPath = new ControlPath(newBlock, newState);
 			pendingPaths.add(newPath);
 			unencounteredBlocks.remove(addr);
@@ -238,7 +238,7 @@ public class SsaMapper {
 			BasicBlock firstBlock = db.getBasicBlock(addr);
 
 			// Add this path to the queue.
-			SsaState state = new SsaState(db, firstBlock.getSubroutine());
+			SsaStateRecorder state = new SsaStateRecorder(db, firstBlock.getSubroutine());
 			ControlPath path = new ControlPath(firstBlock, state);
 			pendingPaths.add(path);
 
