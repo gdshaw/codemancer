@@ -157,43 +157,6 @@ public class CpuTest {
 		registers.put("PC+", new Constant(null, nextPc));
 		expr = expr.resolveRegisters(registers).simplify();
 
-		Context ctx = new Context(arch);
-		EphemeralState state = new EphemeralState();
-		for (int i = 0; i != preconds.length; ++i) {
-			String precond = preconds[i];
-			int f = precond.indexOf("=");
-			if (f == -1) {
-				throw new IllegalArgumentException("missing = in precondition");
-			}
-			Expression lvalue = parseLvalue(ctx, precond.substring(0, f));
-			Expression rvalue = parseRvalue(precond.substring(f + 1, precond.length()));
-			if (lvalue instanceof Register) {
-				state.put((Register)lvalue, rvalue);
-			} else if (lvalue instanceof Memory) {
-				state.put((Memory)lvalue, rvalue);
-			}
-		}
-		expr.evaluate(state);
-
-		for (int i = 0; i != postconds.length; ++i) {
-			String postcond = postconds[i];
-			int f = postcond.indexOf("=");
-			if (f == -1) {
-				throw new IllegalArgumentException("missing = in postcondition");
-			}
-			Expression lvalue = parseLvalue(ctx, postcond.substring(0, f));
-			String expected = postcond.substring(f + 1, postcond.length());
-			if (lvalue instanceof Register) {
-				String found = state.get((Register)lvalue).unparse(style);
-				assertEquals(expected, found);
-			} else if (lvalue instanceof Memory) {
-				Expression foundExpr = state.get((Memory)lvalue);
-				assertTrue(foundExpr != null);
-				String found = foundExpr.unparse(style);
-				assertEquals(expected, found);
-			}
-		}
-
 		for (int i = 0; i != start.getPieceCount(); ++i) {
 			String asm = start.unparse(i, expr);
 			if (i + 1 < fields.length) {
