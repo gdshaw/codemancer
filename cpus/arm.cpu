@@ -1287,18 +1287,6 @@ GNU General Public License (version 3 or any later version).
      </shift>
     </equals>
    </where>
-   <where>
-    <xor>
-     <equals>
-      <and>
-       <ref name="imm"/>
-       <const>3</const>
-      </and>
-      <const>0</const>
-     </equals>
-     <const>1</const>
-    </xor>
-   </where>
    <pattern>
     <ref name="imm"/>
     <ref name="rot-imm"/>
