@@ -174,7 +174,7 @@ public class Database {
 	 */
 	public final List<ExtendedBasicBlock> getExtendedBasicBlocksIn(Subroutine sub) {
 		return em.createQuery(
-			"FROM ExtendedBasicBlock WHERE sub = :sub", ExtendedBasicBlock.class)
+			"FROM ExtendedBasicBlock WHERE subroutine = :sub", ExtendedBasicBlock.class)
 			.setParameter("sub", sub)
 			.getResultList();
 	}
