@@ -70,7 +70,12 @@ public class SsaStatePlayer implements State {
 		String regName = register.getName();
 		SsaExpression expr = outputs.get(regName);
 		if (expr != null) {
-			commentBuilder.append(String.format("%s := %s\n", expr.getName(), value.unparse(new Style())));
+			if ((value instanceof NamedValue) && ((NamedValue)value).getName().equals(expr.getName())) {
+				// Avoid comments of the form v0 := v0. Instead, just list the register.
+				commentBuilder.append(String.format("%s := %s\n", regName, value.unparse(new Style())));
+			} else {
+				commentBuilder.append(String.format("%s (%s) := %s\n", regName, expr.getName(), value.unparse(new Style())));
+			}
 		}
 	}
 

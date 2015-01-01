@@ -102,7 +102,7 @@ public class SsaStateRecorder implements State {
 		SsaExpression expr = liveExpressions.get(regName);
 		if (expr == null) {
 			String ssaName = subroutine.allocateSsaName();
-			expr = new SsaExpression(0, -1, ssaName);
+			expr = new SsaExpression(0, -1, subroutine, ssaName);
 			em.persist(expr);
 			liveExpressions.put(regName, expr);
 		}
@@ -114,9 +114,16 @@ public class SsaStateRecorder implements State {
 	public final void put(Register register, Expression value) {
 		String regName = register.getName();
 		if (noTrack.contains(regName)) return;
-		String ssaName = subroutine.allocateSsaName();
-		SsaExpression expr = new SsaExpression(0, -1, ssaName);
-		em.persist(expr);
+
+		SsaExpression expr;
+		if (value instanceof NamedValue) {
+			NamedValue namedValue = (NamedValue)value;
+			expr = db.getSsaExpression(subroutine, namedValue.getName());
+		} else {
+			String ssaName = subroutine.allocateSsaName();
+			expr = new SsaExpression(0, -1, subroutine, ssaName);
+			em.persist(expr);
+		}
 		liveExpressions.put(regName, expr);
 		SsaMapping mapping = new SsaMapping(0, -1, curAddr, false, regName, expr);
 		em.persist(mapping);

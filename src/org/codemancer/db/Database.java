@@ -78,6 +78,19 @@ public class Database {
 		}
 	}
 
+	/** Get SSA expression with a given name in a given subroutine.
+	 * @param subroutine the subroutine containing the required expression
+	 * @param name the name of the required expression
+	 * @return the SSA expression
+	 */
+	public final SsaExpression getSsaExpression(Subroutine subroutine, String name) {
+		return em.createQuery(
+			"FROM SsaExpression WHERE subroutine = :subroutine AND name = :name", SsaExpression.class)
+			.setParameter("subroutine", subroutine)
+			.setParameter("name", name)
+			.getSingleResult();
+	}
+
 	/** Get SSA mappings for a given address.
 	 * @param addr the address for which mappings are required
 	 * @return a list of mappings

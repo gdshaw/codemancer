@@ -6,13 +6,19 @@
 package org.codemancer.db;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
+import javax.persistence.ManyToOne;
+import javax.persistence.FetchType;
 
 /** A class for describing an SSA expression. */
 @Entity
 public class SsaExpression extends Fact {
-	/** The name of this SSA expression. */
+	/** The subroutine to which this SSA expression belongs. */
+	@ManyToOne(fetch=FetchType.LAZY)
+	private Subroutine subroutine;
+
+	/** The name of this SSA expression.
+	 * Names are unique within a given subroutine, but not globally.
+	 */
 	private String name;
 
 	/** Construct empty SSA expression.
@@ -20,17 +26,27 @@ public class SsaExpression extends Fact {
 	 */
 	protected SsaExpression() {
 		super();
+		this.subroutine = null;
 		this.name = null;
 	}
 
 	/** Construct SSA expression.
 	 * @param minRev the lowest revision number for which this description applies
 	 * @param maxRev the highest revision number for which this description applies
+	 * @param subroutine the subroutine to which this SSA expression belongs
 	 * @param name the name of this SSA expression
 	 */
-	public SsaExpression(long minRev, long maxRev, String name) {
+	public SsaExpression(long minRev, long maxRev, Subroutine subroutine, String name) {
 		super(minRev, maxRev);
+		this.subroutine = subroutine;
 		this.name = name;
+	}
+
+	/** Get the subroutine to which this SSA expression belongs.
+	 * @return the subroutine
+	 */
+	public Subroutine getSubroutine() {
+		return subroutine;
 	}
 
 	/** Get the name of this SSA expression.
