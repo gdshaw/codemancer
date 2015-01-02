@@ -32,8 +32,8 @@ Current status
 
   - plain disassembly: working
   - semantic modelling: working, but untested and accessible only via API
-  - control flow analysis: not started
-  - data flow analysis: not started
+  - control flow analysis: incomplete, experimental
+  - data flow analysis: incomplete, experimental
   - interactive user interface: not started
 
   Architectures
@@ -41,7 +41,7 @@ Current status
   - 6500: complete, including 65C00, R65C00 and W65C00S
   - 6800: complete
   - 6805: complete
-  - ARM: complete to armv3 but not beyond
+  - ARM: complete to armv4 but not beyond
   - PIC (14-bit core): complete
   - x86: incomplete
   - Z80: complete
@@ -111,12 +111,8 @@ Limitations
   Only a small part of the planned funcionality for Codemancer has
   been implemented thus far. Most notably it is only usable as a
   plain disassembler at present, and then only for a small number
-  of architectures.
-
-  Use of the semantic modelling capability, which is in any event
-  only possible via the API, is not recommended for anything other
-  than experimental purposes at present due to lack of testing and
-  some missing features.
+  of architectures. Other functionality, to the extent that it has
+  been implemented, should be considered experimental.
 
   Other limitations include the following:
 
@@ -131,3 +127,66 @@ Limitations
   - Architectures where the instruction width is not a multiple of
     8 bits (for example, the PIC 12- and 14-bit architectures) could
     be handled more elegantly.
+
+Control and data flow analysis (experimental)
+
+  Currently the analysis code is able to:
+
+  - identify branches and subroutine calls to fixed addresses;
+  - identify basic blocks, extended basic blocks and subroutines.
+  - track the content of registers within basic blocks;
+  - perform a partial transformation into static single-assignment
+    form.
+
+  However, it does not (yet):
+
+  - analyse jump tables;
+  - make deductions from knowledge of the calling convention
+    (which has not been modelled yet);
+  - track the content of stack-resident local variables;
+  - track the content of global variables;
+  - track the flow of data between basic blocks;
+  - attempt to deduce the type or meaning of data values;
+  - allow the database to be augmented by the user.
+
+  In principle the algorithms implemented so far are applicable to
+  any architecture, however they have only been tested on ARM code
+  in an ELF object file. The algorithms will need to be made
+  idempotent, however that has not been arranged yet.
+
+  If you would like to experiment with the analysis code then the
+  following must be accessible via the CLASSPATH:
+
+  - Apache Derby (tested with 10.3.2.1);
+  - Hibernate (tested with 3.6.9).
+
+  From Derby you need both derby.jar and derbyclient.jar. From
+  Hibernate you need hibernate3.jar, plus the dependencies found
+  in the lib/required and lib/jpa subdirectories of the Hibernate
+  distribution.
+
+  When a binary is analysed, the results are recorded in a database.
+  You can do this using the command:
+
+  java org.codemancer.test.Analyse <projname> <architecture> <pathname>
+
+  where <projname> is a project name of your choosing (used as a
+  subdirectory name in which to store the database), <architecture>
+  is the relevant machine architecture, and <pathname> is the binary
+  to be analysed.
+
+  Be aware that this currently quite a slow process: expect throughput
+  of a few kilobytes per minute on mid-range hardware, so anything
+  larger than a megabyte is likely to take many hours.
+
+  When the analysis is complete, the content of the database can be
+  listed using the command:
+
+  java org.codemancer.test.ListDb <projname>
+
+  The result is not expected to be useful yet, however it shows that
+  the disassembler is able to partially understand the behaviour of
+  the executable, and track values as they are passed from register
+  to register. Future versions will attempt to take this analysis
+  further, provide an interactive user interface, and improve
+  throughput if it is feasible to do so.
