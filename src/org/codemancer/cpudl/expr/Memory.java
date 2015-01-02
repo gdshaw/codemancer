@@ -55,6 +55,10 @@ public class Memory extends Expression {
 		state.put(this, value);
 	}
 
+	public Expression simplify() {
+		return new Memory(getType(), address.simplify());
+	}
+
 	public Expression evaluate(State state) {
 		Expression evalAddr = address.evaluate(state);
 		Memory mem = new Memory(getType(), evalAddr);
