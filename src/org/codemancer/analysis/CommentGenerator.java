@@ -115,7 +115,7 @@ public class CommentGenerator {
 			long byteCount = bitCount >> 3;
 
 			// Evaluate the effect of this instruction.
-			SsaStatePlayer state = new SsaStatePlayer(db, addr);
+			SsaStatePlayer state = new SsaStatePlayer(reader, db, arch, addr);
 			instr.evaluate(state);
 			String commentString = state.getComment();
 			Comment comment = new Comment(0, -1, addr, true, commentString);
