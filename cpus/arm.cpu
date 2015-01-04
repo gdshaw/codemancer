@@ -1146,7 +1146,7 @@ GNU General Public License (version 3 or any later version).
    <literal></literal>
   </phrase>
   <effect>
-   <memory size="4">
+   <memory size="32">
     <ref name="ea"/>
    </memory>
   </effect>
@@ -1160,7 +1160,7 @@ GNU General Public License (version 3 or any later version).
    <literal>B</literal>
   </phrase>
   <effect>
-   <memory size="1">
+   <memory size="8">
     <ref name="ea"/>
    </memory>
   </effect>
@@ -2666,7 +2666,7 @@ GNU General Public License (version 3 or any later version).
      <ref name="opcode">
       <bind name="rd" src="r"/>
       <bind name="operand">
-       <memory>
+       <memory size="32">
         <add>
          <ref name="rn"/>
          <ref name="mode">

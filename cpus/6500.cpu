@@ -387,7 +387,7 @@ GNU General Public License (version 3 or any later version).
    <literal>Y</literal>
   </phrase>
   <effect>
-   <memory>
+   <memory size="8">
     <add>
      <ref name="addr"/>
      <register name="Y"/>
@@ -468,7 +468,7 @@ GNU General Public License (version 3 or any later version).
    <literal>Y</literal>
   </phrase>
   <effect>
-   <memory>
+   <memory size="8">
     <add>
      <ref name="addr"/>
      <register name="Y"/>
@@ -1247,7 +1247,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <assign>
-    <memory>
+    <memory size="8">
      <add>
       <const>256</const>
       <register name="S"/>
@@ -1284,7 +1284,7 @@ GNU General Public License (version 3 or any later version).
    </assign>
    <assign>
     <ref name="operand"/>
-    <memory>
+    <memory size="8">
      <add>
       <const>256</const>
       <register name="S"/>
@@ -1358,7 +1358,7 @@ GNU General Public License (version 3 or any later version).
   <phrase></phrase>
   <effect>
    <assign>
-    <memory>
+    <memory size="16">
      <add>
       <const>255</const>
       <register name="S"/>
@@ -1367,7 +1367,7 @@ GNU General Public License (version 3 or any later version).
     <register name="PC"/>
    </assign>
    <assign>
-    <memory>
+    <memory size="8">
      <add>
       <const>254</const>
       <register name="S"/>
@@ -1409,7 +1409,7 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <assign>
-    <memory>
+    <memory size="16">
      <add>
       <const>255</const>
       <register name="S"/>
@@ -1444,7 +1444,7 @@ GNU General Public License (version 3 or any later version).
   <effect>
    <assign>
     <register name="P"/>
-    <memory>
+    <memory size="8">
      <add>
       <const>257</const>
       <register name="S"/>
@@ -1454,7 +1454,7 @@ GNU General Public License (version 3 or any later version).
    <assign>
     <register name="PC"/>
     <add>
-     <memory>
+     <memory size="16">
       <add>
        <const>258</const>
        <register name="S"/>
@@ -1487,7 +1487,7 @@ GNU General Public License (version 3 or any later version).
    <assign>
     <register name="PC"/>
     <add>
-     <memory>
+     <memory size="16">
       <add>
        <const>257</const>
        <register name="S"/>
