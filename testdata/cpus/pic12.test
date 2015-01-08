@@ -1,0 +1,36 @@
+; This file is part of Codemancer.
+; Copyright 2014 Graham Shaw.
+; Distribution and modification are permitted within the terms of the
+; GNU General Public License (version 3 or any later version).
+
+0032	MOVWF	0x12
+0040	CLRW
+0072	CLRF	0x12
+0092	SUBWF	0x12, 0
+00B2	SUBWF	0x12, 1
+00D2	DECF	0x12, 0
+00F2	DECF	0x12, 1
+0112	IORWF	0x12, 0
+0132	IORWF	0x12, 1
+0152	ANDWF	0x12, 0
+0172	ANDWF	0x12, 1
+0192	XORWF	0x12, 0
+01B2	XORWF	0x12, 1
+01D2	ADDWF	0x12, 0
+01F2	ADDWF	0x12, 1
+0212	MOVF	0x12, 0
+0232	MOVF	0x12, 1
+0252	COMF	0x12, 0
+0272	COMF	0x12, 1
+0292	INCF	0x12, 0
+02B2	INCF	0x12, 1
+02D2	DECFSZ	0x12, 0
+02F2	DECFSZ	0x12, 1
+0312	RRF	0x12, 0
+0332	RRF	0x12, 1
+0352	RLF	0x12, 0
+0372	RLF	0x12, 1
+0392	SWAPF	0x12, 0
+03B2	SWAPF	0x12, 1
+03D2	INCFSZ	0x12, 0
+03F2	INCFSZ	0x12, 1
