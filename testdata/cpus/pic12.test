@@ -1,5 +1,5 @@
 ; This file is part of Codemancer.
-; Copyright 2014 Graham Shaw.
+; Copyright 2015 Graham Shaw.
 ; Distribution and modification are permitted within the terms of the
 ; GNU General Public License (version 3 or any later version).
 
@@ -34,3 +34,36 @@
 03B2	SWAPF	0x12, 1
 03D2	INCFSZ	0x12, 0
 03F2	INCFSZ	0x12, 1
+
+0412	BCF	0x12, 0
+0432	BCF	0x12, 1
+0452	BCF	0x12, 2
+0472	BCF	0x12, 3
+0492	BCF	0x12, 4
+04B2	BCF	0x12, 5
+04D2	BCF	0x12, 6
+04F2	BCF	0x12, 7
+0512	BSF	0x12, 0
+0532	BSF	0x12, 1
+0552	BSF	0x12, 2
+0572	BSF	0x12, 3
+0592	BSF	0x12, 4
+05B2	BSF	0x12, 5
+05D2	BSF	0x12, 6
+05F2	BSF	0x12, 7
+0612	BTFSC	0x12, 0
+0632	BTFSC	0x12, 1
+0652	BTFSC	0x12, 2
+0672	BTFSC	0x12, 3
+0692	BTFSC	0x12, 4
+06B2	BTFSC	0x12, 5
+06D2	BTFSC	0x12, 6
+06F2	BTFSC	0x12, 7
+0712	BTFSS	0x12, 0
+0732	BTFSS	0x12, 1
+0752	BTFSS	0x12, 2
+0772	BTFSS	0x12, 3
+0792	BTFSS	0x12, 4
+07B2	BTFSS	0x12, 5
+07D2	BTFSS	0x12, 6
+07F2	BTFSS	0x12, 7
