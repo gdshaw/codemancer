@@ -20,6 +20,7 @@ GNU General Public License (version 3 or any later version).
 </style>
 
 <register name="W" size="8"/>
+<register name="SP" size="3" role="SP"/>
 <register name="PC" size="13" role="PC"/>
 
 <define name="movwf-op">
@@ -424,6 +425,148 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="retlw-instr">
+ <fragment>
+  <var name="k">
+   <integer size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <const>00001000</const>
+   <ref name="k"/>
+  </pattern>
+  <phrase>
+   <literal>RETLW</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <ref name="k"/>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>1</const>
+    </sub>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <memory size="16" as="stack">
+     <register name="SP"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="movlw-instr">
+ <fragment>
+  <var name="k">
+   <integer size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <const>00001100</const>
+   <ref name="k"/>
+  </pattern>
+  <phrase>
+   <literal>MOVLW</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <ref name="k"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="iorlw-instr">
+ <fragment>
+  <var name="k">
+   <integer size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <const>00001101</const>
+   <ref name="k"/>
+  </pattern>
+  <phrase>
+   <literal>IORLW</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <or>
+     <register name="W"/>
+     <ref name="k"/>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="andlw-instr">
+ <fragment>
+  <var name="k">
+   <integer size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <const>00001110</const>
+   <ref name="k"/>
+  </pattern>
+  <phrase>
+   <literal>ANDLW</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <and>
+     <register name="W"/>
+     <ref name="k"/>
+    </and>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="xorlw-instr">
+ <fragment>
+  <var name="k">
+   <integer size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <const>00001111</const>
+   <ref name="k"/>
+  </pattern>
+  <phrase>
+   <literal>XORLW</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <xor>
+     <register name="W"/>
+     <ref name="k"/>
+    </xor>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -674,5 +817,11 @@ GNU General Public License (version 3 or any later version).
    </if>
   </effect>
  </fragment>
+
+ <ref name="retlw-instr"/>
+ <ref name="movlw-instr"/>
+ <ref name="iorlw-instr"/>
+ <ref name="andlw-instr"/>
+ <ref name="xorlw-instr"/>
 </start>
 </cpudl>
