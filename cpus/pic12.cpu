@@ -919,7 +919,9 @@ GNU General Public License (version 3 or any later version).
   <effect>
    <ref name="opcode">
     <bind name="dst">
-     <register name="W"/>
+     <memory size="8">
+      <ref name="f"/>
+     </memory>
     </bind>
     <bind name="src">
      <memory size="8">
