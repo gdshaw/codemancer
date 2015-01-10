@@ -425,6 +425,89 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="call-instr">
+ <fragment>
+  <var name="k">
+   <integer size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <const>00001001</const>
+   <ref name="k"/>
+  </pattern>
+  <phrase>
+   <literal>CALL</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="16" as="stack">
+     <register name="SP"/>
+    </memory>
+    <register name="PC"/>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>1</const>
+    </add>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <or>
+     <shift width="11" method="logical">
+      <and>
+       <memory size="8">
+        <const>0x03</const>
+       </memory>
+       <const>0x60</const>
+      </and>
+      <const>4</const>
+     </shift>
+     <ref name="k"/>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="goto-instr">
+ <fragment>
+  <var name="k">
+   <integer size="9" encoding="u"/>
+  </var>
+  <pattern>
+   <const>0000101</const>
+   <ref name="k"/>
+  </pattern>
+  <phrase>
+   <literal>GOTO</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <or>
+     <shift width="11" method="logical">
+      <and>
+       <memory size="8">
+        <const>0x03</const>
+       </memory>
+       <const>0x60</const>
+      </and>
+      <const>4</const>
+     </shift>
+     <ref name="k"/>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <define name="retlw-instr">
  <fragment>
   <var name="k">
@@ -817,6 +900,9 @@ GNU General Public License (version 3 or any later version).
    </if>
   </effect>
  </fragment>
+
+ <ref name="call-instr"/>
+ <ref name="goto-instr"/>
 
  <ref name="retlw-instr"/>
  <ref name="movlw-instr"/>
