@@ -13,6 +13,9 @@ GNU General Public License (version 3 or any later version).
  <property name="prefix" value="0x"/>
  <property name="suffix" value=""/>
  <property name="whitespace" value=" "/>
+ <select class="addr">
+  <property name="width" value="2"/>
+ </select>
 </style>
 
 <register name="W" size="8"/>
@@ -563,13 +566,81 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="movpf-instr">
+ <fragment>
+  <var name="p">
+   <integer class="addr" size="5" encoding="u"/>
+  </var>
+  <var name="f">
+   <integer class="addr" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <const>010</const>
+   <ref name="p"/>
+   <ref name="f"/>
+  </pattern>
+  <phrase>
+   <literal>MOVPF</literal>
+  </phrase>
+  <phrase>
+   <ref name="p"/>
+   <literal>,</literal><ws/>
+   <ref name="f"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <ref name="f"/>
+    </memory>
+    <memory>
+     <ref name="p"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="movfp-instr">
+ <fragment>
+  <var name="p">
+   <integer class="addr" size="5" encoding="u"/>
+  </var>
+  <var name="f">
+   <integer class="addr" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <const>011</const>
+   <ref name="p"/>
+   <ref name="f"/>
+  </pattern>
+  <phrase>
+   <literal>MOVFP</literal>
+  </phrase>
+  <phrase>
+   <ref name="f"/>
+   <literal>,</literal><ws/>
+   <ref name="p"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <ref name="f"/>
+    </memory>
+    <memory>
+     <ref name="p"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
    <ref name="movwf-op"/>
   </var>
   <var name="f">
-   <integer size="8" encoding="u"/>
+   <integer class="addr" size="8" encoding="u"/>
   </var>
   <pattern>
    <const>00</const>
@@ -617,7 +688,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="dcfsnz-op"/>
   </var>
   <var name="f">
-   <integer size="8" encoding="u"/>
+   <integer class="addr" size="8" encoding="u"/>
   </var>
   <pattern>
    <const>00</const>
@@ -655,7 +726,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="daw-op"/>
   </var>
   <var name="f">
-   <integer size="8" encoding="u"/>
+   <integer class="addr" size="8" encoding="u"/>
   </var>
   <pattern>
    <const>00</const>
@@ -713,7 +784,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="daw-op"/>
   </var>
   <var name="f">
-   <integer size="8" encoding="u"/>
+   <integer class="addr" size="8" encoding="u"/>
   </var>
   <pattern>
    <const>00</const>
@@ -744,5 +815,8 @@ GNU General Public License (version 3 or any later version).
    </ref>
   </effect>
  </fragment>
+
+ <ref name="movpf-instr"/>
+ <ref name="movfp-instr"/>
 </start>
 </cpudl>

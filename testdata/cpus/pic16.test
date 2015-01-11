@@ -1,5 +1,5 @@
 ; This file is part of Codemancer.
-; Copyright 2015 Graham Shaw.
+; Copyright 2014 Graham Shaw.
 ; Distribution and modification are permitted within the terms of the
 ; GNU General Public License (version 3 or any later version).
 
@@ -50,3 +50,8 @@
 2D12	NEGW	0x12, 1
 2E12	DAW	0x12, 0
 2F12	DAW	0x12, 1
+
+4234	MOVPF	0x02, 0x34
+5234	MOVPF	0x12, 0x34
+6234	MOVFP	0x34, 0x02
+7234	MOVFP	0x34, 0x12
