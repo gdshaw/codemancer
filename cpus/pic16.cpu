@@ -259,10 +259,10 @@ GNU General Public License (version 3 or any later version).
    </assign>
    <if>
     <test>
-     <equals>
+     <is-equal>
       <ref name="dst"/>
       <const>0</const>
-     </equals>
+     </is-equal>
     </test>
     <then>
      <assign>
@@ -368,10 +368,10 @@ GNU General Public License (version 3 or any later version).
    </assign>
    <if>
     <test>
-     <equals>
+     <is-equal>
       <ref name="dst"/>
       <const>0</const>
-     </equals>
+     </is-equal>
     </test>
     <then>
      <assign>
@@ -445,10 +445,10 @@ GNU General Public License (version 3 or any later version).
    </assign>
    <if>
     <test>
-     <equals>
+     <is-equal>
       <ref name="dst"/>
       <const>0</const>
-     </equals>
+     </is-equal>
     </test>
     <else>
      <assign>
@@ -482,10 +482,10 @@ GNU General Public License (version 3 or any later version).
    </assign>
    <if>
     <test>
-     <equals>
+     <is-equal>
       <ref name="dst"/>
       <const>0</const>
-     </equals>
+     </is-equal>
     </test>
     <else>
      <assign>

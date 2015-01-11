@@ -591,10 +591,10 @@ GNU General Public License (version 3 or any later version).
    <literal>EQ</literal>
   </phrase>
   <effect>
-   <equals>
+   <is-equal>
     <register name="Z"/>
     <const>1</const>
-   </equals>
+   </is-equal>
   </effect>
  </fragment>
 
@@ -606,10 +606,10 @@ GNU General Public License (version 3 or any later version).
    <literal>NE</literal>
   </phrase>
   <effect>
-   <equals>
+   <is-equal>
     <register name="Z"/>
     <const>0</const>
-   </equals>
+   </is-equal>
   </effect>
  </fragment>
 
@@ -621,10 +621,10 @@ GNU General Public License (version 3 or any later version).
    <literal>CS</literal>
   </phrase>
   <effect>
-   <equals>
+   <is-equal>
     <register name="C"/>
     <const>1</const>
-   </equals>
+   </is-equal>
   </effect>
  </fragment>
 
@@ -636,10 +636,10 @@ GNU General Public License (version 3 or any later version).
    <literal>CC</literal>
   </phrase>
   <effect>
-   <equals>
+   <is-equal>
     <register name="C"/>
     <const>0</const>
-   </equals>
+   </is-equal>
   </effect>
  </fragment>
 
@@ -651,10 +651,10 @@ GNU General Public License (version 3 or any later version).
    <literal>MI</literal>
   </phrase>
   <effect>
-   <equals>
+   <is-equal>
     <register name="N"/>
     <const>1</const>
-   </equals>
+   </is-equal>
   </effect>
  </fragment>
 
@@ -666,10 +666,10 @@ GNU General Public License (version 3 or any later version).
    <literal>PL</literal>
   </phrase>
   <effect>
-   <equals>
+   <is-equal>
     <register name="N"/>
     <const>0</const>
-   </equals>
+   </is-equal>
   </effect>
  </fragment>
 
@@ -681,10 +681,10 @@ GNU General Public License (version 3 or any later version).
    <literal>VS</literal>
   </phrase>
   <effect>
-   <equals>
+   <is-equal>
     <register name="V"/>
     <const>1</const>
-   </equals>
+   </is-equal>
   </effect>
  </fragment>
 
@@ -696,10 +696,10 @@ GNU General Public License (version 3 or any later version).
    <literal>VC</literal>
   </phrase>
   <effect>
-   <equals>
+   <is-equal>
     <register name="V"/>
     <const>0</const>
-   </equals>
+   </is-equal>
   </effect>
  </fragment>
 
@@ -712,14 +712,14 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <and>
-    <equals>
+    <is-equal>
      <register name="Z"/>
      <const>0</const>
-    </equals>
-    <equals>
+    </is-equal>
+    <is-equal>
      <register name="C"/>
      <const>1</const>
-    </equals>
+    </is-equal>
    </and>
   </effect>
  </fragment>
@@ -733,14 +733,14 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <and>
-    <equals>
+    <is-equal>
      <register name="Z"/>
      <const>1</const>
-    </equals>
-    <equals>
+    </is-equal>
+    <is-equal>
      <register name="C"/>
      <const>0</const>
-    </equals>
+    </is-equal>
    </and>
   </effect>
  </fragment>
@@ -753,13 +753,13 @@ GNU General Public License (version 3 or any later version).
    <literal>GE</literal>
   </phrase>
   <effect>
-   <equals>
+   <is-equal>
     <xor>
      <register name="N"/>
      <register name="V"/>
     </xor>
     <const>0</const>
-   </equals>
+   </is-equal>
   </effect>
  </fragment>
 
@@ -771,13 +771,13 @@ GNU General Public License (version 3 or any later version).
    <literal>LT</literal>
   </phrase>
   <effect>
-   <equals>
+   <is-equal>
     <xor>
      <register name="N"/>
      <register name="V"/>
     </xor>
     <const>1</const>
-   </equals>
+   </is-equal>
   </effect>
  </fragment>
 
@@ -790,17 +790,17 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <and>
-    <equals>
+    <is-equal>
      <register name="Z"/>
      <const>0</const>
-    </equals>
-    <equals>
+    </is-equal>
+    <is-equal>
      <xor>
       <register name="N"/>
       <register name="V"/>
      </xor>
      <const>0</const>
-    </equals>
+    </is-equal>
    </and>
   </effect>
  </fragment>
@@ -814,17 +814,17 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <or>
-    <equals>
+    <is-equal>
      <register name="Z"/>
      <const>1</const>
-    </equals>
-    <equals>
+    </is-equal>
+    <is-equal>
      <xor>
       <register name="N"/>
       <register name="V"/>
      </xor>
      <const>1</const>
-    </equals>
+    </is-equal>
    </or>
   </effect>
  </fragment>
@@ -1273,7 +1273,7 @@ GNU General Public License (version 3 or any later version).
     <integer size="32"/>
    </var>
    <where>
-    <equals>
+    <is-equal>
      <ref name="imm2"/>
      <shift width="32" method="rotation">
       <ref name="imm"/>
@@ -1285,7 +1285,7 @@ GNU General Public License (version 3 or any later version).
        </mul>
       </sub>
      </shift>
-    </equals>
+    </is-equal>
    </where>
    <pattern>
     <ref name="imm"/>
@@ -1322,13 +1322,13 @@ GNU General Public License (version 3 or any later version).
    <integer class="shift" size="5"/>
   </var>
   <where>
-   <equals>
+   <is-equal>
     <ref name="rot-imm2"/>
     <mul>
      <ref name="rot-imm"/>
      <const>2</const>
     </mul>
-   </equals>
+   </is-equal>
   </where>
   <pattern>
    <ref name="imm"/>
@@ -1827,7 +1827,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="u-bit"/>
   </var>
   <where>
-   <equals>
+   <is-equal>
     <ref name="offset"/>
     <or>
      <ref name="offset-lo"/>
@@ -1836,7 +1836,7 @@ GNU General Public License (version 3 or any later version).
       <const>4</const>
      </shift>
     </or>
-   </equals>
+   </is-equal>
   </where>
   <pattern>
    <ref name="offset-lo"/>
@@ -2718,7 +2718,7 @@ GNU General Public License (version 3 or any later version).
    <integer class="addr" size="32"/>
   </var>
   <where>
-   <equals>
+   <is-equal>
     <ref name="addr"/>
     <add>
      <register name="PC"/>
@@ -2730,7 +2730,7 @@ GNU General Public License (version 3 or any later version).
      </mul>
      <const>8</const>
     </add>
-   </equals>
+   </is-equal>
   </where>
   <pattern>
    <ref name="offset"/>
@@ -2912,13 +2912,13 @@ GNU General Public License (version 3 or any later version).
    <ref name="u-bit"/>
   </var>
   <where>
-   <equals>
+   <is-equal>
     <ref name="byte-offset"/>
     <mul>
      <ref name="word-offset"/>
      <const>4</const>
     </mul>
-   </equals>
+   </is-equal>
   </where>
   <pattern>
    <ref name="word-offset"/>
@@ -2981,13 +2981,13 @@ GNU General Public License (version 3 or any later version).
    <ref name="u-bit"/>
   </var>
   <where>
-   <equals>
+   <is-equal>
     <ref name="byte-offset"/>
     <mul>
      <ref name="word-offset"/>
      <const>4</const>
     </mul>
-   </equals>
+   </is-equal>
   </where>
   <pattern>
    <ref name="word-offset"/>
@@ -3174,7 +3174,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="psr"/>
   </var>
   <where>
-   <equals>
+   <is-equal>
     <ref name="imm2"/>
     <shift width="32" method="rotation">
      <ref name="imm"/>
@@ -3186,7 +3186,7 @@ GNU General Public License (version 3 or any later version).
       </mul>
      </sub>
     </shift>
-   </equals>
+   </is-equal>
   </where>
   <pattern>
    <ref name="imm"/>

@@ -348,10 +348,10 @@ GNU General Public License (version 3 or any later version).
    </assign>
    <if>
     <test>
-     <equals>
+     <is-equal>
       <ref name="dst"/>
       <const>0</const>
-     </equals>
+     </is-equal>
     </test>
     <then>
      <assign>
@@ -457,10 +457,10 @@ GNU General Public License (version 3 or any later version).
    </assign>
    <if>
     <test>
-     <equals>
+     <is-equal>
       <ref name="dst"/>
       <const>0</const>
-     </equals>
+     </is-equal>
     </test>
     <then>
      <assign>
@@ -1054,7 +1054,7 @@ GNU General Public License (version 3 or any later version).
   <effect>
    <if>
     <test>
-     <equals>
+     <is-equal>
       <and>
        <memory size="8">
         <ref name="f"/>
@@ -1065,7 +1065,7 @@ GNU General Public License (version 3 or any later version).
        <ref name="value"/>
        <ref name="mask"/>
       </and>
-     </equals>
+     </is-equal>
     </test>
     <then>
      <register name="PC"/>

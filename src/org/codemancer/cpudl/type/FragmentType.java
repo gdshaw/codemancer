@@ -22,7 +22,7 @@ import org.codemancer.cpudl.expr.Reference;
 import org.codemancer.cpudl.expr.Constant;
 import org.codemancer.cpudl.expr.Sequence;
 import org.codemancer.cpudl.expr.Fragment;
-import org.codemancer.cpudl.expr.Equality;
+import org.codemancer.cpudl.expr.IsEqual;
 
 /** A class to represent a type of instruction fragment. */
 public class FragmentType extends Type {
@@ -103,8 +103,8 @@ public class FragmentType extends Type {
 		// members referenced by the solution are available. It is therefore
 		// unlikely to handle chains of dependencies correctly.
 		for (Expression constraint: constraints) {
-			if (constraint instanceof Equality) {
-				Equality equality = (Equality)constraint;
+			if (constraint instanceof IsEqual) {
+				IsEqual equality = (IsEqual)constraint;
 				for (Map.Entry<String, MemberInfo> entry: members.entrySet()) {
 					String name = entry.getKey();
 					MemberInfo member = entry.getValue();
