@@ -13,6 +13,9 @@ GNU General Public License (version 3 or any later version).
  <property name="prefix" value="0x"/>
  <property name="suffix" value=""/>
  <property name="whitespace" value=" "/>
+ <select class="addr">
+  <property name="width" value="2"/>
+ </select>
  <select class="bit">
   <property name="base" value="10"/>
   <property name="prefix" value=""/>
@@ -788,7 +791,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="clrf-op"/>
   </var>
   <var name="f">
-   <integer size="5" encoding="u"/>
+   <integer class="addr" size="5" encoding="u"/>
   </var>
   <pattern>
    <const>000000</const>
@@ -852,7 +855,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="incfsz-op"/>
   </var>
   <var name="f">
-   <integer size="5" encoding="u"/>
+   <integer class="addr" size="5" encoding="u"/>
   </var>
   <pattern>
    <const>000000</const>
@@ -900,7 +903,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="incfsz-op"/>
   </var>
   <var name="f">
-   <integer size="5" encoding="u"/>
+   <integer class="addr" size="5" encoding="u"/>
   </var>
   <pattern>
    <const>000000</const>
@@ -940,7 +943,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="bit-mask"/>
   </var>
   <var name="f">
-   <integer size="5" encoding="u"/>
+   <integer class="addr" size="5" encoding="u"/>
   </var>
   <pattern>
    <const>0000010</const>
@@ -990,7 +993,7 @@ GNU General Public License (version 3 or any later version).
    <ref name="bit-mask"/>
   </var>
   <var name="f">
-   <integer size="5" encoding="u"/>
+   <integer class="addr" size="5" encoding="u"/>
   </var>
   <pattern>
    <const>0000011</const>
