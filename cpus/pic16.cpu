@@ -747,7 +747,7 @@ GNU General Public License (version 3 or any later version).
    <is-equal>
     <ref name="src"/>
     <const>0</const>
-   </is-greater>
+   </is-equal>
   </effect>
  </fragment>
 </define>
