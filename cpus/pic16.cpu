@@ -880,6 +880,50 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="lcall-instr">
+ <fragment>
+  <var name="k">
+   <integer size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <const>10110111</const>
+   <ref name="k"/>
+  </pattern>
+  <phrase>
+   <literal>LCALL</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory as="stack">
+     <register name="SP"/>
+    </memory>
+    <register name="PC"/>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>1</const>
+    </add>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <or>
+     <shift width="8" method="logical">
+      <memory size="8">
+       <const>0x03</const>
+      </memory>
+     </shift>
+     <ref name="k"/>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <define name="movlb-instr">
  <fragment>
   <var name="k">
@@ -901,6 +945,90 @@ GNU General Public License (version 3 or any later version).
      <const>0xF</const>
     </memory>
     <ref name="k"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="goto-instr">
+ <fragment>
+  <var name="k">
+   <integer size="13" encoding="u"/>
+  </var>
+  <pattern>
+   <const>110</const>
+   <ref name="k"/>
+  </pattern>
+  <phrase>
+   <literal>GOTO</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <or>
+     <and>
+      <memory size="8">
+       <const>0x03</const>
+      </memory>
+      <const>0xE0</const>
+     </and>
+     <ref name="k"/>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="call-instr">
+ <fragment>
+  <var name="k">
+   <integer size="13" encoding="u"/>
+  </var>
+  <pattern>
+   <const>111</const>
+   <ref name="k"/>
+  </pattern>
+  <phrase>
+   <literal>CALL</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory as="stack">
+     <register name="SP"/>
+    </memory>
+    <register name="PC"/>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>1</const>
+    </add>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <or>
+     <and>
+      <register name="PC"/>
+      <const>0x1FFF</const>
+     </and>
+     <ref name="k"/>
+    </or>
+   </assign>
+   <assign>
+    <memory size="8">
+     <const>0x03</const>
+    </memory>
+    <shift width="16" method="logical">
+     <register name="PC"/>
+     <const>-8</const>
+    </shift>
    </assign>
   </effect>
  </fragment>
@@ -1235,6 +1363,10 @@ GNU General Public License (version 3 or any later version).
  <ref name="xorlw-instr"/>
  <ref name="andlw-instr"/>
  <ref name="retlw-instr"/>
+ <ref name="lcall-instr"/>
  <ref name="movlb-instr"/>
+
+ <ref name="goto-instr"/>
+ <ref name="call-instr"/>
 </start>
 </cpudl>
