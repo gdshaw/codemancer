@@ -22,6 +22,10 @@ GNU General Public License (version 3 or any later version).
  <select class="imm">
   <property name="width" value="2"/>
  </select>
+ <select class="inc">
+  <property name="base" value="10"/>
+  <property name="prefix" value=""/>
+ </select>
  <select class="bit">
   <property name="base" value="10"/>
   <property name="prefix" value=""/>
@@ -32,6 +36,9 @@ GNU General Public License (version 3 or any later version).
 <register name="SP" size="4"/>
 <register name="PC" size="16"/>
 <register name="C" size="1"/>
+<register name="TBLAT" size="16"/>
+<register name="TBLATL" size="8"/>
+<register name="TBLATH" size="8"/>
 
 <define name="nop-instr">
  <fragment>
@@ -912,6 +919,226 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="tblat">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>0</literal>
+  </phrase>
+  <effect>
+   <register name="TBLATL"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>1</literal>
+  </phrase>
+  <effect>
+   <register name="TBLATH"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tlrd-instr">
+ <fragment>
+  <var name="t">
+   <ref name="tblat"/>
+  </var>
+  <var name="x">
+   <integer size="1"/>
+  </var>
+  <var name="f">
+   <integer class="daddr" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <const>101000</const>
+   <ref name="t"/>
+   <ref name="x"/>
+   <ref name="f"/>
+  </pattern>
+  <phrase>
+   <literal>TLRD</literal>
+  </phrase>
+  <phrase>
+   <ref name="t"/>
+   <literal>,</literal><ws/>
+   <ref name="f"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <ref name="f"/>
+    </memory>
+    <ref name="t"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tlwt-instr">
+ <fragment>
+  <var name="t">
+   <ref name="tblat"/>
+  </var>
+  <var name="x">
+   <integer size="1"/>
+  </var>
+  <var name="f">
+   <integer class="daddr" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <const>101001</const>
+   <ref name="t"/>
+   <ref name="x"/>
+   <ref name="f"/>
+  </pattern>
+  <phrase>
+   <literal>TLWT</literal>
+  </phrase>
+  <phrase>
+   <ref name="t"/>
+   <literal>,</literal><ws/>
+   <ref name="f"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="t"/>
+    <memory size="8">
+     <ref name="f"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tablrd-instr">
+ <fragment>
+  <var name="t">
+   <ref name="tblat"/>
+  </var>
+  <var name="i">
+   <integer class="inc" size="1" encoding="u"/>
+  </var>
+  <var name="f">
+   <integer class="daddr" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <const>101010</const>
+   <ref name="t"/>
+   <ref name="i"/>
+   <ref name="f"/>
+  </pattern>
+  <phrase>
+   <literal>TABLRD</literal>
+  </phrase>
+  <phrase>
+   <ref name="t"/>
+   <literal>,</literal><ws/>
+   <ref name="i"/>
+   <literal>,</literal><ws/>
+   <ref name="f"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <ref name="f"/>
+    </memory>
+    <ref name="t"/>
+   </assign>
+   <assign>
+    <register name="TBLAT"/>
+    <memory size="16" as="prog">
+     <memory size="16" encoding="u" endian="little">
+      <const>0x0D</const>
+     </memory>
+    </memory>
+   </assign>
+   <assign>
+    <memory size="16" as="prog">
+     <memory size="16" encoding="u" endian="little">
+      <const>0x0D</const>
+     </memory>
+    </memory>
+    <add>
+     <memory size="16" as="prog">
+      <memory size="16" encoding="u" endian="little">
+       <const>0x0D</const>
+      </memory>
+     </memory>
+     <ref name="i"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tablwt-instr">
+ <fragment>
+  <var name="t">
+   <ref name="tblat"/>
+  </var>
+  <var name="i">
+   <integer class="inc" size="1" encoding="u"/>
+  </var>
+  <var name="f">
+   <integer class="daddr" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <const>101011</const>
+   <ref name="t"/>
+   <ref name="i"/>
+   <ref name="f"/>
+  </pattern>
+  <phrase>
+   <literal>TABLWT</literal>
+  </phrase>
+  <phrase>
+   <ref name="t"/>
+   <literal>,</literal><ws/>
+   <ref name="i"/>
+   <literal>,</literal><ws/>
+   <ref name="f"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="t"/>
+    <memory size="8">
+     <ref name="f"/>
+    </memory>
+   </assign>
+   <assign>
+    <memory size="16" as="prog">
+     <memory size="16" encoding="u" endian="little">
+      <const>0x0D</const>
+     </memory>
+    </memory>
+    <register name="TBLAT"/>
+   </assign>
+   <assign>
+    <memory size="16" as="prog">
+     <memory size="16" encoding="u" endian="little">
+      <const>0x0D</const>
+     </memory>
+    </memory>
+    <add>
+     <memory size="16" as="prog">
+      <memory size="16" encoding="u" endian="little">
+       <const>0x0D</const>
+      </memory>
+     </memory>
+     <ref name="i"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <define name="movlw-instr">
  <fragment>
   <var name="k">
@@ -1591,6 +1818,11 @@ GNU General Public License (version 3 or any later version).
    </if>
   </effect>
  </fragment>
+
+ <ref name="tlrd-instr"/>
+ <ref name="tlwt-instr"/>
+ <ref name="tablrd-instr"/>
+ <ref name="tablwt-instr"/>
 
  <ref name="movlw-instr"/>
  <ref name="addlw-instr"/>
