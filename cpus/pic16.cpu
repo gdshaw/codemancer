@@ -684,6 +684,121 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="cpfslt-op">
+ <fragment>
+  <pattern>
+   <const>0000</const>
+  </pattern>
+  <phrase>
+   <literal>CPFSLT</literal>
+  </phrase>
+  <effect>
+   <is-less>
+    <ref name="src"/>
+    <register name="W"/>
+   </is-less>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cpfseq-op">
+ <fragment>
+  <pattern>
+   <const>0001</const>
+  </pattern>
+  <phrase>
+   <literal>CPFSEQ</literal>
+  </phrase>
+  <effect>
+   <is-equal>
+    <ref name="src"/>
+    <register name="W"/>
+   </is-equal>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cpfsgt-op">
+ <fragment>
+  <pattern>
+   <const>0010</const>
+  </pattern>
+  <phrase>
+   <literal>CPFSGT</literal>
+  </phrase>
+  <effect>
+   <is-greater>
+    <ref name="src"/>
+    <register name="W"/>
+   </is-greater>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tstfsz-op">
+ <fragment>
+  <pattern>
+   <const>0011</const>
+  </pattern>
+  <phrase>
+   <literal>TSTFSZ</literal>
+  </phrase>
+  <effect>
+   <is-equal>
+    <ref name="src"/>
+    <const>0</const>
+   </is-greater>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cp-instr">
+ <fragment>
+  <var name="opcode">
+   <ref name="cpfslt-op"/>
+   <ref name="cpfseq-op"/>
+   <ref name="cpfsgt-op"/>
+   <ref name="tstfsz-op"/>
+  </var>
+  <var name="f">
+   <integer class="daddr" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <const>0011</const>
+   <ref name="opcode"/>
+   <ref name="f"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="f"/>
+  </phrase>
+  <effect>
+   <if>
+    <test>
+     <ref name="opcode">
+      <bind name="src">
+       <memory size="8">
+        <ref name="f"/>
+       </memory>
+      </bind>
+     </ref>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <add>
+       <register name="PC"/>
+       <const>2</const>
+      </add>
+     </assign>
+    </then>
+   </if>
+  </effect>
+ </fragment>
+</define>
+
 <define name="movpf-instr">
  <fragment>
   <var name="p">
@@ -1334,6 +1449,8 @@ GNU General Public License (version 3 or any later version).
    </ref>
   </effect>
  </fragment>
+
+ <ref name="cp-instr"/>
 
  <fragment>
   <var name="mask">
