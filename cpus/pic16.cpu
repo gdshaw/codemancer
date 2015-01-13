@@ -33,6 +33,113 @@ GNU General Public License (version 3 or any later version).
 <register name="PC" size="16"/>
 <register name="C" size="1"/>
 
+<define name="nop-instr">
+ <fragment>
+  <pattern>
+   <const>00000000</const>
+   <const>00000000</const>
+  </pattern>
+  <phrase>
+   <literal>NOP</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect></effect>
+ </fragment>
+</define>
+
+<define name="return-instr">
+ <fragment>
+  <pattern>
+   <const>00000000</const>
+   <const>00000010</const>
+  </pattern>
+  <phrase>
+   <literal>RETURN</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>1</const>
+    </sub>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <memory as="stack">
+     <register name="SP"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sleep-instr">
+ <fragment>
+  <pattern>
+   <const>00000000</const>
+   <const>00000011</const>
+  </pattern>
+  <phrase>
+   <literal>SLEEP</literal>
+  </phrase>
+  <phrase></phrase>
+ </fragment>
+</define>
+
+<define name="retfie-instr">
+ <fragment>
+  <pattern>
+   <const>00000000</const>
+   <const>00000101</const>
+  </pattern>
+  <phrase>
+   <literal>RETFIE</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>1</const>
+    </sub>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <memory as="stack">
+     <register name="SP"/>
+    </memory>
+   </assign>
+   <assign>
+    <memory size="8" encoding="u">
+     <const>0x06</const>
+    </memory>
+    <and>
+     <memory size="8" encoding="u">
+      <const>0x06</const>
+     </memory>
+     <const>0xEF</const>
+    </and>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="clrwdt-instr">
+ <fragment>
+  <pattern>
+   <const>00000000</const>
+   <const>00001000</const>
+  </pattern>
+  <phrase>
+   <literal>CLRWDT</literal>
+  </phrase>
+  <phrase></phrase>
+ </fragment>
+</define>
+
 <define name="movwf-op">
  <fragment>
   <pattern>
@@ -1041,6 +1148,12 @@ GNU General Public License (version 3 or any later version).
 </define>
 
 <start>
+ <ref name="nop-instr"/>
+ <ref name="return-instr"/>
+ <ref name="sleep-instr"/>
+ <ref name="retfie-instr"/>
+ <ref name="clrwdt-instr"/>
+
  <fragment>
   <var name="opcode">
    <ref name="movwf-op"/>

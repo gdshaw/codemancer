@@ -3,6 +3,12 @@
 ; Distribution and modification are permitted within the terms of the
 ; GNU General Public License (version 3 or any later version).
 
+0000	NOP
+0002	RETURN
+0003	SLEEP
+0005	RETFIE
+0008	CLRWDT
+
 0112	MOVWF	0x12
 0212	SUBWFB	0x12, 0
 0312	SUBWFB	0x12, 1
