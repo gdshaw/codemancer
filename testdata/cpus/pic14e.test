@@ -1,12 +1,18 @@
 ; This file is part of Codemancer.
-; Copyright 2014 Graham Shaw.
+; Copyright 2014-15 Graham Shaw.
 ; Distribution and modification are permitted within the terms of the
 ; GNU General Public License (version 3 or any later version).
 
+0000	NOP
+0001	RESET
 0008	RETURN
 0009	RETFIE
+0062	OPTION
 0063	SLEEP
 0064	CLRWDT
+0065	TRIS	5
+0066	TRIS	6
+0067	TRIS	7
 
 0092	MOVWF	0x12
 0100	CLRW
