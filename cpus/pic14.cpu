@@ -34,6 +34,49 @@ GNU General Public License (version 3 or any later version).
 <register name="W" size="8"/>
 <register name="SP" size="3"/>
 <register name="PC" size="13"/>
+<register name="C" size="1"/>
+
+<define name="ignore1">
+ <require name="enhanced">
+  <fragment>
+   <pattern>
+    <const>0</const>
+   </pattern>
+  </fragment>
+ </require>
+
+ <require name="!enhanced">
+  <fragment>
+   <var name="x">
+    <integer size="1"/>
+   </var>
+   <pattern>
+    <ref name="x"/>
+   </pattern>
+  </fragment>
+ </require>
+</define>
+
+<define name="ignore2">
+ <require name="enhanced">
+  <fragment>
+   <pattern>
+    <const>00</const>
+   </pattern>
+  </fragment>
+ </require>
+
+ <require name="!enhanced">
+  <fragment>
+   <var name="x">
+    <integer size="2"/>
+   </var>
+   <pattern>
+    <ref name="x"/>
+   </pattern>
+  </fragment>
+ </require>
+</define>
 
 <define name="tris-reg">
  <fragment>
@@ -307,10 +350,58 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="clrw-instr">
+ <require name="enhanced">
+  <fragment>
+   <var name="x">
+    <integer class="daddr" size="2" encoding="u"/>
+   </var>
+   <pattern>
+    <const>00000001</const>
+    <const>000000</const>
+    <ref name="x"/>
+   </pattern>
+   <phrase>
+    <literal>CLRW</literal>
+   </phrase>
+   <phrase></phrase>
+   <effect>
+    <assign>
+     <register name="W"/>
+     <const>0</const>
+    </assign>
+   </effect>
+  </fragment>
+ </require>
+
+ <require name="!enhanced">
+  <fragment>
+   <var name="x">
+    <integer class="daddr" size="7" encoding="u"/>
+   </var>
+   <pattern>
+    <const>00000001</const>
+    <const>0</const>
+    <ref name="x"/>
+   </pattern>
+   <phrase>
+    <literal>CLRW</literal>
+   </phrase>
+   <phrase></phrase>
+   <effect>
+    <assign>
+     <register name="W"/>
+     <const>0</const>
+    </assign>
+   </effect>
+  </fragment>
+ </require>
+</define>
+
 <define name="movwf-op">
  <fragment>
   <pattern>
-   <const>00001</const>
+   <const>0000001</const>
   </pattern>
   <phrase>
    <literal>MOVWF</literal>
@@ -327,7 +418,7 @@ GNU General Public License (version 3 or any later version).
 <define name="clrf-op">
  <fragment>
   <pattern>
-   <const>00011</const>
+   <const>0000011</const>
   </pattern>
   <phrase>
    <literal>CLRF</literal>
@@ -344,7 +435,7 @@ GNU General Public License (version 3 or any later version).
 <define name="subwf-op">
  <fragment>
   <pattern>
-   <const>0010</const>
+   <const>000010</const>
   </pattern>
   <phrase>
    <literal>SUBWF</literal>
@@ -364,7 +455,7 @@ GNU General Public License (version 3 or any later version).
 <define name="decf-op">
  <fragment>
   <pattern>
-   <const>0011</const>
+   <const>000011</const>
   </pattern>
   <phrase>
    <literal>DECF</literal>
@@ -384,7 +475,7 @@ GNU General Public License (version 3 or any later version).
 <define name="iorwf-op">
  <fragment>
   <pattern>
-   <const>0100</const>
+   <const>000100</const>
   </pattern>
   <phrase>
    <literal>IORWF</literal>
@@ -404,7 +495,7 @@ GNU General Public License (version 3 or any later version).
 <define name="andwf-op">
  <fragment>
   <pattern>
-   <const>0101</const>
+   <const>000101</const>
   </pattern>
   <phrase>
    <literal>ANDWF</literal>
@@ -424,7 +515,7 @@ GNU General Public License (version 3 or any later version).
 <define name="xorwf-op">
  <fragment>
   <pattern>
-   <const>0110</const>
+   <const>000110</const>
   </pattern>
   <phrase>
    <literal>XORWF</literal>
@@ -444,7 +535,7 @@ GNU General Public License (version 3 or any later version).
 <define name="addwf-op">
  <fragment>
   <pattern>
-   <const>0111</const>
+   <const>000111</const>
   </pattern>
   <phrase>
    <literal>ADDWF</literal>
@@ -464,7 +555,7 @@ GNU General Public License (version 3 or any later version).
 <define name="movf-op">
  <fragment>
   <pattern>
-   <const>1000</const>
+   <const>001000</const>
   </pattern>
   <phrase>
    <literal>MOVF</literal>
@@ -481,7 +572,7 @@ GNU General Public License (version 3 or any later version).
 <define name="comf-op">
  <fragment>
   <pattern>
-   <const>1001</const>
+   <const>001001</const>
   </pattern>
   <phrase>
    <literal>COMF</literal>
@@ -501,7 +592,7 @@ GNU General Public License (version 3 or any later version).
 <define name="incf-op">
  <fragment>
   <pattern>
-   <const>1010</const>
+   <const>001010</const>
   </pattern>
   <phrase>
    <literal>INCF</literal>
@@ -521,7 +612,7 @@ GNU General Public License (version 3 or any later version).
 <define name="decfsz-op">
  <fragment>
   <pattern>
-   <const>1011</const>
+   <const>001011</const>
   </pattern>
   <phrase>
    <literal>DECFSZ</literal>
@@ -558,7 +649,7 @@ GNU General Public License (version 3 or any later version).
 <define name="rrf-op">
  <fragment>
   <pattern>
-   <const>1100</const>
+   <const>001100</const>
   </pattern>
   <phrase>
    <literal>RRF</literal>
@@ -578,7 +669,7 @@ GNU General Public License (version 3 or any later version).
 <define name="rlf-op">
  <fragment>
   <pattern>
-   <const>1101</const>
+   <const>001101</const>
   </pattern>
   <phrase>
    <literal>RLF</literal>
@@ -598,7 +689,7 @@ GNU General Public License (version 3 or any later version).
 <define name="swapf-op">
  <fragment>
   <pattern>
-   <const>1110</const>
+   <const>001110</const>
   </pattern>
   <phrase>
    <literal>SWAPF</literal>
@@ -630,7 +721,7 @@ GNU General Public License (version 3 or any later version).
 <define name="incfsz-op">
  <fragment>
   <pattern>
-   <const>1111</const>
+   <const>001111</const>
   </pattern>
   <phrase>
    <literal>INCFSZ</literal>
@@ -660,6 +751,107 @@ GNU General Public License (version 3 or any later version).
      </assign>
     </then>
    </if>
+  </effect>
+ </fragment>
+</define>
+
+<define name="lslf-op">
+ <fragment>
+  <pattern>
+   <const>110101</const>
+  </pattern>
+  <phrase>
+   <literal>LSLF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <shift width="8" method="logical">
+     <register name="W"/>
+     <const>1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="lsrf-op">
+ <fragment>
+  <pattern>
+   <const>110110</const>
+  </pattern>
+  <phrase>
+   <literal>LSRF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <shift width="8" method="logical">
+     <register name="W"/>
+     <const>-1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="asrf-op">
+ <fragment>
+  <pattern>
+   <const>110111</const>
+  </pattern>
+  <phrase>
+   <literal>ASRF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <shift width="8" method="arithmetic">
+     <register name="W"/>
+     <const>-1</const>
+    </shift>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="subwfb-op">
+ <fragment>
+  <pattern>
+   <const>111011</const>
+  </pattern>
+  <phrase>
+   <literal>SUBWFB</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <sub>
+     <register name="W"/>
+     <ref name="src"/>
+     <register name="C"/>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="addwfc-op">
+ <fragment>
+  <pattern>
+   <const>111101</const>
+  </pattern>
+  <phrase>
+   <literal>ADDWFC</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <add>
+     <register name="W"/>
+     <ref name="src"/>
+    </add>
+   </assign>
   </effect>
  </fragment>
 </define>
@@ -795,7 +987,7 @@ GNU General Public License (version 3 or any later version).
 <define name="movlw-instr">
  <fragment>
   <var name="x">
-   <integer size="2"/>
+   <ref name="ignore2"/>
   </var>
   <var name="k">
    <integer class="imm" size="8" encoding="u"/>
@@ -823,7 +1015,7 @@ GNU General Public License (version 3 or any later version).
 <define name="retlw-instr">
  <fragment>
   <var name="x">
-   <integer size="2"/>
+   <ref name="ignore2"/>
   </var>
   <var name="k">
    <integer class="imm" size="8" encoding="u"/>
@@ -945,7 +1137,7 @@ GNU General Public License (version 3 or any later version).
 <define name="sublw-instr">
  <fragment>
   <var name="x">
-   <integer size="1"/>
+   <ref name="ignore1"/>
   </var>
   <var name="k">
    <integer class="imm" size="8" encoding="u"/>
@@ -976,7 +1168,7 @@ GNU General Public License (version 3 or any later version).
 <define name="addlw-instr">
  <fragment>
   <var name="x">
-   <integer size="1"/>
+   <ref name="ignore1"/>
   </var>
   <var name="k">
    <integer class="imm" size="8" encoding="u"/>
@@ -1031,7 +1223,7 @@ GNU General Public License (version 3 or any later version).
    <integer class="daddr" size="7" encoding="u"/>
   </var>
   <pattern>
-   <const>0000</const>
+   <const>00</const>
    <ref name="opcode"/>
    <ref name="f"/>
   </pattern>
@@ -1057,26 +1249,7 @@ GNU General Public License (version 3 or any later version).
   </effect>
  </fragment>
 
- <fragment>
-  <var name="f">
-   <integer class="daddr" size="7" encoding="u"/>
-  </var>
-  <pattern>
-   <const>0000</const>
-   <const>00010</const>
-   <ref name="f"/>
-  </pattern>
-  <phrase>
-   <literal>CLRW</literal>
-  </phrase>
-  <phrase></phrase>
-  <effect>
-   <assign>
-    <register name="W"/>
-    <const>0</const>
-   </assign>
-  </effect>
- </fragment>
+ <ref name="clrw-instr"/>
 
  <fragment>
   <var name="opcode">
@@ -1094,12 +1267,19 @@ GNU General Public License (version 3 or any later version).
    <ref name="rlf-op"/>
    <ref name="swapf-op"/>
    <ref name="incfsz-op"/>
+   <require name="enhanced">
+    <ref name="lslf-op"/>
+    <ref name="lsrf-op"/>
+    <ref name="asrf-op"/>
+    <ref name="subwfb-op"/>
+    <ref name="addwfc-op"/>
+   </require>
   </var>
   <var name="f">
    <integer class="daddr" size="7" encoding="u"/>
   </var>
   <pattern>
-   <const>0000</const>
+   <const>00</const>
    <ref name="opcode"/>
    <const>0</const>
    <ref name="f"/>
@@ -1142,12 +1322,19 @@ GNU General Public License (version 3 or any later version).
    <ref name="rlf-op"/>
    <ref name="swapf-op"/>
    <ref name="incfsz-op"/>
+   <require name="enhanced">
+    <ref name="lslf-op"/>
+    <ref name="lsrf-op"/>
+    <ref name="asrf-op"/>
+    <ref name="subwfb-op"/>
+    <ref name="addwfc-op"/>
+   </require>
   </var>
   <var name="f">
    <integer class="daddr" size="7" encoding="u"/>
   </var>
   <pattern>
-   <const>0000</const>
+   <const>00</const>
    <ref name="opcode"/>
    <const>1</const>
    <ref name="f"/>
