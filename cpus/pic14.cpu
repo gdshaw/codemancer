@@ -167,6 +167,72 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="callw-instr">
+ <fragment>
+  <pattern>
+   <const>00000000</const>
+   <const>00001010</const>
+  </pattern>
+  <phrase>
+   <literal>CALLW</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <memory as="stack">
+     <register name="SP"/>
+    </memory>
+    <register name="PC"/>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>1</const>
+    </add>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <or>
+     <shift width="13" method="logical">
+      <and>
+       <memory size="8">
+        <const>0x0A</const>
+       </memory>
+       <const>0x7F</const>
+      </and>
+      <const>8</const>
+     </shift>
+     <register name="W"/>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="brw-instr">
+ <fragment>
+  <pattern>
+   <const>00000000</const>
+   <const>00001011</const>
+  </pattern>
+  <phrase>
+   <literal>BRW</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <add>
+     <register name="PC"/>
+     <const>1</const>
+     <register name="W"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <define name="option-instr">
  <fragment>
   <pattern>
@@ -946,6 +1012,8 @@ GNU General Public License (version 3 or any later version).
  <ref name="return-instr"/>
  <ref name="retfie-instr"/>
  <require name="enhanced">
+  <ref name="callw-instr"/>
+  <ref name="brw-instr"/>
   <ref name="option-instr"/>
  </require>
  <ref name="sleep-instr"/>
