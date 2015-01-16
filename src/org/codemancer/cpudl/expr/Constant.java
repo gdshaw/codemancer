@@ -53,7 +53,7 @@ public class Constant extends Expression {
 			v = v / base;
 			if (width != 0) --width;
 		}
-		return prefix + sign + new String(digits, i, digits.length - i) + suffix;
+		return sign + prefix + new String(digits, i, digits.length - i) + suffix;
 	}
 
 	public void accumulate(Accumulator acc, long multiplier) {
