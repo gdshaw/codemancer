@@ -22,6 +22,9 @@ GNU General Public License (version 3 or any later version).
  <select class="paddr">
   <property name="width" value="4"/>
  </select>
+ <select class="ofs">
+  <property name="width" value="2"/>
+ </select>
  <select class="imm">
   <property name="width" value="2"/>
  </select>
@@ -112,6 +115,167 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <const>0x8E</const>
+  </effect>
+ </fragment>
+</define>
+
+<define name="fsr-reg">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>FSR0</literal>
+  </phrase>
+  <effect>
+   <memory size="16" encoding="u" endian="little">
+    <const>0x04</const>
+   </memory>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>FSR1</literal>
+  </phrase>
+  <effect>
+   <memory size="16" encoding="u" endian="little">
+    <const>0x06</const>
+   </memory>
+  </effect>
+ </fragment>
+</define>
+
+<define name="fsr-id-ea">
+ <fragment>
+  <var name="fsr">
+   <ref name="fsr-reg"/>
+  </var>
+  <pattern>
+   <ref name="fsr"/>
+   <const>00</const>
+  </pattern>
+  <phrase>
+   <literal>++</literal>
+   <ref name="fsr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="fsr"/>
+    <add>
+     <ref name="fsr"/>
+     <const>1</const>
+    </add>
+   </assign>
+   <ref name="fsr"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="fsr">
+   <ref name="fsr-reg"/>
+  </var>
+  <pattern>
+   <ref name="fsr"/>
+   <const>01</const>
+  </pattern>
+  <phrase>
+   <literal>--</literal>
+   <ref name="fsr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="fsr"/>
+    <sub>
+     <ref name="fsr"/>
+     <const>1</const>
+    </sub>
+   </assign>
+   <ref name="fsr"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="fsr">
+   <ref name="fsr-reg"/>
+  </var>
+  <pattern>
+   <ref name="fsr"/>
+   <const>10</const>
+  </pattern>
+  <phrase>
+   <ref name="fsr"/>
+   <literal>++</literal>
+  </phrase>
+  <effect>
+   <temp name="fsr">
+    <ref name="fsr"/>
+   </temp>
+   <assign>
+    <ref name="fsr"/>
+    <add>
+     <ref name="fsr"/>
+     <const>1</const>
+    </add>
+   </assign>
+   <temp name="fsr"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="fsr">
+   <ref name="fsr-reg"/>
+  </var>
+  <pattern>
+   <ref name="fsr"/>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <ref name="fsr"/>
+   <literal>--</literal>
+  </phrase>
+  <effect>
+   <temp name="fsr">
+    <ref name="fsr"/>
+   </temp>
+   <assign>
+    <ref name="fsr"/>
+    <sub>
+     <ref name="fsr"/>
+     <const>1</const>
+    </sub>
+   </assign>
+   <temp name="fsr"/>
+  </effect>
+ </fragment>
+</define>
+
+<define name="fsr-ofs-ea">
+ <fragment>
+  <var name="fsr">
+   <ref name="fsr-reg"/>
+  </var>
+  <var name="k">
+   <integer class="ofs" size="6" encoding="2c"/>
+  </var>
+  <pattern>
+   <ref name="fsr"/>
+   <ref name="k"/>
+  </pattern>
+  <phrase>
+   <ref name="k"/>
+   <literal>[</literal>
+   <ref name="fsr"/>
+   <literal>]</literal>
+  </phrase>
+  <effect>
+   <add>
+    <ref name="fsr"/>
+    <ref name="k"/>
+   </add>
   </effect>
  </fragment>
 </define>
@@ -271,6 +435,110 @@ GNU General Public License (version 3 or any later version).
      <const>1</const>
      <register name="W"/>
     </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="moviw-instr">
+ <fragment>
+  <var name="ea">
+   <ref name="fsr-id-ea"/>
+  </var>
+  <pattern>
+   <const>00000000</const>
+   <const>00010</const>
+   <ref name="ea"/>
+  </pattern> 
+  <phrase>
+   <literal>MOVIW</literal>
+  </phrase>
+  <phrase>
+   <ref name="ea"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <memory size="8">
+     <ref name="ea"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="ea">
+   <ref name="fsr-ofs-ea"/>
+  </var>
+  <pattern>
+   <const>00111111</const>
+   <const>0</const>
+   <ref name="ea"/>
+  </pattern> 
+  <phrase>
+   <literal>MOVIW</literal>
+  </phrase>
+  <phrase>
+   <ref name="ea"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <memory size="8">
+     <ref name="ea"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="movwi-instr">
+ <fragment>
+  <var name="ea">
+   <ref name="fsr-id-ea"/>
+  </var>
+  <pattern>
+   <const>00000000</const>
+   <const>00011</const>
+   <ref name="ea"/>
+  </pattern>
+  <phrase>
+   <literal>MOVWI</literal>
+  </phrase>
+  <phrase>
+   <ref name="ea"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <ref name="ea"/>
+    </memory>
+    <register name="W"/>
+   </assign>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="ea">
+   <ref name="fsr-ofs-ea"/>
+  </var>
+  <pattern>
+   <const>00111111</const>
+   <const>1</const>
+   <ref name="ea"/>
+  </pattern> 
+  <phrase>
+   <literal>MOVWI</literal>
+  </phrase>
+  <phrase>
+   <ref name="ea"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <ref name="ea"/>
+    </memory>
+    <register name="W"/>
    </assign>
   </effect>
  </fragment>
@@ -1206,6 +1474,8 @@ GNU General Public License (version 3 or any later version).
  <require name="enhanced">
   <ref name="callw-instr"/>
   <ref name="brw-instr"/>
+  <ref name="moviw-instr"/>
+  <ref name="movwi-instr"/>
   <ref name="option-instr"/>
  </require>
  <ref name="sleep-instr"/>
