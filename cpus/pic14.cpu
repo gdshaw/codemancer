@@ -36,7 +36,8 @@ GNU General Public License (version 3 or any later version).
 
 <register name="W" size="8"/>
 <register name="SP" size="3"/>
-<register name="PC" size="13"/>
+<!-- Size of PC should be 13 for non-enhanced core. -->
+<register name="PC" size="15"/>
 <register name="C" size="1"/>
 
 <define name="ignore1">
@@ -539,6 +540,33 @@ GNU General Public License (version 3 or any later version).
      <ref name="ea"/>
     </memory>
     <register name="W"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="movlb-instr">
+ <fragment>
+  <var name="k">
+   <integer class="imm" size="5" encoding="u"/>
+  </var>
+  <pattern>
+   <const>00000000</const>
+   <const>001</const>
+   <ref name="k"/>
+  </pattern>
+  <phrase>
+   <literal>MOVLB</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <const>0x08</const>
+    </memory>
+    <ref name="k"/>
    </assign>
   </effect>
  </fragment>
@@ -1280,6 +1308,104 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="addfsr-instr">
+ <fragment>
+  <var name="fsr">
+   <ref name="fsr-reg"/>
+  </var>
+  <var name="k">
+   <integer class="imm" size="6" encoding="2c"/>
+  </var>
+  <pattern>
+   <const>00110001</const>
+   <const>0</const>
+   <ref name="fsr"/>
+   <ref name="k"/>
+  </pattern>
+  <phrase>
+   <literal>ADDFSR</literal>
+  </phrase>
+  <phrase>
+   <ref name="fsr"/>
+   <literal>,</literal><ws/>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="fsr"/>
+    <add>
+     <ref name="fsr"/>
+     <ref name="k"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="movlp-instr">
+ <fragment>
+  <var name="k">
+   <integer class="imm" size="7" encoding="u"/>
+  </var>
+  <pattern>
+   <const>00110001</const>
+   <const>1</const>
+   <ref name="k"/>
+  </pattern>
+  <phrase>
+   <literal>MOVLP</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <const>0x0A</const>
+    </memory>
+    <ref name="k"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="bra-instr">
+ <fragment>
+  <var name="k">
+   <integer class="paddr" size="9" encoding="2c"/>
+  </var>
+  <var name="addr">
+   <integer class="paddr" size="16" encoding="u"/>
+  </var>
+  <where>
+   <is-equal>
+    <ref name="addr"/>
+    <add>
+     <register name="PC"/>
+     <const>1</const>
+     <ref name="k"/>
+    </add>
+   </is-equal>
+  </where>
+  <pattern>
+   <const>0011001</const>
+   <ref name="k"/>
+  </pattern>
+  <phrase>
+   <literal>BRA</literal>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <ref name="addr"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <define name="retlw-instr">
  <fragment>
   <var name="x">
@@ -1476,6 +1602,7 @@ GNU General Public License (version 3 or any later version).
   <ref name="brw-instr"/>
   <ref name="moviw-instr"/>
   <ref name="movwi-instr"/>
+  <ref name="movlb-instr"/>
   <ref name="option-instr"/>
  </require>
  <ref name="sleep-instr"/>
@@ -1745,5 +1872,11 @@ GNU General Public License (version 3 or any later version).
  <ref name="xorlw-instr"/>
  <ref name="sublw-instr"/>
  <ref name="addlw-instr"/>
+
+ <require name="enhanced">
+  <ref name="addfsr-instr"/>
+  <ref name="movlp-instr"/>
+  <ref name="bra-instr"/>
+ </require>
 </start>
 </cpudl>
