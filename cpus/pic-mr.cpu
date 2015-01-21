@@ -6,8 +6,8 @@ GNU General Public License (version 3 or any later version).
 -->
 
 <cpudl endian="big">
-<cpu name="pic14"/>
-<cpu name="pic14e" extends="pic14">
+<cpu name="pic-mr"/>
+<cpu name="pic-emr" extends="pic-mr">
  <feature name="enhanced"/>
 </cpu>
 

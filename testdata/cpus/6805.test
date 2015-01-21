@@ -3,6 +3,7 @@
 ; Distribution and modification are permitted within the terms of the
 ; GNU General Public License (version 3 or any later version).
 
+@0000
 001234	BRSET0	$12,$0037
 011234	BRCLR0	$12,$0037
 021234	BRSET1	$12,$0037

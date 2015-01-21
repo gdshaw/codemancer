@@ -6,7 +6,7 @@ GNU General Public License (version 3 or any later version).
 -->
 
 <cpudl endian="big">
-<cpu name="pic12"/>
+<cpu name="pic-bl"/>
 
 <style>
  <property name="base" value="16"/>
