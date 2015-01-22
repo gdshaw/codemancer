@@ -176,8 +176,8 @@ GNU General Public License (version 3 or any later version).
    <assign>
     <ref name="dst"/>
     <sub>
-     <register name="W"/>
      <ref name="src"/>
+     <register name="W"/>
      <register name="C"/>
     </sub>
    </assign>
@@ -197,8 +197,8 @@ GNU General Public License (version 3 or any later version).
    <assign>
     <ref name="dst"/>
     <sub>
-     <register name="W"/>
      <ref name="src"/>
+     <register name="W"/>
     </sub>
    </assign>
   </effect>
@@ -1209,8 +1209,8 @@ GNU General Public License (version 3 or any later version).
    <assign>
     <register name="W"/>
     <sub>
-     <register name="W"/>
      <ref name="k"/>
+     <register name="W"/>
     </sub>
    </assign>
   </effect>

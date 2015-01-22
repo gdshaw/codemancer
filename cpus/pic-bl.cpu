@@ -203,8 +203,8 @@ GNU General Public License (version 3 or any later version).
    <assign>
     <ref name="dst"/>
     <sub>
-     <register name="W"/>
      <ref name="src"/>
+     <register name="W"/>
     </sub>
    </assign>
   </effect>
