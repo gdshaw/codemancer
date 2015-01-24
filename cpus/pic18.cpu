@@ -1092,6 +1092,200 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="bit-mask">
+ <fragment>
+  <var name="n">
+   <integer class="bit" size="3"/>
+  </var>
+  <pattern>
+   <ref name="n"/>
+  </pattern>
+  <phrase>
+   <ref name="n"/>
+  </phrase>
+  <effect>
+   <shift width="8" mode="logical">
+    <ref name="n"/>
+   </shift>
+  </effect>
+ </fragment>
+</define>
+
+<define name="bit-value">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>S</literal>
+  </phrase>
+  <effect>
+   <const>0xFF</const>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>C</literal>
+  </phrase>
+  <effect>
+   <const>0x00</const>
+  </effect>
+ </fragment>
+</define>
+
+<define name="btg-instr">
+ <fragment>
+  <var name="mask">
+   <ref name="bit-mask"/>
+  </var>
+  <var name="addr">
+   <ref name="daddr"/>
+  </var>
+  <pattern>
+   <ref name="addr"/>
+   <ref name="mask"/>
+   <const>1110</const>
+  </pattern>
+  <phrase>
+   <literal>BTG</literal>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+   <literal>,</literal><ws/>
+   <ref name="mask"/>
+   <literal>,</literal><ws/>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <ref name="addr"/>
+    </memory>
+    <xor>
+     <memory size="8">
+      <ref name="addr"/>
+     </memory>
+     <ref name="mask"/>
+    </xor>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="bscf-instr">
+ <fragment>
+  <var name="value">
+   <ref name="bit-value"/>
+  </var>
+  <var name="mask">
+   <ref name="bit-mask"/>
+  </var>
+  <var name="addr">
+   <ref name="daddr"/>
+  </var>
+  <pattern>
+   <ref name="addr"/>
+   <ref name="mask"/>
+   <ref name="value"/>
+   <const>001</const>
+  </pattern>
+  <phrase>
+   <literal>B</literal>
+   <ref name="value"/>
+   <literal>F</literal>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+   <literal>,</literal><ws/>
+   <ref name="mask"/>
+   <literal>,</literal><ws/>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <ref name="addr"/>
+    </memory>
+    <or>
+     <and>
+      <memory size="8">
+       <ref name="addr"/>
+      </memory>
+      <xor>
+       <ref name="mask"/>
+       <const>0xFF</const>
+      </xor>
+     </and>
+     <and>
+      <ref name="value"/>
+      <ref name="mask"/>
+     </and>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="btfssc-instr">
+ <fragment>
+  <var name="value">
+   <ref name="bit-value"/>
+  </var>
+  <var name="mask">
+   <ref name="bit-mask"/>
+  </var>
+  <var name="addr">
+   <ref name="daddr"/>
+  </var>
+  <pattern>
+   <ref name="addr"/>
+   <ref name="mask"/>
+   <ref name="value"/>
+   <const>101</const>
+  </pattern>
+  <phrase>
+   <literal>BTFS</literal>
+   <ref name="value"/>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+   <literal>,</literal><ws/>
+   <ref name="mask"/>
+   <literal>,</literal><ws/>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <if>
+    <test>
+     <is-equal>
+      <and>
+       <memory size="8">
+        <ref name="addr"/>
+       </memory>
+       <ref name="mask"/>
+      </and>
+      <and>
+       <ref name="value"/>
+       <ref name="mask"/>
+      </and>
+     </is-equal>
+    </test>
+    <then>
+     <register name="PC"/>
+     <add>
+      <register name="PC"/>
+      <const>2</const>
+     </add>
+    </then>
+   </if>
+  </effect>
+ </fragment>
+</define>
+
 <define name="lfsr-instr">
  <fragment>
   <var name="fsr">
@@ -1296,6 +1490,10 @@ GNU General Public License (version 3 or any later version).
  <ref name="mullw-instr"/>
  <ref name="movlw-instr"/>
  <ref name="addlw-instr"/>
+
+ <ref name="btg-instr"/>
+ <ref name="bscf-instr"/>
+ <ref name="btfssc-instr"/>
 
  <ref name="lfsr-instr"/>
 </start>
