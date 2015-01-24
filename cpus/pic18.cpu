@@ -580,6 +580,197 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="cpfslt-op">
+ <fragment>
+  <pattern>
+   <const>0000110</const>
+  </pattern>
+  <phrase>
+   <literal>CPFSLT</literal>
+  </phrase>
+  <effect>
+   <if>
+    <test>
+     <is-less>
+      <ref name="dst"/>
+      <register name="W"/>
+     </is-less>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <add>
+       <register name="PC"/>
+       <const>2</const>
+      </add>
+     </assign>
+    </then>
+   </if>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cpfseq-op">
+ <fragment>
+  <pattern>
+   <const>1000110</const>
+  </pattern>
+  <phrase>
+   <literal>CPFSEQ</literal>
+  </phrase>
+  <effect>
+   <if>
+    <test>
+     <is-equal>
+      <ref name="dst"/>
+      <register name="W"/>
+     </is-equal>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <add>
+       <register name="PC"/>
+       <const>2</const>
+      </add>
+     </assign>
+    </then>
+   </if>
+  </effect>
+ </fragment>
+</define>
+
+<define name="cpfsgt-op">
+ <fragment>
+  <pattern>
+   <const>0100110</const>
+  </pattern>
+  <phrase>
+   <literal>CPFSGT</literal>
+  </phrase>
+  <effect>
+   <if>
+    <test>
+     <is-greater>
+      <ref name="dst"/>
+      <register name="W"/>
+     </is-greater>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <add>
+       <register name="PC"/>
+       <const>2</const>
+      </add>
+     </assign>
+    </then>
+   </if>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tstfsz-op">
+ <fragment>
+  <pattern>
+   <const>1100110</const>
+  </pattern>
+  <phrase>
+   <literal>TSTFSZ</literal>
+  </phrase>
+  <effect>
+   <if>
+    <test>
+     <is-equal>
+      <ref name="dst"/>
+      <const>0</const>
+     </is-equal>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <add>
+       <register name="PC"/>
+       <const>2</const>
+      </add>
+     </assign>
+    </then>
+   </if>
+  </effect>
+ </fragment>
+</define>
+
+<define name="setf-op">
+ <fragment>
+  <pattern>
+   <const>0010110</const>
+  </pattern>
+  <phrase>
+   <literal>SETF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <const>0xFF</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="clrf-op">
+ <fragment>
+  <pattern>
+   <const>1010110</const>
+  </pattern>
+  <phrase>
+   <literal>CLRF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <const>0</const>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="negf-op">
+ <fragment>
+  <pattern>
+   <const>0110110</const>
+  </pattern>
+  <phrase>
+   <literal>NEGF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <sub>
+     <const>0</const>
+     <ref name="dst"/>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="movwf-op">
+ <fragment>
+  <pattern>
+   <const>1110110</const>
+  </pattern>
+  <phrase>
+   <literal>MOVWF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="dst"/>
+    <register name="W"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -683,6 +874,41 @@ GNU General Public License (version 3 or any later version).
      <ref name="addr"/>
     </bind>
     <bind name="src">
+     <ref name="addr"/>
+    </bind>
+   </ref>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <var name="opcode">
+   <ref name="cpfslt-op"/>
+   <ref name="cpfseq-op"/>
+   <ref name="cpfsgt-op"/>
+   <ref name="tstfsz-op"/>
+   <ref name="setf-op"/>
+   <ref name="clrf-op"/>
+   <ref name="negf-op"/>
+   <ref name="movwf-op"/>
+  </var>
+  <var name="addr">
+   <ref name="daddr"/>
+  </var>
+  <pattern>
+   <ref name="addr"/>
+   <ref name="opcode"/>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+   <literal>,</literal><ws/>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <ref name="opcode">
+    <bind name="dst">
      <ref name="addr"/>
     </bind>
    </ref>
