@@ -47,6 +47,8 @@ GNU General Public License (version 3 or any later version).
 <register name="C" size="1"/>
 <register name="OV" size="1"/>
 <register name="N" size="1"/>
+<register name="TBLPTR" size="21"/>
+<register name="TBLAT" size="8"/>
 
 <register name="WS" size="8"/>
 <register name="BSRS" size="8"/>
@@ -215,6 +217,83 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="tbl-ea">
+ <fragment>
+  <pattern>
+   <const>00</const>
+  </pattern>
+  <phrase>
+   <literal>*</literal>
+  </phrase>
+  <effect>
+   <register name="TBLPTR"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10</const>
+  </pattern>
+  <phrase>
+   <literal>*+</literal>
+  </phrase>
+  <effect>
+   <temp name="tblptr">
+    <register name="TBLPTR"/>
+   </temp>
+   <assign>
+    <register name="TBLPTR"/>
+    <add>
+     <temp name="tblptr"/>
+     <const>1</const>
+    </add>
+   </assign>
+   <temp name="tblptr"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>01</const>
+  </pattern>
+  <phrase>
+   <literal>*-</literal>
+  </phrase>
+  <effect>
+   <temp name="tblptr">
+    <register name="TBLPTR"/>
+   </temp>
+   <assign>
+    <register name="TBLPTR"/>
+    <sub>
+     <temp name="tblptr"/>
+     <const>1</const>
+    </sub>
+   </assign>
+   <temp name="tblptr"/>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>11</const>
+  </pattern>
+  <phrase>
+   <literal>+*</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="TBLPTR"/>
+    <add>
+     <register name="TBLPTR"/>
+     <const>1</const>
+    </add>
+   </assign>
+    <register name="TBLPTR"/>
+  </effect>
+ </fragment>
+</define>
+
 <define name="nop-instr">
  <fragment>
   <pattern>
@@ -315,6 +394,60 @@ GNU General Public License (version 3 or any later version).
    <literal>DAW</literal>
   </phrase>
   <phrase></phrase>
+ </fragment>
+</define>
+
+<define name="tblrd-instr">
+ <fragment>
+  <var name="ea">
+   <ref name="tbl-ea"/>
+  </var>
+  <pattern>
+   <ref name="ea"/>
+   <const>010000</const>
+   <const>00000000</const>
+  </pattern>
+  <phrase>
+   <literal>TBLRD</literal>
+  </phrase>
+  <phrase>
+   <ref name="ea"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="TBLAT"/>
+    <memory size="8" as="prog">
+     <ref name="ea"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="tblwt-instr">
+ <fragment>
+  <var name="ea">
+   <ref name="tbl-ea"/>
+  </var>
+  <pattern>
+   <ref name="ea"/>
+   <const>110000</const>
+   <const>00000000</const>
+  </pattern>
+  <phrase>
+   <literal>TBLWT</literal>
+  </phrase>
+  <phrase>
+   <ref name="ea"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8" as="prog">
+     <ref name="ea"/>
+    </memory>
+    <register name="TBLAT"/>
+   </assign>
+  </effect>
  </fragment>
 </define>
 
@@ -2032,6 +2165,8 @@ GNU General Public License (version 3 or any later version).
  <ref name="push-instr"/>
  <ref name="pop-instr"/>
  <ref name="daw-instr"/>
+ <ref name="tblrd-instr"/>
+ <ref name="tblwt-instr"/>
  <ref name="retfie-instr"/>
  <ref name="return-instr"/>
  <ref name="reset-instr"/>
