@@ -16,6 +16,9 @@ GNU General Public License (version 3 or any later version).
  <select class="daddr">
   <property name="width" value="2"/>
  </select>
+ <select class="xdaddr">
+  <property name="width" value="3"/>
+ </select>
  <select class="paddr">
   <property name="width" value="6"/>
  </select>
@@ -1422,6 +1425,41 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="movff-instr">
+ <fragment>
+  <var name="fs">
+   <integer class="xdaddr" size="12" encoding="u"/>
+  </var>
+  <var name="fd">
+   <integer class="xdaddr" size="12" encoding="u"/>
+  </var>
+  <pattern>
+   <ref name="fs"/>
+   <const>0011</const>
+   <ref name="fd"/>
+   <const>1111</const>
+  </pattern>
+  <phrase>
+   <literal>MOVFF</literal>
+  </phrase>
+  <phrase>
+   <ref name="fs"/>
+   <literal>,</literal><ws/>
+   <ref name="fd"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8">
+     <ref name="fs"/>
+    </memory>
+    <memory size="8">
+     <ref name="fd"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <define name="bra-instr">
  <fragment>
   <var name="offset">
@@ -1915,6 +1953,7 @@ GNU General Public License (version 3 or any later version).
  <ref name="bscf-instr"/>
  <ref name="btfssc-instr"/>
 
+ <ref name="movff-instr"/>
  <ref name="bra-instr"/>
  <ref name="rcall-instr"/>
  <ref name="b-instr"/>
