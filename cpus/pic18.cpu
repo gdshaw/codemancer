@@ -17,7 +17,7 @@ GNU General Public License (version 3 or any later version).
   <property name="width" value="2"/>
  </select>
  <select class="paddr">
-  <property name="width" value="4"/>
+  <property name="width" value="6"/>
  </select>
  <select class="imm8">
   <property name="width" value="2"/>
@@ -38,7 +38,16 @@ GNU General Public License (version 3 or any later version).
 <register name="W" size="8"/>
 <register name="PC" size="21"/>
 <register name="SP" size="5"/>
+<register name="BSR" size="8"/>
+<register name="STATUS" size="8"/>
+<register name="Z" size="1"/>
 <register name="C" size="1"/>
+<register name="OV" size="1"/>
+<register name="N" size="1"/>
+
+<register name="WS" size="8"/>
+<register name="BSRS" size="8"/>
+<register name="STATUSS" size="8"/>
 
 <define name="daddr">
  <fragment>
@@ -78,7 +87,12 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <memory as="data">
-    <ref name="f"/>
+    <add>
+     <slice index="0" size="8" offset="8">
+      <register name="BSR"/>
+     </slice>
+     <ref name="f"/>
+    </add>
    </memory>
   </effect>
  </fragment>
@@ -1286,6 +1300,367 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="cc">
+ <fragment>
+  <pattern>
+   <const>000</const>
+  </pattern>
+  <phrase>
+   <literal>Z</literal>
+  </phrase>
+  <effect>
+   <is-equal>
+    <register name="Z"/>
+    <const>1</const>
+   </is-equal>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>100</const>
+  </pattern>
+  <phrase>
+   <literal>NZ</literal>
+  </phrase>
+  <effect>
+   <is-equal>
+    <register name="Z"/>
+    <const>0</const>
+   </is-equal>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>010</const>
+  </pattern>
+  <phrase>
+   <literal>C</literal>
+  </phrase>
+  <effect>
+   <is-equal>
+    <register name="C"/>
+    <const>1</const>
+   </is-equal>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>110</const>
+  </pattern>
+  <phrase>
+   <literal>NC</literal>
+  </phrase>
+  <effect>
+   <is-equal>
+    <register name="C"/>
+    <const>0</const>
+   </is-equal>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>001</const>
+  </pattern>
+  <phrase>
+   <literal>OV</literal>
+  </phrase>
+  <effect>
+   <is-equal>
+    <register name="OV"/>
+    <const>1</const>
+   </is-equal>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>101</const>
+  </pattern>
+  <phrase>
+   <literal>NOV</literal>
+  </phrase>
+  <effect>
+   <is-equal>
+    <register name="OV"/>
+    <const>0</const>
+   </is-equal>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>011</const>
+  </pattern>
+  <phrase>
+   <literal>N</literal>
+  </phrase>
+  <effect>
+   <is-equal>
+    <register name="N"/>
+    <const>1</const>
+   </is-equal>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>111</const>
+  </pattern>
+  <phrase>
+   <literal>NN</literal>
+  </phrase>
+  <effect>
+   <is-equal>
+    <register name="N"/>
+    <const>0</const>
+   </is-equal>
+  </effect>
+ </fragment>
+</define>
+
+<define name="bra-instr">
+ <fragment>
+  <var name="offset">
+   <integer size="11" encoding="2c"/>
+  </var>
+  <var name="addr">
+   <integer class="paddr" size="21"/>
+  </var>
+  <where>
+   <is-equal>
+    <ref name="addr"/>
+    <add>
+     <register name="PC"/>
+     <const>2</const>
+     <ref name="offset"/>
+     <ref name="offset"/>
+    </add>
+   </is-equal>
+  </where>
+  <pattern>
+   <ref name="offset"/>
+   <const>01011</const>
+  </pattern>
+  <phrase>
+   <literal>BRA</literal>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="PC"/>
+    <ref name="addr"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="rcall-instr">
+ <fragment>
+  <var name="offset">
+   <integer size="11" encoding="2c"/>
+  </var>
+  <var name="addr">
+   <integer class="paddr" size="21"/>
+  </var>
+  <where>
+   <is-equal>
+    <ref name="addr"/>
+    <add>
+     <register name="PC"/>
+     <const>2</const>
+     <ref name="offset"/>
+     <ref name="offset"/>
+    </add>
+   </is-equal>
+  </where>
+  <pattern>
+   <ref name="offset"/>
+   <const>11011</const>
+  </pattern>
+  <phrase>
+   <literal>RCALL</literal>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory as="stack">
+     <register name="SP"/>
+    </memory>
+    <register name="PC"/>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>1</const>
+    </add>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <ref name="addr"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="b-instr">
+ <fragment>
+  <var name="cc">
+   <ref name="cc"/>
+  </var>
+  <var name="offset">
+   <integer size="8" encoding="2c"/>
+  </var>
+  <var name="addr">
+   <integer class="paddr" size="21"/>
+  </var>
+  <where>
+   <is-equal>
+    <ref name="addr"/>
+    <add>
+     <register name="PC"/>
+     <const>2</const>
+     <ref name="offset"/>
+     <ref name="offset"/>
+    </add>
+   </is-equal>
+  </where>
+  <pattern>
+   <ref name="offset"/>
+   <ref name="cc"/>
+   <const>00111</const>
+  </pattern>
+  <phrase>
+   <literal>B</literal>
+   <ref name="cc"/>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+  <effect>
+   <if>
+    <test>
+     <ref name="cc"/>
+    </test>
+    <then>
+     <assign>
+      <register name="PC"/>
+      <ref name="addr"/>
+     </assign>
+    </then>
+   </if>
+  </effect>
+ </fragment>
+</define>
+
+<define name="s-bit">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>0</literal>
+  </phrase>
+  <effect></effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>1</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="WS"/>
+    <register name="W"/>
+   </assign>
+   <assign>
+    <register name="STATUSS"/>
+    <register name="STATUS"/>
+   </assign>
+   <assign>
+    <register name="BSR"/>
+    <register name="BSRS"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="call-instr">
+ <fragment>
+  <var name="k">
+   <integer class="paddr" size="8" encoding="u"/>
+  </var>
+  <var name="k0">
+   <integer size="8" encoding="u"/>
+  </var>
+  <var name="k1">
+   <integer size="12" encoding="u"/>
+  </var>
+  <var name="s">
+   <ref name="s-bit"/>
+  </var>
+  <where>
+   <is-equal>
+    <ref name="k"/>
+    <or>
+     <slice index="0" size="8" offset="1">
+      <ref name="k0"/>
+     </slice>
+     <slice index="0" size="12" offset="9">
+      <ref name="k1"/>
+     </slice>
+    </or>
+   </is-equal>
+  </where>
+  <pattern>
+   <ref name="k0"/>
+   <ref name="s"/>
+   <const>0110111</const>
+   <ref name="k1"/>
+   <const>1111</const>
+  </pattern>
+  <phrase>
+   <literal>CALL</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+   <literal>,</literal><ws/>
+   <ref name="s"/>
+  </phrase>
+  <effect>
+   <ref name="s"/>
+   <assign>
+    <memory as="stack">
+     <register name="SP"/>
+    </memory>
+    <register name="PC"/>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>1</const>
+    </add>
+   </assign>
+   <assign>
+    <ref name="PC"/>
+    <ref name="k"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <define name="lfsr-instr">
  <fragment>
   <var name="fsr">
@@ -1330,6 +1705,51 @@ GNU General Public License (version 3 or any later version).
   <effect>
    <assign>
     <ref name="fsr"/>
+    <ref name="k"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="goto-instr">
+ <fragment>
+  <var name="k">
+   <integer class="paddr" size="8" encoding="u"/>
+  </var>
+  <var name="k0">
+   <integer size="8" encoding="u"/>
+  </var>
+  <var name="k1">
+   <integer size="12" encoding="u"/>
+  </var>
+  <where>
+   <is-equal>
+    <ref name="k"/>
+    <or>
+     <slice index="0" size="8" offset="1">
+      <ref name="k0"/>
+     </slice>
+     <slice index="0" size="12" offset="9">
+      <ref name="k1"/>
+     </slice>
+    </or>
+   </is-equal>
+  </where>
+  <pattern>
+   <ref name="k0"/>
+   <const>11110111</const>
+   <ref name="k1"/>
+   <const>1111</const>
+  </pattern>
+  <phrase>
+   <literal>GOTO</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="PC"/>
     <ref name="k"/>
    </assign>
   </effect>
@@ -1495,6 +1915,12 @@ GNU General Public License (version 3 or any later version).
  <ref name="bscf-instr"/>
  <ref name="btfssc-instr"/>
 
+ <ref name="bra-instr"/>
+ <ref name="rcall-instr"/>
+ <ref name="b-instr"/>
+
+ <ref name="call-instr"/>
  <ref name="lfsr-instr"/>
+ <ref name="goto-instr"/>
 </start>
 </cpudl>
