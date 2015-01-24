@@ -19,8 +19,11 @@ GNU General Public License (version 3 or any later version).
  <select class="paddr">
   <property name="width" value="4"/>
  </select>
- <select class="imm">
+ <select class="imm8">
   <property name="width" value="2"/>
+ </select>
+ <select class="imm12">
+  <property name="width" value="3"/>
  </select>
  <select class="inc">
   <property name="base" value="10"/>
@@ -34,6 +37,7 @@ GNU General Public License (version 3 or any later version).
 
 <register name="W" size="8"/>
 <register name="PC" size="21"/>
+<register name="SP" size="5"/>
 <register name="C" size="1"/>
 
 <define name="daddr">
@@ -76,6 +80,72 @@ GNU General Public License (version 3 or any later version).
    <memory as="data">
     <ref name="f"/>
    </memory>
+  </effect>
+ </fragment>
+</define>
+
+<define name="fsr-reg">
+ <fragment>
+  <pattern>
+   <const>00</const>
+  </pattern>
+  <phrase>
+   <literal>0</literal>
+  </phrase>
+  <effect>
+   <memory size="16" encoding="u">
+    <const>0xFE9</const>
+   </memory>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>10</const>
+  </pattern>
+  <phrase>
+   <literal>1</literal>
+  </phrase>
+  <effect>
+   <memory size="16" encoding="u">
+    <const>0xFE1</const>
+   </memory>
+  </effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>01</const>
+  </pattern>
+  <phrase>
+   <literal>2</literal>
+  </phrase>
+  <effect>
+   <memory size="16" encoding="u">
+    <const>0xFD9</const>
+   </memory>
+  </effect>
+ </fragment>
+</define>
+
+<define name="mulwf-op">
+ <fragment>
+  <pattern>
+   <const>1000000</const>
+  </pattern>
+  <phrase>
+   <literal>MULWF</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="16" encoding="u">
+     <const>0xFF3</const>
+    </memory>
+    <mul>
+     <register name="W"/>
+     <ref name="dst"/>
+    </mul>
+   </assign>
   </effect>
  </fragment>
 </define>
@@ -771,6 +841,307 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="movlb-instr">
+ <fragment>
+  <var name="k">
+   <integer class="imm8" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <ref name="k"/>
+   <const>10000000</const>
+  </pattern>
+  <phrase>
+   <literal>MOVLB</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="8" encoding="u">
+     <const>0xFE0</const>
+    </memory>
+    <ref name="k"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="sublw-instr">
+ <fragment>
+  <var name="k">
+   <integer class="imm8" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <ref name="k"/>
+   <const>00010000</const>
+  </pattern>
+  <phrase>
+   <literal>SUBLW</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <sub>
+     <ref name="k"/>
+     <register name="W"/>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="iorlw-instr">
+ <fragment>
+  <var name="k">
+   <integer class="imm8" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <ref name="k"/>
+   <const>10010000</const>
+  </pattern>
+  <phrase>
+   <literal>IORLW</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <or>
+     <register name="W"/>
+     <ref name="k"/>
+    </or>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="xorlw-instr">
+ <fragment>
+  <var name="k">
+   <integer class="imm8" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <ref name="k"/>
+   <const>01010000</const>
+  </pattern>
+  <phrase>
+   <literal>XORLW</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <xor>
+     <register name="W"/>
+     <ref name="k"/>
+    </xor>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="andlw-instr">
+ <fragment>
+  <var name="k">
+   <integer class="imm8" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <ref name="k"/>
+   <const>11010000</const>
+  </pattern>
+  <phrase>
+   <literal>ANDLW</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <and>
+     <register name="W"/>
+     <ref name="k"/>
+    </and>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="retlw-instr">
+ <fragment>
+  <var name="k">
+   <integer class="imm8" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <ref name="k"/>
+   <const>00110000</const>
+  </pattern>
+  <phrase>
+   <literal>RETLW</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <ref name="k"/>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>1</const>
+    </sub>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <memory as="stack">
+     <register name="SP"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="mullw-instr">
+ <fragment>
+  <var name="k">
+   <integer class="imm8" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <ref name="k"/>
+   <const>10110000</const>
+  </pattern>
+  <phrase>
+   <literal>MULLW</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <memory size="16" encoding="u">
+     <const>0xFF3</const>
+    </memory>
+    <mul>
+     <register name="W"/>
+     <ref name="k"/>
+    </mul>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="movlw-instr">
+ <fragment>
+  <var name="k">
+   <integer class="imm8" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <ref name="k"/>
+   <const>01110000</const>
+  </pattern>
+  <phrase>
+   <literal>MOVLW</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <ref name="k"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="addlw-instr">
+ <fragment>
+  <var name="k">
+   <integer class="imm8" size="8" encoding="u"/>
+  </var>
+  <pattern>
+   <ref name="k"/>
+   <const>11110000</const>
+  </pattern>
+  <phrase>
+   <literal>ADDLW</literal>
+  </phrase>
+  <phrase>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <add>
+     <register name="W"/>
+     <ref name="k"/>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="lfsr-instr">
+ <fragment>
+  <var name="fsr">
+   <ref name="fsr-reg"/>
+  </var>
+  <var name="k">
+   <integer class="imm12" size="8" encoding="u"/>
+  </var>
+  <var name="k0">
+   <integer size="8" encoding="u"/>
+  </var>
+  <var name="k1">
+   <integer size="4" encoding="u"/>
+  </var>
+  <where>
+   <is-equal>
+    <ref name="k"/>
+    <or>
+     <ref name="k0"/>
+     <slice index="0" size="4" offset="8">
+      <ref name="k1"/>
+     </slice>
+    </or>
+   </is-equal>
+  </where>
+  <pattern>
+   <ref name="k1"/>
+   <ref name="fsr"/>
+   <const>00</const>
+   <const>01110111</const>
+   <ref name="k0"/>
+   <const>00001111</const>
+  </pattern>
+  <phrase>
+   <literal>LFSR</literal>
+  </phrase>
+  <phrase>
+   <ref name="fsr"/>
+   <literal>,</literal><ws/>
+   <ref name="k"/>
+  </phrase>
+  <effect>
+   <assign>
+    <ref name="fsr"/>
+    <ref name="k"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -882,6 +1253,7 @@ GNU General Public License (version 3 or any later version).
 
  <fragment>
   <var name="opcode">
+   <ref name="mulwf-op"/>
    <ref name="cpfslt-op"/>
    <ref name="cpfseq-op"/>
    <ref name="cpfsgt-op"/>
@@ -914,5 +1286,17 @@ GNU General Public License (version 3 or any later version).
    </ref>
   </effect>
  </fragment>
+
+ <ref name="movlb-instr"/>
+ <ref name="sublw-instr"/>
+ <ref name="iorlw-instr"/>
+ <ref name="xorlw-instr"/>
+ <ref name="andlw-instr"/>
+ <ref name="retlw-instr"/>
+ <ref name="mullw-instr"/>
+ <ref name="movlw-instr"/>
+ <ref name="addlw-instr"/>
+
+ <ref name="lfsr-instr"/>
 </start>
 </cpudl>
