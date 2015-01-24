@@ -145,6 +145,272 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="s-call">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>0</literal>
+  </phrase>
+  <effect></effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>1</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="WS"/>
+    <register name="W"/>
+   </assign>
+   <assign>
+    <register name="STATUSS"/>
+    <register name="STATUS"/>
+   </assign>
+   <assign>
+    <register name="BSR"/>
+    <register name="BSRS"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="s-return">
+ <fragment>
+  <pattern>
+   <const>0</const>
+  </pattern>
+  <phrase>
+   <literal>0</literal>
+  </phrase>
+  <effect></effect>
+ </fragment>
+
+ <fragment>
+  <pattern>
+   <const>1</const>
+  </pattern>
+  <phrase>
+   <literal>1</literal>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="W"/>
+    <register name="WS"/>
+   </assign>
+   <assign>
+    <register name="STATUS"/>
+    <register name="STATUSS"/>
+   </assign>
+   <assign>
+    <register name="BSRS"/>
+    <register name="BSR"/>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="nop-instr">
+ <fragment>
+  <pattern>
+   <const>00000000</const>
+   <const>00000000</const>
+  </pattern>
+  <phrase>
+   <literal>NOP</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect></effect>
+ </fragment>
+</define>
+
+<define name="sleep-instr">
+ <fragment>
+  <pattern>
+   <const>11000000</const>
+   <const>00000000</const>
+  </pattern>
+  <phrase>
+   <literal>SLEEP</literal>
+  </phrase>
+  <phrase></phrase>
+ </fragment>
+</define>
+
+<define name="clrwdt-instr">
+ <fragment>
+  <pattern>
+   <const>00100000</const>
+   <const>00000000</const>
+  </pattern>
+  <phrase>
+   <literal>CLRWDT</literal>
+  </phrase>
+  <phrase></phrase>
+ </fragment>
+</define>
+
+<define name="push-instr">
+ <fragment>
+  <pattern>
+   <const>10100000</const>
+   <const>00000000</const>
+  </pattern>
+  <phrase>
+   <literal>PUSH</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <memory as="stack">
+     <register name="SP"/>
+    </memory>
+    <register name="PC"/>
+   </assign>
+   <assign>
+    <register name="SP"/>
+    <add>
+     <register name="SP"/>
+     <const>1</const>
+    </add>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="pop-instr">
+ <fragment>
+  <pattern>
+   <const>01100000</const>
+   <const>00000000</const>
+  </pattern>
+  <phrase>
+   <literal>POP</literal>
+  </phrase>
+  <phrase></phrase>
+  <effect>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>1</const>
+    </sub>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="daw-instr">
+ <fragment>
+  <pattern>
+   <const>11100000</const>
+   <const>00000000</const>
+  </pattern>
+  <phrase>
+   <literal>DAW</literal>
+  </phrase>
+  <phrase></phrase>
+ </fragment>
+</define>
+
+<define name="retfie-instr">
+ <fragment>
+  <var name="s">
+   <ref name="s-return"/>
+  </var>
+  <pattern>
+   <ref name="s"/>
+   <const>0001000</const>
+   <const>00000000</const>
+  </pattern>
+  <phrase>
+   <literal>RETFIE</literal>
+  </phrase>
+  <phrase>
+   <ref name="s"/>
+  </phrase>
+  <effect>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>1</const>
+    </sub>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <memory as="stack">
+     <register name="SP"/>
+    </memory>
+   </assign>
+   <assign>
+    <memory size="8" encoding="u">
+     <const>0x06</const>
+    </memory>
+    <and>
+     <memory size="8" encoding="u">
+      <const>0x06</const>
+     </memory>
+     <const>0xEF</const>
+    </and>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="return-instr">
+ <fragment>
+  <var name="s">
+   <ref name="s-return"/>
+  </var>
+  <pattern>
+   <ref name="s"/>
+   <const>1001000</const>
+   <const>00000000</const>
+  </pattern>
+  <phrase>
+   <literal>RETURN</literal>
+  </phrase>
+  <phrase>
+   <ref name="s"/>
+  </phrase>
+  <effect>
+   <ref name="s"/>
+   <assign>
+    <register name="SP"/>
+    <sub>
+     <register name="SP"/>
+     <const>1</const>
+    </sub>
+   </assign>
+   <assign>
+    <register name="PC"/>
+    <memory as="stack">
+     <register name="SP"/>
+    </memory>
+   </assign>
+  </effect>
+ </fragment>
+</define>
+
+<define name="reset-instr">
+ <fragment>
+  <pattern>
+   <const>11111111</const>
+   <const>00000000</const>
+  </pattern>
+  <phrase>
+   <literal>RESET</literal>
+  </phrase>
+  <phrase></phrase>
+ </fragment>
+</define>
+
 <define name="mulwf-op">
  <fragment>
   <pattern>
@@ -1599,41 +1865,6 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
-<define name="s-bit">
- <fragment>
-  <pattern>
-   <const>0</const>
-  </pattern>
-  <phrase>
-   <literal>0</literal>
-  </phrase>
-  <effect></effect>
- </fragment>
-
- <fragment>
-  <pattern>
-   <const>1</const>
-  </pattern>
-  <phrase>
-   <literal>1</literal>
-  </phrase>
-  <effect>
-   <assign>
-    <register name="WS"/>
-    <register name="W"/>
-   </assign>
-   <assign>
-    <register name="STATUSS"/>
-    <register name="STATUS"/>
-   </assign>
-   <assign>
-    <register name="BSR"/>
-    <register name="BSRS"/>
-   </assign>
-  </effect>
- </fragment>
-</define>
-
 <define name="call-instr">
  <fragment>
   <var name="k">
@@ -1646,7 +1877,7 @@ GNU General Public License (version 3 or any later version).
    <integer size="12" encoding="u"/>
   </var>
   <var name="s">
-   <ref name="s-bit"/>
+   <ref name="s-call"/>
   </var>
   <where>
    <is-equal>
@@ -1795,6 +2026,16 @@ GNU General Public License (version 3 or any later version).
 </define>
 
 <start>
+ <ref name="nop-instr"/>
+ <ref name="sleep-instr"/>
+ <ref name="clrwdt-instr"/>
+ <ref name="push-instr"/>
+ <ref name="pop-instr"/>
+ <ref name="daw-instr"/>
+ <ref name="retfie-instr"/>
+ <ref name="return-instr"/>
+ <ref name="reset-instr"/>
+
  <fragment>
   <var name="opcode">
    <ref name="addwf-op"/>
