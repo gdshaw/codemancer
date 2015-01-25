@@ -579,7 +579,10 @@ GNU General Public License (version 3 or any later version).
     <memory size="16" as="stack">
      <register name="SP"/>
     </memory>
-    <register name="PC"/>
+    <add>
+     <register name="PC"/>
+     <const>1</const>
+    </add>
    </assign>
    <assign>
     <register name="SP"/>

@@ -328,7 +328,7 @@ GNU General Public License (version 3 or any later version).
    </assign>
    <assign>
     <register name="PC"/>
-    <memory as="stack">
+    <memory size="15" as="stack">
      <register name="SP"/>
     </memory>
    </assign>
@@ -356,7 +356,7 @@ GNU General Public License (version 3 or any later version).
    </assign>
    <assign>
     <register name="PC"/>
-    <memory as="stack">
+    <memory size="15" as="stack">
      <register name="SP"/>
     </memory>
    </assign>
@@ -387,10 +387,13 @@ GNU General Public License (version 3 or any later version).
   <phrase></phrase>
   <effect>
    <assign>
-    <memory as="stack">
+    <memory size="15" as="stack">
      <register name="SP"/>
     </memory>
-    <register name="PC"/>
+    <add>
+     <register name="PC"/>
+     <const>1</const>
+    </add>
    </assign>
    <assign>
     <register name="SP"/>
@@ -1214,10 +1217,13 @@ GNU General Public License (version 3 or any later version).
   </phrase>
   <effect>
    <assign>
-    <memory as="stack">
+    <memory size="15" as="stack">
      <register name="SP"/>
     </memory>
-    <register name="PC"/>
+    <add>
+     <register name="PC"/>
+     <const>1</const>
+    </add>
    </assign>
    <assign>
     <register name="SP"/>
@@ -1439,7 +1445,7 @@ GNU General Public License (version 3 or any later version).
    </assign>
    <assign>
     <register name="PC"/>
-    <memory as="stack">
+    <memory size="15" as="stack">
      <register name="SP"/>
     </memory>
    </assign>
