@@ -21,7 +21,10 @@ GNU General Public License (version 3 or any later version).
 <cpu name="armv4" extends="armv3m">
  <feature name="armv4"/>
 </cpu>
-<cpu name="arm" extends="armv4">
+<cpu name="armv5" extends="armv4">
+ <feature name="armv5"/>
+</cpu>
+<cpu name="arm" extends="armv5">
 </cpu>
 
 <style>
@@ -47,6 +50,9 @@ GNU General Public License (version 3 or any later version).
  </select>
  <select class="swi">
   <property name="width" value="6"/>
+ </select>
+ <select class="bkpt">
+  <property name="width" value="4"/>
  </select>
  <select class="cp">
   <property name="base" value="10"/>
@@ -3675,6 +3681,143 @@ GNU General Public License (version 3 or any later version).
  </fragment>
 </define>
 
+<define name="blx1-instr">
+ <fragment>
+  <var name="offset">
+   <integer size="24" encoding="2c"/>
+  </var>
+  <var name="h">
+   <integer size="1" encoding="u"/>
+  </var>
+  <var name="addr">
+   <integer class="addr" size="32"/>
+  </var>
+  <where>
+   <is-equal>
+    <ref name="addr"/>
+    <add>
+     <register name="PC"/>
+     <mul>
+      <extend size="32">
+       <ref name="offset"/>
+      </extend>
+      <const>4</const>
+     </mul>
+     <mul>
+      <extend size="32">
+       <ref name="h"/>
+      </extend>
+      <const>2</const>
+     </mul>
+     <const>8</const>
+    </add>
+   </is-equal>
+  </where>
+  <pattern>
+   <ref name="offset"/>
+   <ref name="h"/>
+   <const>101</const>
+   <const>1111</const>
+  </pattern>
+  <phrase>
+   <literal>BLX</literal>
+  </phrase>
+  <phrase>
+   <ref name="addr"/>
+  </phrase>
+ </fragment>
+</define>
+
+<define name="blx2-instr">
+ <fragment>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>11001111</const>
+   <const>11111111</const>
+   <const>01001000</const>
+  </pattern>
+  <phrase>
+   <literal>BLX</literal>
+  </phrase>
+  <phrase></phrase>
+  <phrase>
+   <ref name="rm"/>
+  </phrase>
+ </fragment>
+</define>
+
+<define name="bkpt-instr">
+ <fragment>
+  <var name="imm0">
+   <integer size="4" encoding="u"/>
+  </var>
+  <var name="imm1">
+   <integer size="12" encoding="u"/>
+  </var>
+  <var name="imm">
+   <integer class="bkpt" size="16" encoding="u"/>
+  </var>
+  <where>
+   <is-equal>
+    <ref name="imm"/>
+    <or>
+     <slice index="0" size="4" offset="0">
+      <ref name="imm0"/>
+     </slice>
+     <slice index="0" size="12" offset="4">
+      <ref name="imm1"/>
+     </slice>
+    </or>
+   </is-equal>
+  </where>
+  <pattern>
+   <ref name="imm0"/>
+   <const>1110</const>
+   <ref name="imm1"/>
+   <const>01001000</const>
+   <const>0111</const>
+  </pattern>
+  <phrase>
+   <literal>BKPT</literal>
+  </phrase>
+  <phrase>
+   <ref name="imm"/>
+  </phrase>
+ </fragment>
+</define>
+
+<define name="clz-instr">
+ <fragment>
+  <var name="rd">
+   <ref name="register"/>
+  </var>
+  <var name="rm">
+   <ref name="register"/>
+  </var>
+  <pattern>
+   <ref name="rm"/>
+   <const>1000</const>
+   <const>1111</const>
+   <ref name="rd"/>
+   <const>1111</const>
+   <const>0110</const>
+   <const>1000</const>
+  </pattern>
+  <phrase>
+   <literal>CLZ</literal>
+  </phrase>
+  <phrase></phrase>
+  <phrase>
+   <ref name="rd"/>
+   <literal>,</literal><ws/>
+   <ref name="rm"/>
+  </phrase>
+ </fragment>
+</define>
+
 <start>
  <fragment>
   <var name="opcode">
@@ -3697,6 +3840,10 @@ GNU General Public License (version 3 or any later version).
    <require name="armv4">
     <ref name="lsh-instr"/>
     <ref name="bx-instr"/>
+   </require>
+   <require name="armv5">
+    <ref name="blx2-instr"/>
+    <ref name="clz-instr"/>
    </require>
   </var>
   <var name="cc">
@@ -3723,6 +3870,34 @@ GNU General Public License (version 3 or any later version).
      <ref name="opcode"/>
     </then>
    </if>
+  </effect>
+ </fragment>
+
+ <require name="armv5">
+  <ref name="bkpt-instr"/>
+  <ref name="blx1-instr"/>
+ </require>
+
+ <fragment>
+  <var name="opcode">
+   <require name="armv5">
+    <ref name="cp-instr"/>
+   </require>
+  </var>
+  <pattern>
+   <ref name="opcode"/>
+   <const>1111</const>
+  </pattern>
+  <phrase>
+   <ref name="opcode"/>
+   <literal>2</literal>
+   <ref name="opcode"/>
+  </phrase>
+  <phrase>
+   <ref name="opcode"/>
+  </phrase>
+  <effect>
+   <ref name="opcode"/>
   </effect>
  </fragment>
 </start>
