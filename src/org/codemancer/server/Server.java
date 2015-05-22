@@ -4,6 +4,8 @@
 
 package org.codemancer.server;
 
+import java.util.Map;
+import java.util.HashMap;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import com.sun.net.httpserver.HttpServer;
@@ -14,9 +16,13 @@ public class Server {
 	 * @param port the TCP port number on which to accept requests
 	 */
 	public final void start(int port) throws IOException {
+		// Initialise MIME types map for HTTP server.
+		Map<String, String> mimeTypes = new HashMap<String, String>();
+		mimeTypes.put("html", "text/html");
+
 		// Create and run HTTP server.
 		HttpServer httpServer = HttpServer.create(new InetSocketAddress(port), 0);
-		FileHandler fileHandler = new FileHandler("www");
+		FileHandler fileHandler = new FileHandler("www", mimeTypes);
 		httpServer.createContext("/", fileHandler);
 		httpServer.setExecutor(java.util.concurrent.Executors.newCachedThreadPool());
 		httpServer.start();

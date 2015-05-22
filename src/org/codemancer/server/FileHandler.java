@@ -4,6 +4,7 @@
 
 package org.codemancer.server;
 
+import java.util.Map;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.FileInputStream;
@@ -18,12 +19,18 @@ public class FileHandler implements HttpHandler {
 	/** The root of the filesystem subtree to be served. */
 	private final File root;
 
+	/** An optional map from filename suffixes to MIME types. */
+	private final Map<String, String> mimeTypes;
+
 	/** Construct handler for serving files from the filesystem.
 	 * The supplied root path is canonicalised before use.
 	 * @param rootPath the root of the filesystem subtree to be served
+	 * @param mimeTypes an optional map from filename suffixes to MIME types
 	 * @throws FileNotFoundException if the root path does not exist.
 	 */
-	public FileHandler(String rootPath) throws FileNotFoundException {
+	public FileHandler(String rootPath, Map<String,String> mimeTypes)
+		throws FileNotFoundException {
+
 		try {
 			this.root = new File(rootPath).getCanonicalFile();
 			if (!this.root.exists()) {
@@ -32,6 +39,29 @@ public class FileHandler implements HttpHandler {
 		} catch (IOException ex) {
 			throw new FileNotFoundException("Root for HTTP file handler not found");
 		}
+		this.mimeTypes = mimeTypes;
+	}
+
+	/** Choose the MIME type for given file.
+	 * @param file the file for which the MIME type is required
+	 * @return the MIME type
+	 */
+	public final String chooseMimeType(File file) {
+		// First look for a MIME type based on the longest matching file suffix.
+		if (mimeTypes != null) {
+			String name = file.getName();
+			int i = name.indexOf('.');
+			while (i != -1) {
+				String mimeType = mimeTypes.get(name.substring(i + 1, name.length()));
+				if (mimeType != null) {
+					return mimeType;
+				}
+				i = name.indexOf('.', i + 1);
+			}
+		}
+
+		// If no suffix matches then default to no MIME type.
+		return null;
 	}
 
 	public final void handle(HttpExchange t) throws IOException {
@@ -74,6 +104,11 @@ public class FileHandler implements HttpHandler {
 		} else {
 			// Object exists and is a file:
 			// accept with response code 200.
+			String mimeType = chooseMimeType(file);
+			if (mimeType != null) {
+				Headers h = t.getResponseHeaders();
+				h.set("Content-Type", mimeType);
+			}
 			t.sendResponseHeaders(200, 0);
 			OutputStream os = t.getResponseBody();
 			FileInputStream fs = new FileInputStream(file);
