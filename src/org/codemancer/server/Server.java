@@ -10,10 +10,12 @@ import com.sun.net.httpserver.HttpServer;
 
 /** The main class for running a Codemancer server. */
 public class Server {
-	/** Start accepting HTTP requests. */
-	public final void start() throws IOException {
+	/** Start accepting HTTP requests.
+	 * @param port the TCP port number on which to accept requests
+	 */
+	public final void start(int port) throws IOException {
 		// Create and run HTTP server.
-		HttpServer httpServer = HttpServer.create(new InetSocketAddress(80), 0);
+		HttpServer httpServer = HttpServer.create(new InetSocketAddress(port), 0);
 		FileHandler fileHandler = new FileHandler("www");
 		httpServer.createContext("/", fileHandler);
 		httpServer.setExecutor(java.util.concurrent.Executors.newCachedThreadPool());
@@ -22,8 +24,14 @@ public class Server {
 
 	public static void main(String[] args) {
 		try {
+			// Construct and start server.
+			// If no port specified then default to port 80.
+			int port = 80;
+			if (args.length > 0) {
+				port = Integer.parseInt(args[0]);
+			}
 			Server server = new Server();
-			server.start();
+			server.start(port);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
