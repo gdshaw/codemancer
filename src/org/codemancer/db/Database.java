@@ -1,5 +1,5 @@
 // This file is part of Codemancer.
-// Copyright 2014 Graham Shaw.
+// Copyright 2014-2015 Graham Shaw.
 // Distribution and modification are permitted within the terms of the
 // GNU General Public License (version 3 or any later version).
 
@@ -11,11 +11,15 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
+import javax.persistence.NoResultException;
 
 /** A class to represent a Codemancer database. */
 public class Database {
 	/** The entity manager for this database. */
 	private final EntityManager em;
+
+	/** The current revision number for this database. */
+	private final Revision revision;
 
 	/** Open database.
 	 * @param url the url of the database to be opened.
@@ -26,6 +30,17 @@ public class Database {
 		props.setProperty("javax.persistence.jdbc.url", url + ";create=true");
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("org.codemancer", props);
 		em = emf.createEntityManager();
+
+		Revision tempRevision = null;
+		try {
+			tempRevision = em.createQuery("FROM Revision WHERE id = 0", Revision.class).getSingleResult();
+		} catch (NoResultException ex) {
+			tempRevision = new Revision();
+			em.getTransaction().begin();
+			em.persist(tempRevision);
+			em.getTransaction().commit();
+		}
+		revision = tempRevision;
 	}
 
 	/** Get entity manager.
@@ -40,6 +55,13 @@ public class Database {
 	 */
 	public final EntityTransaction getTransaction() {
 		return em.getTransaction();
+	}
+
+	/** Get current revision number.
+	 * @return the object representing the current revision number
+	 */
+	public final Revision getRevision() {
+		return revision;
 	}
 
 	/** Get basic block containing a given address.
