@@ -19,6 +19,7 @@ public class Server {
 		// Initialise MIME types map for HTTP server.
 		Map<String, String> mimeTypes = new HashMap<String, String>();
 		mimeTypes.put("html", "text/html");
+		mimeTypes.put("css", "text/css");
 
 		// Create and run HTTP server.
 		HttpServer httpServer = HttpServer.create(new InetSocketAddress(port), 0);
