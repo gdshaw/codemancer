@@ -44,6 +44,11 @@ function intToHex(value, digits) {
  */
 function processLines(lines) {
 	var codeTable = document.getElementById("code");
+	if (codeTable == null) {
+		document.getElementById("content").innerHTML = "<table id='code'></table>";
+		codeTable = document.getElementById("code");
+	}
+
 	var i = 0;
 
 	if (reloadCodeTable != 0) {
@@ -120,16 +125,16 @@ function requestChangeset() {
 	xhr.open("GET", "/changeset.json?db=" + db + "&minrev=" + minRev + "&minaddr=" + minAddr.toString(16) + "&maxaddr=" + maxAddr.toString(16), true);
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4) {
-			if (xhr.status == 200) {
+			if (xhr.status >= 200 && xhr.status < 300) {
 				// If the request was successful then process the response, then immediately request again.
+				retryCounter = 0;
 				var changeset = eval(xhr.responseText);
 				processChangeset(changeset);
 				requestChangeset();
 			} else {
-				// If the request failed then retry after 5 seconds.
-				setTimeout(function() {
-					requestChangeset();
-				}, 5000);
+				// If the request failed, display the response as an error.
+				var contentDiv = document.getElementById("content");
+				contentDiv.innerHTML = xhr.responseText;
 			}
 		}
 	}
