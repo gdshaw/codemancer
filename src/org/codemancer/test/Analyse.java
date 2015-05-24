@@ -41,7 +41,7 @@ class Analyse {
 		Architecture arch = Architecture.makeArchitecture(architectureName);
 
 		// Open connection to database.
-		String dbUrl = "jdbc:derby:" + projName;
+		String dbUrl = "jdbc:derby:" + projName + ";create=true";
 		Database db = new Database(dbUrl);
 		EntityManager em = db.getEntityManager();
 

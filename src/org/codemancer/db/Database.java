@@ -27,7 +27,7 @@ public class Database {
 	public Database(String url) {
 		Properties props = new Properties();
 		props.setProperty("javax.persistence.jdbc.driver", "org.apache.derby.jdbc.ClientDriver");
-		props.setProperty("javax.persistence.jdbc.url", url + ";create=true");
+		props.setProperty("javax.persistence.jdbc.url", url);
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("org.codemancer", props);
 		em = emf.createEntityManager();
 
