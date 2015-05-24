@@ -63,4 +63,21 @@ public class Line extends Fact {
 	public final String getInstruction() {
 		return instruction;
 	}
+
+	/** Convert to JSON.
+	 * @return this line, as JSON.
+	 */
+	public final String asJSON() {
+		StringBuffer buffer = new StringBuffer(100);
+		buffer.append("[0x");
+		buffer.append(Long.toHexString(minAddr));
+		buffer.append(",0x");
+		buffer.append(Long.toHexString(maxAddr));
+		buffer.append(",\"");
+		if (instruction != null) {
+			buffer.append(instruction);
+		}
+		buffer.append("\"]");
+		return buffer.toString();
+	}
 }

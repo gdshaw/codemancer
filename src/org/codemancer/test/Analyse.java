@@ -73,7 +73,7 @@ class Analyse {
 		while (!disasm.process(pc, links));
 		db.getTransaction().commit();
 		System.err.printf("Iterative disassembly complete.\n");
-		System.err.printf("%d instructions disassembled.\n" ,db.getLines(0, 0x7fffffffffffffffL).size());
+		System.err.printf("%d instructions disassembled.\n" ,db.getLines(0, db.getRevision().get(), 0, 0x7fffffffffffffffL).size());
 
 		// Run basic block detector.
 		System.err.printf("Starting basic block detector.\n");

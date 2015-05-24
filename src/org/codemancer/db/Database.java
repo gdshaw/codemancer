@@ -215,13 +215,17 @@ public class Database {
 	}
 
 	/** Get all lines of disassembled code in given address range.
+	 * @param minRev the earliest revision for which results are required
+	 * @param maxRev the latest revision for which results are required
 	 * @param minAddr the lowest address to include
 	 * @param maxAddr the highest address to include
 	 * @return a list of lines
 	 */
-	public final List<Line> getLines(long minAddr, long maxAddr) {
+	public final List<Line> getLines(long minRev, long maxRev, long minAddr, long maxAddr) {
 		return em.createQuery(
-			"FROM Line where (minAddr >= :minAddr) AND (maxAddr <= :maxAddr) ORDER BY minAddr", Line.class)
+			"FROM Line where (minRev >= :minRev) AND (minRev <= :maxRev) AND (maxRev = -1) AND (minAddr >= :minAddr) AND (maxAddr <= :maxAddr) ORDER BY minAddr", Line.class)
+			.setParameter("minRev", minRev)
+			.setParameter("maxRev", maxRev)
 			.setParameter("minAddr", minAddr)
 			.setParameter("maxAddr", maxAddr)
 			.getResultList();

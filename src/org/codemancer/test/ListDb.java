@@ -44,7 +44,7 @@ class ListDb {
 						}
 						System.out.printf("\n");
 					}
-					for (Line line: db.getLines(bb.getMinAddr(), bb.getMaxAddr())) {
+					for (Line line: db.getLines(0, db.getRevision().get(), bb.getMinAddr(), bb.getMaxAddr())) {
 						String asm = String.format("%08X\t%s", line.getMinAddr(), line.getInstruction());
 						List<String> commentLines = new ArrayList<String>();
 						for (Comment comment: db.getComments(line.getMinAddr())) {
