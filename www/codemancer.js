@@ -119,12 +119,14 @@ function requestChangeset() {
 	var minRev = rev + 1;
 	if (reloadCodeTable != 0) {
 		minRev = 0;
+		document.getElementById('loading').style.display = 'block';
 	}
 
 	xhr = new XMLHttpRequest();
 	xhr.open("GET", "/changeset.json?db=" + db + "&minrev=" + minRev + "&minaddr=" + minAddr.toString(16) + "&maxaddr=" + maxAddr.toString(16), true);
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4) {
+			document.getElementById('loading').style.display = 'none';
 			if (xhr.status >= 200 && xhr.status < 300) {
 				// If the request was successful then process the response, then immediately request again.
 				retryCounter = 0;

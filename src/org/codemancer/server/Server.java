@@ -26,6 +26,7 @@ public class Server {
 		mimeTypes.put("html", "text/html");
 		mimeTypes.put("css", "text/css");
 		mimeTypes.put("js", "application/javascript");
+		mimeTypes.put("gif", "image/gif");
 
 		// Create and run HTTP server.
 		HttpServer httpServer = HttpServer.create(new InetSocketAddress(port), 0);
