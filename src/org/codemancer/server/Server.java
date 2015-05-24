@@ -25,6 +25,7 @@ public class Server {
 		Map<String, String> mimeTypes = new HashMap<String, String>();
 		mimeTypes.put("html", "text/html");
 		mimeTypes.put("css", "text/css");
+		mimeTypes.put("js", "application/javascript");
 
 		// Create and run HTTP server.
 		HttpServer httpServer = HttpServer.create(new InetSocketAddress(port), 0);
