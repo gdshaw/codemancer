@@ -6,6 +6,8 @@
 package org.codemancer.db;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Properties;
 import javax.persistence.EntityTransaction;
 import javax.persistence.EntityManagerFactory;
@@ -256,5 +258,34 @@ public class Database {
 		return em.createQuery(
 			"FROM Subroutine ORDER BY entryAddr", Subroutine.class)
 			.getResultList();
+	}
+
+	/** Get changed subroutines.
+	 * Subroutines are listed at most once for each entry address, and then
+	 * only if a change has occurred within the given range of revisions.
+	 * It is the state as of revision maxRev that is reported. Subroutines
+	 * that have been deleted with no replacement are represented by a
+	 * mapping to null.
+	 * @param minRev the earliest revision for which results are required
+	 * @param maxRev the latest revision for which results are required
+	 * @return the subroutines that have changed, indexed by entry address
+	 */
+	public final Map<Long, Subroutine> getSubroutines(long minRev, long maxRev) {
+		List<Subroutine> subroutines = em.createQuery(
+			"FROM Subroutine where ((minRev >= :minRev) AND (minRev <= :maxRev)) OR ((maxRev >= :minRev) AND (maxRev <= :maxRev)) ORDER BY minRev", Subroutine.class)
+			.setParameter("minRev", minRev)
+			.setParameter("maxRev", maxRev)
+			.getResultList();
+
+		Map<Long, Subroutine> filteredSubroutines = new HashMap<Long, Subroutine>();
+		for (Subroutine subroutine: subroutines) {
+			if ((subroutine.getMaxRev() >= maxRev) || (subroutine.getMaxRev() == -1)) {
+				filteredSubroutines.put(subroutine.getEntryAddr(), subroutine);
+			} else {
+				filteredSubroutines.put(subroutine.getEntryAddr(), null);
+			}
+		}
+
+		return filteredSubroutines;
 	}
 }

@@ -5,6 +5,7 @@
 package org.codemancer.server;
 
 import java.util.List;
+import java.util.Map;
 import java.math.BigInteger;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,6 +17,7 @@ import com.sun.net.httpserver.HttpExchange;
 import org.codemancer.db.Database;
 import org.codemancer.db.Revision;
 import org.codemancer.db.Line;
+import org.codemancer.db.Subroutine;
 
 /** A class for supplying changesets to the client. */
 public class ChangesetHandler implements HttpHandler {
@@ -47,8 +49,26 @@ public class ChangesetHandler implements HttpHandler {
 			StringBuilder response = new StringBuilder();
 			response.append("({\"rev\":");
 			response.append(new Long(revision.get()).toString());
-			response.append(",\"lines\":[");
 
+			response.append(",\"areas\":[");
+			Map<Long, Subroutine> subroutines = db.getSubroutines(minRev, revision.get());
+			boolean firstSubroutine = true;
+			for (Map.Entry<Long, Subroutine> entry: subroutines.entrySet()) {
+				if (firstSubroutine) {
+					firstSubroutine = false;
+				} else {
+					response.append(",");
+				}
+				Long entryAddr = entry.getKey();
+				Subroutine subroutine = entry.getValue();
+				String json = (subroutine != null) ?
+					String.format("[0x%08x, \"sub%08x\"]", entryAddr, entryAddr) :
+					String.format("[0x%08x]", entryAddr);
+				response.append(json);
+			}
+			response.append("]");
+
+			response.append(",\"lines\":[");
 			List<Line> lines = db.getLines(minRev, revision.get(), minAddr, maxAddr);
 			boolean firstLine = true;
 			for (Line line: lines) {
