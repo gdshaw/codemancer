@@ -88,3 +88,23 @@ body {
 	left: 50%;
 	margin: -16px 0 0 -16px;
 }
+
+ul.tree {
+	list-style-type: none;
+	margin-left: 1em;
+	padding-left: 0pt;
+}
+
+ul.tree.root {
+	padding-left: 0em;
+	margin: 0;
+}
+
+ul.tree li {
+	padding-left: 0em;
+}
+
+ul.tree button {
+	background: none;
+	border: none;
+}

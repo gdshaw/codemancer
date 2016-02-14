@@ -1,5 +1,5 @@
 // This file is part of Codemancer.
-// Copyright 2015 Graham Shaw.
+// Copyright 2015-2016 Graham Shaw.
 // All rights reserved.
 
 var rev = 0;
@@ -34,6 +34,121 @@ var db = query['db'];
 function intToHex(value, digits) {
 	var string = "0000000000000000"+value.toString(16);
 	return string.slice(-digits).toUpperCase();
+}
+
+/** Update the content of a tree view element.
+ * @param root the DOM element at the root of the tree or subtree to be updated
+ * @param updates an ordered list of changes to be applied to the tree or subtree
+ * The root element should be a 'ul' element. It should not have any content,
+ * other than that given to it by this function.
+ * Each update has up to three components:
+ * - a unique ID which uniquely identifies the node to be updated (required);
+ * - a string used to label the node (optional); and
+ * - a list of updates to be applied recursively to descendants of the node
+ *   (optional).
+ * If the label is missing or null then the node is deleted. Any descendants of
+ * the deleted node are deleted implicitly, therefore they need not be listed
+ * as updates in their own right.
+ * If the list of updates is missing or null then the node becomes an internal
+ * node (capable of being expanded or collapsed), otherwise it becomes an
+ * external node (capable of being selected).
+ * The unique ID is used as the 'id' attribute of the corresponding 'li' element
+ * in the DOM, so it must be globally unique within the page (not just within the
+ * tree view). The ID is also used to determine the order in which the children
+ * of a node are displayed. Updates must be supplied in ascending order of ID.
+ * Each label is displayed within a 'button' element.
+ */
+function updateTreeView(root, updates) {
+	var currentLi = root.firstChild;
+
+	for (var i = 0; i != updates.length; i++) {
+		// Extract the update to be applied.
+		var update = updates[i];
+		var id = update[0];
+		var label = update[1];
+		var content = update[2];
+
+		// Skip over any list items which precede the node to be updated.
+		while (currentLi && (currentLi.getAttribute('id') < id)) {
+			currentLi = currentLi.nextSibling;
+		}
+
+		if (label == null) {
+			// Delete the list item with the given ID.
+			if (currentLi && (currentLi.getAttribute('id') == id)) {
+				// The current list item matches, so delete it.
+				var nextLi = currentLi.nextSibling;
+				root.removeChild(currentLi);
+				currentLi = nextLi;
+			}
+		} else {
+			// Ensure that a list item exists with the given ID and label.
+			// It should also have a sub-list, if and only if it is an
+			// internal node.
+			var button = null;
+			if (currentLi && (currentLi.getAttribute('id') == id)) {
+				// There is already a list item with the required ID.
+				// Ensure that it has the required label.
+				button = currentLi.firstChild;
+				if (button.textContent != label) {
+					button.textContent = label;
+				}
+			} else {
+				// The ID of the current list item is different,
+				// or we have reached the end of the list.
+				// Create a new button.
+				button = document.createElement('button');
+				button.textContent = label;
+
+				// Create a new list item.
+				var newLi = document.createElement('li');
+				newLi.setAttribute('id', id);
+				newLi.appendChild(button);
+				root.insertBefore(newLi, currentLi);
+				currentLi = newLi;
+			}
+
+			if (content) {
+				// Ensure that there is a sublist (but if it is
+				// a new one then don't add it yet).
+				var ul = currentLi.firstChild.nextSibling;
+				if (!ul) {
+					ul = document.createElement('ul');
+					ul.setAttribute('class', 'tree');
+				}
+
+				// Update the subtree with the required list of changes.
+				updateTreeView(ul, content);
+
+				// Ensure that the sublist is attached to the current
+				// list item.
+				if (currentLi.firstChild.nextSibling == null) {
+					currentLi.appendChild(ul);
+				}
+			} else {
+				// If the current list item has a sublist then remove it.
+				if (currentLi.firstChild.nextSibling != null) {
+					currentLi.removeChild(ul);
+				}
+			}
+		}
+	}
+}
+
+/** Process areas from changeset.
+ * Each area is represented by an array with two components: a fixed ID
+ * (which determines the ordering), and a name. For areas that have been
+ * deleted, only the ID is listed.
+ * @param areas an array of areas
+ */
+function processAreas(areas) {
+	var areaTree = document.getElementById("areas");
+	if (areaTree == null) {
+		document.getElementById("nav").innerHTML = "<ul id='areas' class='tree root'></ul>";
+		areaTree = document.getElementById("areas");
+	}
+
+	updateTreeView(document.getElementById("areas"), areas);
 }
 
 /** Process lines from changeset.
@@ -108,6 +223,9 @@ function processLines(lines) {
  * @param changeset the changeset to process
  */
 function processChangeset(changeset) {
+	if (changeset.areas != null) {
+		processAreas(changeset.areas);
+	}
 	if (changeset.lines != null) {
 		processLines(changeset.lines);
 	}

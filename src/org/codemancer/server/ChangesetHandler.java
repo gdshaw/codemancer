@@ -1,5 +1,5 @@
 // This file is part of Codemancer.
-// Copyright 2015 Graham Shaw.
+// Copyright 2015-2016 Graham Shaw.
 // All rights reserved.
 
 package org.codemancer.server;
@@ -51,6 +51,8 @@ public class ChangesetHandler implements HttpHandler {
 			response.append(new Long(revision.get()).toString());
 
 			response.append(",\"areas\":[");
+			response.append("[\"sub\", \"subroutines\", [");
+
 			Map<Long, Subroutine> subroutines = db.getSubroutines(minRev, revision.get());
 			boolean firstSubroutine = true;
 			for (Map.Entry<Long, Subroutine> entry: subroutines.entrySet()) {
@@ -66,7 +68,7 @@ public class ChangesetHandler implements HttpHandler {
 					String.format("[0x%08x]", entryAddr);
 				response.append(json);
 			}
-			response.append("]");
+			response.append("]]]");
 
 			response.append(",\"lines\":[");
 			List<Line> lines = db.getLines(minRev, revision.get(), minAddr, maxAddr);
