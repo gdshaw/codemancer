@@ -108,3 +108,24 @@ ul.tree button {
 	background: none;
 	border: none;
 }
+
+input.tree-control {
+	display: none;
+}
+
+.tree-control + .tree-label:before {
+	content: "\229e";
+	padding-right: 0.5em;
+}
+
+.tree-control:checked + .tree-label:before {
+	content: "\229f";
+}
+
+.tree-control ~ .tree {
+	display: none;
+}
+
+.tree-control:checked ~ .tree {
+	display: block;
+}

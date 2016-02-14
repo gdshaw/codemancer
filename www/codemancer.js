@@ -82,37 +82,49 @@ function updateTreeView(root, updates) {
 				currentLi = nextLi;
 			}
 		} else {
-			// Ensure that a list item exists with the given ID and label.
-			// It should also have a sub-list, if and only if it is an
-			// internal node.
-			var button = null;
-			if (currentLi && (currentLi.getAttribute('id') == id)) {
-				// There is already a list item with the required ID.
-				// Ensure that it has the required label.
-				button = currentLi.firstChild;
-				if (button.textContent != label) {
-					button.textContent = label;
-				}
-			} else {
-				// The ID of the current list item is different,
-				// or we have reached the end of the list.
-				// Create a new button.
-				button = document.createElement('button');
-				button.textContent = label;
-
-				// Create a new list item.
-				var newLi = document.createElement('li');
-				newLi.setAttribute('id', id);
-				newLi.appendChild(button);
-				root.insertBefore(newLi, currentLi);
-				currentLi = newLi;
+			// Ensure that a list item exists with the given ID
+			// (but do not add it to the tree yet if it is a new one).
+			var li = currentLi;
+			if (!(li && (currentLi.getAttribute('id') != id))) {
+				li = document.createElement('li');
+				li.setAttribute('id', id);
 			}
+			var child = li.firstChild;
+
+			// Ensure that the node has a checkbox of the appropriate class.
+			var cb = child;
+			if (!(cb && ((cb.classList.contains('tree-control')) || (cb.classList.contains('tree-select'))))) {
+				var cb = document.createElement('input');
+				cb.setAttribute('id', 'checkbox-' + id);
+				cb.setAttribute('type', 'checkbox');
+				li.insertBefore(cb, child);
+				child = cb;
+			}
+			if (content) {
+				cb.classList.add('tree-control');
+				cb.classList.remove('tree-select');
+			} else {
+				cb.classList.add('tree-select');
+				cb.classList.remove('tree-control');
+			}
+			child = child.nextSibling;
+
+			// Ensure that the node has a label.
+			if (!(child && (child.classList.contains('tree-label')))) {
+				var tl = document.createElement('label');
+				tl.classList.add('tree-label');
+				tl.setAttribute('for', 'checkbox-' + id);
+				tl.textContent = label;
+				li.insertBefore(tl, child);
+				child = tl;
+			}
+			child = child.nextSibling;
 
 			if (content) {
-				// Ensure that there is a sublist (but if it is
-				// a new one then don't add it yet).
-				var ul = currentLi.firstChild.nextSibling;
-				if (!ul) {
+				// Internal node: ensure that the list item
+				// has a sublist.
+				var ul = child;
+				if (!(ul && (ul.classList.contains('tree')))) {
 					ul = document.createElement('ul');
 					ul.setAttribute('class', 'tree');
 				}
@@ -122,14 +134,28 @@ function updateTreeView(root, updates) {
 
 				// Ensure that the sublist is attached to the current
 				// list item.
-				if (currentLi.firstChild.nextSibling == null) {
-					currentLi.appendChild(ul);
+				if (ul != child) {
+					li.insertBefore(ul, child);
 				}
 			} else {
-				// If the current list item has a sublist then remove it.
-				if (currentLi.firstChild.nextSibling != null) {
-					currentLi.removeChild(ul);
+				// External node: ensure that there is no sublist.
+				if (child && (child.classList.contains('tree'))) {
+					var tc = child;
+					child = child.nextSibling;
+					li.removeChild(tc);
 				}
+			}
+
+			// Remove any remaining children.
+			while (child) {
+				var node = child;
+				child = child.nextSibling;
+				li.removeChild(node);
+			}
+
+			// If the list item is a new one then add it to the tree.
+			if (li != currentLi) {
+				root.insertBefore(li, currentLi);
 			}
 		}
 	}
