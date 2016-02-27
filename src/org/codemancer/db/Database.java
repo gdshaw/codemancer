@@ -1,5 +1,5 @@
 // This file is part of Codemancer.
-// Copyright 2014-2015 Graham Shaw.
+// Copyright 2014-2016 Graham Shaw.
 // Distribution and modification are permitted within the terms of the
 // GNU General Public License (version 3 or any later version).
 
@@ -192,6 +192,17 @@ public class Database {
 			.getResultList();
 	}
 
+	/** Get basic blocks in a given subroutine.
+	 * @param sub the subroutine
+	 * @return a list of basic blocks
+	 */
+	public final List<BasicBlock> getBasicBlocksIn(Subroutine sub) {
+		return em.createQuery(
+			"FROM BasicBlock WHERE ebb.id IN (SELECT id FROM ExtendedBasicBlock WHERE subroutine = :sub)", BasicBlock.class)
+			.setParameter("sub", sub)
+			.getResultList();
+	}
+
 	/** Get extended basic blocks in a given subroutine.
 	 * @param sub the subroutine
 	 * @return a list of extended basic blocks
@@ -233,6 +244,20 @@ public class Database {
 			.getResultList();
 	}
 
+	/** Get all lines of disassembled code that lie within a given set of address ranges.
+	 * @param minRev the earliest revision for which results are required
+	 * @param maxRev the latest revision for which results are required
+	 * @param ranges the set of address ranges
+	 * @return a list of lines
+	 */
+	public final List<Line> getLines(long minRev, long maxRev, AddressRangeSet ranges) {
+		return em.createQuery(
+			"FROM Line where (minRev >= :minRev) AND (minRev <= :maxRev) AND (maxRev = -1) AND " + ranges.asJPQL("minAddr") + " ORDER BY minAddr", Line.class)
+			.setParameter("minRev", minRev)
+			.setParameter("maxRev", maxRev)
+			.getResultList();
+	}
+
 	/** Get all basic blocks.
 	 * @return a list of basic blocks
 	 */
@@ -249,6 +274,24 @@ public class Database {
 		return em.createQuery(
 			"FROM ExtendedBasicBlock ORDER BY entryAddr", ExtendedBasicBlock.class)
 			.getResultList();
+	}
+
+	/** Get subroutine with given entry address.
+	 * @param entryAddr the required entry address
+	 * @param rev the revision number for which a result is required
+	 * @return the subroutine with that entry address, or null if not found
+	 */
+	public final Subroutine getSubroutineAt(long entryAddr, long rev) {
+		List<Subroutine> subroutines = em.createQuery(
+			"FROM Subroutine WHERE (entryAddr = :entryAddr) AND (minRev <= :rev) AND ((maxRev >= :rev) OR (maxRev = -1))", Subroutine.class)
+			.setParameter("entryAddr", entryAddr)
+			.setParameter("rev", rev)
+			.getResultList();
+		if (subroutines.isEmpty()) {
+			return null;
+		} else {
+			return subroutines.get(0);
+		}
 	}
 
 	/** Get all subroutines.

@@ -14,9 +14,11 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 
+import org.codemancer.db.AddressRangeSet;
 import org.codemancer.db.Database;
 import org.codemancer.db.Revision;
 import org.codemancer.db.Line;
+import org.codemancer.db.BasicBlock;
 import org.codemancer.db.Subroutine;
 
 /** A class for supplying changesets to the client. */
@@ -36,15 +38,50 @@ public class ChangesetHandler implements HttpHandler {
 			// Parse query string.
 			HttpQuery query = new HttpQuery(t);
 			String dbName = query.get("db");
-			long minRev = new BigInteger(query.get("minrev"), 10).longValue();
-			long minAddr = new BigInteger(query.get("minaddr"), 16).longValue();
-			long maxAddr = new BigInteger(query.get("maxaddr"), 16).longValue();
+			long minAreaRev = new BigInteger(query.get("arearev"), 10).longValue();
+			long minCodeRev = new BigInteger(query.get("coderev"), 10).longValue();
+			long minRev = Math.min(minAreaRev, minCodeRev);
 
-			// Open database then wait for specified revision
-			// if it is not already available.
+			// Open database then wait for specified revision if it is not already available.
 			Database db = server.open(dbName);
 			Revision revision = db.getRevision();
 			revision.await(minRev);
+			long curRev = revision.get();
+
+			// Construct required address range, either from sub or from minaddr/maxaddr
+			// parameters.
+			AddressRangeSet allRanges = new AddressRangeSet();
+			AddressRangeSet finalRanges = new AddressRangeSet();
+			String subArg = query.get("sub");
+			if (subArg != null) {
+				// Get the subroutine object, both as it was at minCodeRev,
+				// and as it is now at curRev.
+				long entryAddr = new BigInteger(subArg, 16).longValue();
+				Subroutine subBefore = db.getSubroutineAt(entryAddr, minCodeRev);
+				Subroutine subNow = db.getSubroutineAt(entryAddr, curRev);
+
+				// The subroutine need not have existing before, but if it
+				// does not exist now then that is an error.
+				if (subNow == null) {
+					throw new Exception("subroutine not found");
+				}
+
+				// Add the basic blocks for both subroutines to the range set.
+				if (subBefore != null) {
+					for (BasicBlock block: db.getBasicBlocksIn(subBefore)) {
+						allRanges.add(block.getMinAddr(), block.getMaxAddr());
+					}
+				}
+				for (BasicBlock block: db.getBasicBlocksIn(subNow)) {
+					allRanges.add(block.getMinAddr(), block.getMaxAddr());
+					finalRanges.add(block.getMinAddr(), block.getMaxAddr());
+				}
+			} else {
+				long minAddr = new BigInteger(query.get("minaddr"), 16).longValue();
+				long maxAddr = new BigInteger(query.get("maxaddr"), 16).longValue();
+				allRanges.add(minAddr, maxAddr);
+				finalRanges.add(minAddr, maxAddr);
+			}
 
 			StringBuilder response = new StringBuilder();
 			response.append("({\"rev\":");
@@ -53,7 +90,7 @@ public class ChangesetHandler implements HttpHandler {
 			response.append(",\"areas\":[");
 			response.append("[\"sub\", \"subroutines\", [");
 
-			Map<Long, Subroutine> subroutines = db.getSubroutines(minRev, revision.get());
+			Map<Long, Subroutine> subroutines = db.getSubroutines(minAreaRev, revision.get());
 			boolean firstSubroutine = true;
 			for (Map.Entry<Long, Subroutine> entry: subroutines.entrySet()) {
 				if (firstSubroutine) {
@@ -71,7 +108,7 @@ public class ChangesetHandler implements HttpHandler {
 			response.append("]]]");
 
 			response.append(",\"lines\":[");
-			List<Line> lines = db.getLines(minRev, revision.get(), minAddr, maxAddr);
+			List<Line> lines = db.getLines(minCodeRev, revision.get(), allRanges);
 			boolean firstLine = true;
 			for (Line line: lines) {
 				if (firstLine) {
@@ -79,7 +116,12 @@ public class ChangesetHandler implements HttpHandler {
 				} else {
 					response.append(",");
 				}
-				response.append(line.asJSON());
+				if (finalRanges.contains(line.getMinAddr())) {
+					response.append(line.asJSON());
+				} else {
+					String json = String.format("[0x%08x]", line.getMinAddr());
+					response.append(json);
+				}
 			}
 			response.append("]})");
 

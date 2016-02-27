@@ -2,12 +2,10 @@
 // Copyright 2015-2016 Graham Shaw.
 // All rights reserved.
 
-var rev = 0;
-var minAddr = 0x0000;
-var maxAddr = 0x3FFF;
+var rev = -1;
+var reloadCodeTable = 1;
 var codeTableInfo = [];
 var xhr = null;
-var reloadCodeTable = 1;
 
 // Construct hash containing name-value pairs from URI query string.
 var Query = function() {
@@ -25,6 +23,7 @@ var Query = function() {
 }
 var query = new Query();
 var db = query['db'];
+var sub = query['sub'];
 
 /** Convert integer to upper case hex.
  * @param value the integer to be converted
@@ -34,6 +33,18 @@ var db = query['db'];
 function intToHex(value, digits) {
 	var string = "0000000000000000"+value.toString(16);
 	return string.slice(-digits).toUpperCase();
+}
+
+/** Handle click on an area link.
+ * @param event the click event
+ */
+function handleAreaClick(event) {
+	history.pushState({}, '', event.target.getAttribute('href'));
+	sub = event.target.id.replace('area-','');
+	reloadCodeTable = 1;
+	if (xhr) { xhr.abort(); }
+	requestChangeset();
+	return false;
 }
 
 /** Update the content of a tree view element.
@@ -85,44 +96,38 @@ function updateTreeView(root, updates) {
 			// Ensure that a list item exists with the given ID
 			// (but do not add it to the tree yet if it is a new one).
 			var li = currentLi;
-			if (!(li && (currentLi.getAttribute('id') != id))) {
+			if (!(li && (currentLi.getAttribute('id') == id))) {
 				li = document.createElement('li');
 				li.setAttribute('id', id);
 			}
 			var child = li.firstChild;
 
-			// Ensure that the node has a checkbox of the appropriate class.
-			var cb = child;
-			if (!(cb && ((cb.classList.contains('tree-control')) || (cb.classList.contains('tree-select'))))) {
-				var cb = document.createElement('input');
-				cb.setAttribute('id', 'checkbox-' + id);
-				cb.setAttribute('type', 'checkbox');
-				li.insertBefore(cb, child);
-				child = cb;
-			}
 			if (content) {
-				cb.classList.add('tree-control');
-				cb.classList.remove('tree-select');
-			} else {
-				cb.classList.add('tree-select');
-				cb.classList.remove('tree-control');
-			}
-			child = child.nextSibling;
+				// Internal node:
+				// Ensure that the node has a checkbox.
+				var cb = child;
+				if (!(cb && cb.classList.contains('tree-control'))) {
+					var cb = document.createElement('input');
+					cb.setAttribute('id', 'checkbox-' + id);
+					cb.setAttribute('type', 'checkbox');
+					cb.classList.add('tree-control');
+					li.insertBefore(cb, child);
+					child = cb;
+				}
+				child = child.nextSibling;
 
-			// Ensure that the node has a label.
-			if (!(child && (child.classList.contains('tree-label')))) {
-				var tl = document.createElement('label');
-				tl.classList.add('tree-label');
-				tl.setAttribute('for', 'checkbox-' + id);
-				tl.textContent = label;
-				li.insertBefore(tl, child);
-				child = tl;
-			}
-			child = child.nextSibling;
+				// Ensure that the node has a label.
+				if (!(child && child.classList.contains('tree-label'))) {
+					var tl = document.createElement('label');
+					tl.classList.add('tree-label');
+					tl.setAttribute('for', 'checkbox-' + id);
+					tl.textContent = label;
+					li.insertBefore(tl, child);
+					child = tl;
+				}
+				child = child.nextSibling;
 
-			if (content) {
-				// Internal node: ensure that the list item
-				// has a sublist.
+				// Ensure that the list item has a sublist.
 				var ul = child;
 				if (!(ul && (ul.classList.contains('tree')))) {
 					ul = document.createElement('ul');
@@ -136,14 +141,25 @@ function updateTreeView(root, updates) {
 				// list item.
 				if (ul != child) {
 					li.insertBefore(ul, child);
+					child = ul;
 				}
+				child = child.nextSibling;
 			} else {
-				// External node: ensure that there is no sublist.
-				if (child && (child.classList.contains('tree'))) {
-					var tc = child;
-					child = child.nextSibling;
-					li.removeChild(tc);
+				// External node:
+				// Ensure that the node has a button.
+				var cb = child;
+				if (!(cb && cb.classList.contains('tree-link'))) {
+					href = '?db=' + db + '&sub=' + id.toString(16);
+					var cb = document.createElement('a');
+					cb.setAttribute('id', 'area-' + id.toString(16));
+					cb.setAttribute('href', href);
+					cb.classList.add('tree-link');
+					cb.onclick = handleAreaClick;
+					cb.textContent = label;
+					li.insertBefore(cb, child);
+					child = cb;
 				}
+				child = child.nextSibling;
 			}
 
 			// Remove any remaining children.
@@ -260,14 +276,15 @@ function processChangeset(changeset) {
 
 /** Repeatedly request and process changesets from the server. */
 function requestChangeset() {
-	var minRev = rev + 1;
+	var minAreaRev = rev + 1;
+	var minCodeRev = rev + 1;
 	if (reloadCodeTable != 0) {
-		minRev = 0;
+		minCodeRev = 0;
 		document.getElementById('loading').style.display = 'block';
 	}
 
 	xhr = new XMLHttpRequest();
-	xhr.open("GET", "/changeset.json?db=" + db + "&minrev=" + minRev + "&minaddr=" + minAddr.toString(16) + "&maxaddr=" + maxAddr.toString(16), true);
+	xhr.open("GET", "/changeset.json?db=" + db + "&arearev=" + minAreaRev + "&coderev=" + minCodeRev + "&sub=" + sub.toString(16), true);
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4) {
 			document.getElementById('loading').style.display = 'none';
