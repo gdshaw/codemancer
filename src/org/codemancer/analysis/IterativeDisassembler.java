@@ -140,7 +140,7 @@ public class IterativeDisassembler {
 			long byteCount = bitCount >> 3;
 
 			// Record the instruction as a line object.
-			Line line = new Line(0, -1, addr, addr + byteCount - 1, asm);
+			Line line = new org.codemancer.db.jpa.Line(0, -1, addr, addr + byteCount - 1, asm);
 			em.persist(line);
 
 			// Record branches and subroutine calls.
@@ -151,7 +151,7 @@ public class IterativeDisassembler {
 					long dstAddr = dstConstant.getValue();
 					boolean isSub = classifier.isCall();
 					boolean isCode = isSub | classifier.isBranch();
-					Reference ref = new Reference(0, -1, addr, dstAddr, true, false, isCode, isSub);
+					Reference ref = new org.codemancer.db.jpa.Reference(0, -1, addr, dstAddr, true, false, isCode, isSub);
 					em.persist(ref);
 				}
 			}

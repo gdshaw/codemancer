@@ -47,7 +47,7 @@ public class Server {
 		Database db = databases.get(dbName);
 		if (db == null) {
 			String dbUrl = "jdbc:derby:" + dbName;
-			db = new Database(dbUrl);
+			db = new org.codemancer.db.jpa.Database(dbUrl);
 			databases.put(dbName, db);
 		}
 		return db;

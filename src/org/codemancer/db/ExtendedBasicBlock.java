@@ -1,13 +1,9 @@
 // This file is part of Codemancer.
-// Copyright 2014 Graham Shaw.
+// Copyright 2014-2016 Graham Shaw.
 // Distribution and modification are permitted within the terms of the
 // GNU General Public License (version 3 or any later version).
 
 package org.codemancer.db;
-
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.FetchType;
 
 /** A class to represent an extended basic block.
  * An extended basic block is defined to be a sequence of instructions
@@ -19,63 +15,24 @@ import javax.persistence.FetchType;
  * course of events the subroutine will return and execution will
  * continue with the following instruction).
  */
-@Entity
-public class ExtendedBasicBlock extends Fact {
-	/** The entry point for this extended basic block. */
-	private long entryAddr;
-
-	/** True if execution can fall through to the next block, otherwise false. */
-	private boolean fallThrough;
-
-	/** The subroutine to which this block belongs, or null if none. */
-	@ManyToOne(fetch=FetchType.LAZY)
-	private Subroutine subroutine = null;
-
-	/** Construct empty extended basic block.
-	 * A default constructor is required by the JPA.
-	 */
-	protected ExtendedBasicBlock() {
-		super();
-		this.entryAddr = 0;
-		this.fallThrough = false;
-	}
-
-	/** Construct extended basic block.
-	 * @param minRev the lowest revision number for which this extended basic block is present
-	 * @param maxRev the highest revision number for which this extended basic block is present
-	 * @param entryAddr the entry point for this extended basic block
-	 */
-	public ExtendedBasicBlock(long minRev, long maxRev, long entryAddr) {
-		super(minRev, maxRev);
-		this.entryAddr = entryAddr;
-		this.fallThrough = fallThrough;
-	}
-
+public interface ExtendedBasicBlock extends Fact {
 	/** Get entry point
 	 * @return the entry point for this extended basic block
 	 */
-	public long getEntryAddr() {
-		return entryAddr;
-	}
+	long getEntryAddr();
 
 	/** Test whether execution can fall through to the next block.
 	 * @return true if execution can fall through, otherwise false
 	 */
-	public boolean canFallThrough() {
-		return fallThrough;
-	}
+	boolean canFallThrough();
 
 	/** Get the subroutine to which this extended basic block belongs.
 	 * @return the subroutine, or null if none
 	 */
-	public Subroutine getSubroutine() {
-		return subroutine;
-	}
+	Subroutine getSubroutine();
 
 	/** Set the subroutine to which this extended basic block belongs.
 	 * @param subroutine the subroutine, or null if none
 	 */
-	public void setSubroutine(Subroutine subroutine) {
-		this.subroutine = subroutine;
-	}
+	void setSubroutine(Subroutine subroutine);
 }

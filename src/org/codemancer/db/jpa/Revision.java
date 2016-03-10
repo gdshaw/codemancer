@@ -2,21 +2,34 @@
 // Copyright 2015-2016 Graham Shaw.
 // All rights reserved.
 
-package org.codemancer.db;
+package org.codemancer.db.jpa;
 
-/** An interface to represent the current revision number of a Codemancer database.
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+/** A class to represent the current revision number of a Codemancer database.
  * Revisions up to and including the current revision have been committed
  * and are therefore visible to the client. There may be entries in the
  * database numbered (revision+1), however these are uncommitted (so far
  * as the application is concerned), may be incomplete, and should not be
  * transmitted to the client.
  */
-public interface Revision {
+@Entity
+public class Revision implements org.codemancer.db.Revision {
+	/** The unique ID for this object. */
+	@Id
+	private long id = 0;
+
+	/** The current revision number. */
+	private long revision;
+
 	/** Get the most recent committed revision number.
 	 * Revisions up to and including this number are visible to the client.
 	 * @return the revision number
 	 */
-	long get();
+	public final synchronized long get() {
+		return this.revision;
+	}
 
 	/** Wait for a given revision to be committed.
 	 * If the requested revision has not been committed then the
@@ -26,7 +39,16 @@ public interface Revision {
 	 * then this function returns immediately.
 	 * @param revision the revision to wait for
 	 */
-	long await(long revision);
+	public final synchronized long await(long revision) {
+		while (revision > this.revision) {
+			try {
+				wait();
+			} catch (InterruptedException ex) {
+				ex.printStackTrace();
+			}
+		}
+		return revision;
+	}
 
 	/** Commit the revision currently in preparation.
 	 * Committing a revision causes it to become visible to the client.
@@ -34,5 +56,8 @@ public interface Revision {
 	 * will be unblocked if this function causes the requested revision
 	 * to be reached.
 	 */
-	void commit();
+	public final synchronized void commit() {
+		this.revision = this.revision + 1;
+		notifyAll();
+	}
 }

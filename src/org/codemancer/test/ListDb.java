@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.codemancer.db.Database;
 import org.codemancer.db.Reference;
 import org.codemancer.db.Line;
 import org.codemancer.db.BasicBlock;
@@ -17,6 +16,7 @@ import org.codemancer.db.ExtendedBasicBlock;
 import org.codemancer.db.Subroutine;
 import org.codemancer.db.SsaMapping;
 import org.codemancer.db.Comment;
+import org.codemancer.db.Database;
 
 class ListDb {
 	public static final void main(String args[]) throws Exception {
@@ -24,7 +24,7 @@ class ListDb {
 
 		// Open connection to database.
 		String dbUrl = "jdbc:derby:" + projName;
-		Database db = new Database(dbUrl);
+		Database db = new org.codemancer.db.jpa.Database(dbUrl);
 
 		for (Subroutine sub: db.getSubroutines()) {
 			System.out.printf("Subroutine %08X\n", sub.getEntryAddr());

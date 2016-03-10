@@ -3,10 +3,15 @@
 // Distribution and modification are permitted within the terms of the
 // GNU General Public License (version 3 or any later version).
 
-package org.codemancer.db;
+package org.codemancer.db.jpa;
 
-/** An interface to represent a fact stored within the database. */
-public interface Fact {
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.GeneratedValue;
+
+/** A class to represent a fact stored within the database. */
+@Entity
+public class Fact {
 	/** A constant to indicate that this fact has not been processed at all. */
 	public static final int DONE_NOTHING = 0;
 
@@ -26,31 +31,76 @@ public interface Fact {
 	public static final int DONE_SSA_MAPPER = 5;
 
 	/** A constant to indicate that this fact has been processed by the comment generator. */
-	public static final int DONE_COMMENT_GENERATOR = 6;
+	public static final int DONE_COMMENT_GENERATOR = 5;
+
+	/** The unique ID for this fact. */
+	@Id
+	@GeneratedValue
+	private final long id = 0;
+
+	/** The lowest database revision to which this fact is applicable. */
+	private long minRev;
+
+	/** The highest database revision to which this fact is applicable,
+	 * or -1 for all higher revisions. */
+	private long maxRev;
+
+	/** The level to which this fact has been processed. */
+	private int processedLevel = DONE_NOTHING;
+
+	/** Construct empty fact.
+	 * A default constructor is required by the JPA.
+	 */
+	protected Fact() {
+		this.minRev = -1;
+		this.maxRev = -1;
+	}
+
+	/** Construct fact.
+	 * @param minRev the lowest database revision to which this fact is applicable
+	 * @param maxRev the highest database revision to which this fact is applicable,
+	 *  or -1 for all higher revisions
+	 */
+	public Fact(long minRev, long maxRev) {
+		this.minRev = minRev;
+		this.maxRev = maxRev;
+	}
 
 	/** Get minimum database revision.
 	 * @return the lowest database revision to which this fact is applicable
 	 */
-	long getMinRev();
+	public final long getMinRev() {
+		return minRev;
+	}
 
 	/** Get maximum database revision.
 	 * @return the highest database revision to which this fact is applicable,
 	 *  or -1 for all higher revisions
 	 */
-	long getMaxRev();
+	public final long getMaxRev() {
+		return maxRev;
+	}
 
 	/** Check whether this fact has been processed to a given level. */
-	boolean isProcessed(int requiredLevel);
+	public final boolean isProcessed(int requiredLevel) {
+		return (processedLevel >= requiredLevel);
+	}
 
 	/** Mark that this fact has been processed to a given level.
 	 * The level is set irrespective of its previous value.
 	 * @param processedLevel the level that has been completed
 	 */
-	void setProcessed(int processedLevel);
+	public final void setProcessed(int processedLevel) {
+		this.processedLevel = processedLevel;
+	}
 
 	/** Mark that this fact has not been processed to a given level.
 	 * The level may be reduced by this operation but is never increased.
 	 * @param processedLevel the level that has not been completed
 	 */
-	void setNotProcessed(int notProcessedLevel);
+	public final void setNotProcessed(int notProcessedLevel) {
+		if (this.processedLevel >= notProcessedLevel) {
+			this.processedLevel = notProcessedLevel - 1;
+		}
+	}
 }

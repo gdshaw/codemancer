@@ -42,7 +42,7 @@ class Analyse {
 
 		// Open connection to database.
 		String dbUrl = "jdbc:derby:" + projName + ";create=true";
-		Database db = new Database(dbUrl);
+		Database db = new org.codemancer.db.jpa.Database(dbUrl);
 		EntityManager em = db.getEntityManager();
 
 		// Open object file.
@@ -58,7 +58,7 @@ class Analyse {
 		db.getTransaction().begin();
 		for (Symbol symbol: obj.getSymbols()) {
 			if (symbol.isCode()) {
-				Reference ref = new Reference(0, -1, -1, symbol.getValue(), false, false, true, true);
+				Reference ref = new org.codemancer.db.jpa.Reference(0, -1, -1, symbol.getValue(), false, false, true, true);
 				em.persist(ref);
 			}
 		}
