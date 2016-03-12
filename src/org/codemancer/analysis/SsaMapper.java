@@ -176,7 +176,7 @@ public class SsaMapper {
 						Constant dstConstant = (Constant)dst;
 						long dstAddr = dstConstant.getValue();
 						if (unencounteredBlocks.contains(dstAddr)) {
-							BasicBlock newBlock = db.getBasicBlock(dstAddr);
+							BasicBlock newBlock = db.getBasicBlocks().getContaining(dstAddr);
 							SsaStateRecorder newState = new SsaStateRecorder(state);
 							ControlPath newPath = new ControlPath(newBlock, newState);
 							pendingPaths.add(newPath);
@@ -196,7 +196,7 @@ public class SsaMapper {
 		// If this block can fall through, and if the next block is part of the current
 		// extended basic block that has not been encountered yet, then add it to the queue.
 		if (block.canFallThrough() && unencounteredBlocks.contains(addr)) {
-			BasicBlock newBlock = db.getBasicBlock(addr);
+			BasicBlock newBlock = db.getBasicBlocks().getContaining(addr);
 			SsaStateRecorder newState = new SsaStateRecorder(state);
 			ControlPath newPath = new ControlPath(newBlock, newState);
 			pendingPaths.add(newPath);
@@ -218,7 +218,7 @@ public class SsaMapper {
 		// If the pending blocks queue is empty then attempt to refill it.
 		if (pendingBlocks.isEmpty()) {
 			// Attempt to refill the blocks queue.
-			pendingBlocks.addAll(db.getUnprocessedExtendedBasicBlocks(Fact.DONE_SSA_MAPPER));
+			pendingBlocks.addAll(db.getExtendedBasicBlocks().getUnprocessed(Fact.DONE_SSA_MAPPER));
 
 			// If the queue is still empty then stop because there is nothing to do.
 			if (pendingBlocks.isEmpty()) return true;
@@ -235,7 +235,7 @@ public class SsaMapper {
 			// Get the first basic block of the current extended basic block.
 			ExtendedBasicBlock ebb = pendingBlocks.peek();
 			long addr = ebb.getEntryAddr();
-			BasicBlock firstBlock = db.getBasicBlock(addr);
+			BasicBlock firstBlock = db.getBasicBlocks().getContaining(addr);
 
 			// Add this path to the queue.
 			SsaStateRecorder state = new SsaStateRecorder(db, firstBlock.getSubroutine());
@@ -244,7 +244,7 @@ public class SsaMapper {
 
 			// Record the addresses of the other basic blocks which are part of this EBB.
 			unencounteredBlocks.clear();
-			for (BasicBlock block: db.getBasicBlocksIn(ebb)) {
+			for (BasicBlock block: db.getBasicBlocks().getMembersOf(ebb)) {
 				unencounteredBlocks.add(block.getMinAddr());
 			}
 			unencounteredBlocks.remove(addr);

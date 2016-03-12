@@ -118,7 +118,7 @@ public class SsaStateRecorder implements State {
 		SsaExpression expr;
 		if (value instanceof NamedValue) {
 			NamedValue namedValue = (NamedValue)value;
-			expr = db.getSsaExpression(subroutine, namedValue.getName());
+			expr = db.getSsaExpressions().get(subroutine, namedValue.getName());
 		} else {
 			String ssaName = subroutine.allocateSsaName();
 			expr = new org.codemancer.db.jpa.SsaExpression(0, -1, subroutine, ssaName);

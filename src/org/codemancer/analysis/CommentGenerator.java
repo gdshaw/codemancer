@@ -140,7 +140,7 @@ public class CommentGenerator {
 		// If the pending blocks queue is empty then attempt to refill it.
 		if (pendingBlocks.isEmpty()) {
 			// Attempt to refill the blocks queue.
-			pendingBlocks.addAll(db.getUnprocessedBasicBlocks(Fact.DONE_COMMENT_GENERATOR));
+			pendingBlocks.addAll(db.getBasicBlocks().getUnprocessed(Fact.DONE_COMMENT_GENERATOR));
 
 			// If the queue is still empty then stop because there is nothing to do.
 			if (pendingBlocks.isEmpty()) return true;

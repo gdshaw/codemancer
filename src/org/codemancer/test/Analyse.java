@@ -73,7 +73,7 @@ class Analyse {
 		while (!disasm.process(pc, links));
 		db.getTransaction().commit();
 		System.err.printf("Iterative disassembly complete.\n");
-		System.err.printf("%d instructions disassembled.\n" ,db.getLines(0, db.getRevision().get(), 0, 0x7fffffffffffffffL).size());
+		System.err.printf("%d instructions disassembled.\n" ,db.getLines().count(db.getRevision().get()));
 
 		// Run basic block detector.
 		System.err.printf("Starting basic block detector.\n");
@@ -82,7 +82,7 @@ class Analyse {
 		while (!bbDetector.detectNext(pc, links));
 		db.getTransaction().commit();
 		System.err.printf("Basic block detection complete.\n");
-		System.err.printf("%d blocks detected.\n", db.getBasicBlocks().size());
+		System.err.printf("%d blocks detected.\n", db.getBasicBlocks().count(db.getRevision().get()));
 
 		// Run extended basic block detector.
 		System.err.printf("Starting extended basic block detector.\n");
@@ -91,7 +91,7 @@ class Analyse {
 		while (!ebbDetector.detectNext(pc, links));
 		db.getTransaction().commit();
 		System.err.printf("Extended basic block detection complete.\n");
-		System.err.printf("%d extended basic blocks detected.\n", db.getExtendedBasicBlocks().size());
+		System.err.printf("%d extended basic blocks detected.\n", db.getExtendedBasicBlocks().count(db.getRevision().get()));
 
 		// Run subroutine detector.
 		System.err.printf("Starting subroutine detector.\n");
@@ -100,7 +100,7 @@ class Analyse {
 		while (!subDetector.detectNext(pc, links));
 		db.getTransaction().commit();
 		System.err.printf("Subroutine detection complete.\n");
-		System.err.printf("%d subroutines detected.\n", db.getSubroutines().size());
+		System.err.printf("%d subroutines detected.\n", db.getSubroutines().count(db.getRevision().get()));
 
 		// Run register tracer.
 		System.err.printf("Starting register tracing.\n");

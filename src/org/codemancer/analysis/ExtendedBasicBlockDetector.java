@@ -66,7 +66,7 @@ public class ExtendedBasicBlockDetector {
 
 		if (pendingIndex == pendingList.size()) {
 			if (done) return true;
-			pendingList = db.getUnprocessedBasicBlocks(Fact.DONE_EXTENDED_BASIC_BLOCK_DETECTOR);
+			pendingList = db.getBasicBlocks().getUnprocessed(Fact.DONE_EXTENDED_BASIC_BLOCK_DETECTOR);
 			pendingIndex = 0;
 			if (pendingList.size() == 0) return true;
 			done = true;
@@ -75,11 +75,11 @@ public class ExtendedBasicBlockDetector {
 		BasicBlock block = pendingList.get(pendingIndex);
 		if (!block.isProcessed(Fact.DONE_EXTENDED_BASIC_BLOCK_DETECTOR)) {
 			long addr = block.getMinAddr();
-			List<Reference> references = db.getReferences(addr, addr);
+			List<Reference> references = db.getReferences().getByDstAddr(addr, addr);
 
 			// Determine whether this basic block is part of an existing basic block.
 			ExtendedBasicBlock ebb = null;
-			BasicBlock prevBlock = db.getPreviousBasicBlock(addr);
+			BasicBlock prevBlock = db.getBasicBlocks().getPrevious(addr);
 			if ((prevBlock != null) && prevBlock.canFallThrough()) {
 				ebb = prevBlock.getExtendedBasicBlock();
 			}

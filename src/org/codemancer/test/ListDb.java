@@ -26,11 +26,11 @@ class ListDb {
 		String dbUrl = "jdbc:derby:" + projName;
 		Database db = new org.codemancer.db.jpa.Database(dbUrl);
 
-		for (Subroutine sub: db.getSubroutines()) {
+		for (Subroutine sub: db.getSubroutines().get()) {
 			System.out.printf("Subroutine %08X\n", sub.getEntryAddr());
-			for (ExtendedBasicBlock ebb: db.getExtendedBasicBlocksIn(sub)) {
-				for (BasicBlock bb: db.getBasicBlocksIn(ebb)) {
-					List<Reference> references = db.getReferences(bb.getMinAddr(), bb.getMinAddr());
+			for (ExtendedBasicBlock ebb: db.getExtendedBasicBlocks().getMembersOf(sub)) {
+				for (BasicBlock bb: db.getBasicBlocks().getMembersOf(ebb)) {
+					List<Reference> references = db.getReferences().getByDstAddr(bb.getMinAddr(), bb.getMinAddr());
 					if (!references.isEmpty()) {
 						System.out.printf("Xref:");
 						boolean first = true;
@@ -44,10 +44,10 @@ class ListDb {
 						}
 						System.out.printf("\n");
 					}
-					for (Line line: db.getLines(0, db.getRevision().get(), bb.getMinAddr(), bb.getMaxAddr())) {
+					for (Line line: db.getLines().getChanges(0, db.getRevision().get(), bb.getMinAddr(), bb.getMaxAddr())) {
 						String asm = String.format("%08X\t%s", line.getMinAddr(), line.getInstruction());
 						List<String> commentLines = new ArrayList<String>();
-						for (Comment comment: db.getComments(line.getMinAddr())) {
+						for (Comment comment: db.getComments().get(line.getMinAddr())) {
 							commentLines.addAll(Arrays.asList(comment.getContent().split("\\n")));
 						}
 						if (commentLines.isEmpty()) {

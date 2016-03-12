@@ -67,7 +67,7 @@ public class SsaStatePlayer implements State {
 		this.outputs = new HashMap<String, SsaExpression>();
 		this.liveTemporaries = new HashMap<String, Expression>();
 
-		for (SsaMapping mapping: db.getSsaMappings(instrAddr)) {
+		for (SsaMapping mapping: db.getSsaMappings().get(instrAddr)) {
 			if (mapping.isInbound()) {
 				inputs.put(mapping.getName(), mapping.getValue());
 			} else {

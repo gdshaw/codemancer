@@ -177,7 +177,7 @@ public class BasicBlockDetector {
 	 */
 	public boolean detectNext(Register pc, List<Expression> links) {
 		if (pendingIndex == pendingList.size()) {
-			pendingList = db.getUnprocessedLines(Fact.DONE_BASIC_BLOCK_DETECTOR);
+			pendingList = db.getLines().getUnprocessed(Fact.DONE_BASIC_BLOCK_DETECTOR);
 			pendingIndex = 0;
 		}
 

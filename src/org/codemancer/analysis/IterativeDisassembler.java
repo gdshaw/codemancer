@@ -179,7 +179,7 @@ public class IterativeDisassembler {
 	 */
 	public boolean process(Register pc, List<Expression> links) {
 		if (pendingIndex == pendingList.size()) {
-			pendingList = db.getUnprocessedReferences(Fact.DONE_ITERATIVE_DISASSEMBLER);
+			pendingList = db.getReferences().getUnprocessed(Fact.DONE_ITERATIVE_DISASSEMBLER);
 			pendingIndex = 0;
 		}
 		if (pendingIndex == pendingList.size()) {

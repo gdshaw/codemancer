@@ -57,8 +57,8 @@ public class ChangesetHandler implements HttpHandler {
 				// Get the subroutine object, both as it was at minCodeRev,
 				// and as it is now at curRev.
 				long entryAddr = new BigInteger(subArg, 16).longValue();
-				Subroutine subBefore = db.getSubroutineAt(entryAddr, minCodeRev);
-				Subroutine subNow = db.getSubroutineAt(entryAddr, curRev);
+				Subroutine subBefore = db.getSubroutines().getStarting(entryAddr, minCodeRev);
+				Subroutine subNow = db.getSubroutines().getStarting(entryAddr, curRev);
 
 				// The subroutine need not have existing before, but if it
 				// does not exist now then that is an error.
@@ -68,11 +68,11 @@ public class ChangesetHandler implements HttpHandler {
 
 				// Add the basic blocks for both subroutines to the range set.
 				if (subBefore != null) {
-					for (BasicBlock block: db.getBasicBlocksIn(subBefore)) {
+					for (BasicBlock block: db.getBasicBlocks().getMembersOf(subBefore)) {
 						allRanges.add(block.getMinAddr(), block.getMaxAddr());
 					}
 				}
-				for (BasicBlock block: db.getBasicBlocksIn(subNow)) {
+				for (BasicBlock block: db.getBasicBlocks().getMembersOf(subNow)) {
 					allRanges.add(block.getMinAddr(), block.getMaxAddr());
 					finalRanges.add(block.getMinAddr(), block.getMaxAddr());
 				}
@@ -90,7 +90,7 @@ public class ChangesetHandler implements HttpHandler {
 			response.append(",\"areas\":[");
 			response.append("[\"sub\", \"subroutines\", [");
 
-			Map<Long, Subroutine> subroutines = db.getSubroutines(minAreaRev, revision.get());
+			Map<Long, Subroutine> subroutines = db.getSubroutines().getChanged(minAreaRev, revision.get());
 			boolean firstSubroutine = true;
 			for (Map.Entry<Long, Subroutine> entry: subroutines.entrySet()) {
 				if (firstSubroutine) {
@@ -108,7 +108,7 @@ public class ChangesetHandler implements HttpHandler {
 			response.append("]]]");
 
 			response.append(",\"lines\":[");
-			List<Line> lines = db.getLines(minCodeRev, revision.get(), allRanges);
+			List<Line> lines = db.getLines().getChanges(minCodeRev, revision.get(), allRanges);
 			boolean firstLine = true;
 			for (Line line: lines) {
 				if (firstLine) {

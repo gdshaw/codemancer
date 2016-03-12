@@ -76,7 +76,7 @@ public class SubroutineDetector {
 			// then extricate it from that subroutine. To do this, all
 			// blocks of the subroutine (except the entry block) must
 			// be reprocessed.
-			List<ExtendedBasicBlock> subBlocks = db.getExtendedBasicBlocksIn(subroutine);
+			List<ExtendedBasicBlock> subBlocks = db.getExtendedBasicBlocks().getMembersOf(subroutine);
 			for (ExtendedBasicBlock subBlock: subBlocks) {
 				if (subBlock.getEntryAddr() != subroutine.getEntryAddr()) {
 					subBlock.setSubroutine(null);
@@ -101,7 +101,7 @@ public class SubroutineDetector {
 
 		if (pendingIndex == pendingList.size()) {
 			if (done) return true;
-			pendingList = db.getUnprocessedExtendedBasicBlocks(Fact.DONE_SUBROUTINE_DETECTOR);
+			pendingList = db.getExtendedBasicBlocks().getUnprocessed(Fact.DONE_SUBROUTINE_DETECTOR);
 			pendingIndex = 0;
 			if (pendingList.size() == 0) return true;
 			done = true;
@@ -115,7 +115,7 @@ public class SubroutineDetector {
 			// - internal references from subroutine calls, or
 			// - external references to what are assumed to be subroutines.
 			long addr = block.getEntryAddr();
-			List<Reference> references = db.getReferences(addr, addr);
+			List<Reference> references = db.getReferences().getByDstAddr(addr, addr);
 			boolean subEntry = false;
 			for (Reference reference: references) {
 				if (reference.isSubRef()) {
@@ -136,7 +136,7 @@ public class SubroutineDetector {
 
 				// First, consider fallthrough from a previous block.
 				Subroutine subroutine = null;
-				BasicBlock prevBlock = db.getPreviousBasicBlock(addr);
+				BasicBlock prevBlock = db.getBasicBlocks().getPrevious(addr);
 				if ((prevBlock != null) && prevBlock.canFallThrough()) {
 					subroutine = prevBlock.getSubroutine();
 				}
@@ -151,7 +151,7 @@ public class SubroutineDetector {
 					if (!reference.isCodeRef() || reference.isSubRef()) continue;
 
 					// Disregard jumps originating from within this block.
-					BasicBlock refBlock = db.getBasicBlock(reference.getSrcAddr());
+					BasicBlock refBlock = db.getBasicBlocks().getContaining(reference.getSrcAddr());
 					if (refBlock.getExtendedBasicBlock() == block) continue;
 
 					// Disregard jumps originating from a block which as not yet been

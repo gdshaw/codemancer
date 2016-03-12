@@ -5,10 +5,6 @@
 
 package org.codemancer.db.jpa;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Properties;
 import javax.persistence.EntityTransaction;
 import javax.persistence.EntityManagerFactory;
@@ -25,6 +21,30 @@ public class Database implements org.codemancer.db.Database {
 
 	/** The current revision number for this database. */
 	private final Revision revision;
+
+	/** The collection of references for this database. */
+	private References references = null;
+
+	/** The collection of lines for this database. */
+	private Lines lines = null;
+
+	/** The collection of basic blocks for this database. */
+	private BasicBlocks basicBlocks = null;
+
+	/** The collection of extended basic blocks for this database. */
+	private ExtendedBasicBlocks extendedBasicBlocks = null;
+
+	/** The collection of subroutines for this database. */
+	private Subroutines subroutines = null;
+
+	/** The collection of comments for this database. */
+	private Comments comments = null;
+
+	/** The collection of SSA expressions for this database. */
+	private SsaExpressions ssaExpressions = null;
+
+	/** The collection of SSA mappings for this database. */
+	private SsaMappings ssaMappings = null;
 
 	/** Open database.
 	 * @param url the url of the database to be opened.
@@ -48,306 +68,71 @@ public class Database implements org.codemancer.db.Database {
 		revision = tempRevision;
 	}
 
-	/** Get entity manager.
-	 * @return the entity manager
-	 */
 	public final EntityManager getEntityManager() {
 		return em;
 	}
 
-	/** Get transaction object.
-	 * @return a transaction object
-	 */
 	public final EntityTransaction getTransaction() {
 		return em.getTransaction();
 	}
 
-	/** Get current revision number.
-	 * @return the object representing the current revision number
-	 */
 	public final org.codemancer.db.Revision getRevision() {
 		return revision;
 	}
 
-	/** Get basic block containing a given address.
-	 * @param addr an address within the requested basic block
-	 * @return the basic block, or null if none
-	 */
-	public final org.codemancer.db.BasicBlock getBasicBlock(long addr) {
-		List<BasicBlock> blocks = em.createQuery(
-			"FROM BasicBlock WHERE minAddr <= :addr AND maxAddr >= :addr", BasicBlock.class)
-			.setParameter("addr", addr)
-			.getResultList();
-		if (blocks.size() == 0) {
-			return null;
-		} else if (blocks.size() == 1) {
-			return blocks.get(0);
-		} else {
-			throw new IllegalStateException("multiple basic blocks found ending at the same start address");
+	public final org.codemancer.db.Lines getLines() {
+		if (lines == null) {
+			lines = new Lines(em);
 		}
+		return lines;
 	}
 
-	/** Get basic block ending immediately prior to a given address.
-	 * @param addr the address immediately following the requested basic block
-	 * @return the basic block, or null if none
-	 */
-	public final org.codemancer.db.BasicBlock getPreviousBasicBlock(long addr) {
-		List<BasicBlock> blocks = em.createQuery(
-			"FROM BasicBlock WHERE maxAddr = :maxAddr", BasicBlock.class)
-			.setParameter("maxAddr", addr - 1)
-			.getResultList();
-		if (blocks.size() == 0) {
-			return null;
-		} else if (blocks.size() == 1) {
-			return blocks.get(0);
-		} else {
-			throw new IllegalStateException("multiple basic blocks found ending at the same end address");
+	public final org.codemancer.db.References getReferences() {
+		if (references == null) {
+			references = new References(em);
 		}
+		return references;
 	}
 
-	/** Get SSA expression with a given name in a given subroutine.
-	 * @param subroutine the subroutine containing the required expression
-	 * @param name the name of the required expression
-	 * @return the SSA expression
-	 */
-	public final org.codemancer.db.SsaExpression getSsaExpression(org.codemancer.db.Subroutine subroutine, String name) {
-		return em.createQuery(
-			"FROM SsaExpression WHERE subroutine = :subroutine AND name = :name", SsaExpression.class)
-			.setParameter("subroutine", subroutine)
-			.setParameter("name", name)
-			.getSingleResult();
-	}
-
-	/** Get SSA mappings for a given address.
-	 * @param addr the address for which mappings are required
-	 * @return a list of mappings
-	 */
-	public final List<org.codemancer.db.SsaMapping> getSsaMappings(long addr) {
-		List<SsaMapping> mappings = em.createQuery(
-			"FROM SsaMapping WHERE addr = :addr", SsaMapping.class)
-			.setParameter("addr", addr)
-			.getResultList();
-		return new ArrayList<org.codemancer.db.SsaMapping>(mappings);
-	}
-
-	/** Get comments for a given address.
-	 * @param addr the address for which comments are required
-	 * @return a list of comments
-	 */
-	public final List<org.codemancer.db.Comment> getComments(long addr) {
-		List<Comment> comments = em.createQuery(
-			"FROM Comment WHERE addr = :addr", Comment.class)
-			.setParameter("addr", addr)
-			.getResultList();
-		return new ArrayList<org.codemancer.db.Comment>(comments);
-	}
-
-	/** Get unprocessed references.
-	 * @param requiredLevel the required level of processing to be omitted from the result
-	 * @return a list of unprocessed references
-	 */
-	public final List<org.codemancer.db.Reference> getUnprocessedReferences(int requiredLevel) {
-		List<Reference> references = em.createQuery(
-			"FROM Reference WHERE processedLevel < :requiredLevel", Reference.class)
-			.setParameter("requiredLevel", requiredLevel)
-			.getResultList();
-		return new ArrayList<org.codemancer.db.Reference>(references);
-	}
-
-	/** Get unprocessed lines of disassembled code.
-	 * @param requiredLevel the required level of processing to be omitted from the result
-	 * @return a list of unprocessed lines
-	 */
-	public final List<org.codemancer.db.Line> getUnprocessedLines(int requiredLevel) {
-		List<Line> lines = em.createQuery(
-			"FROM Line WHERE processedLevel < :requiredLevel", Line.class)
-			.setParameter("requiredLevel", requiredLevel)
-			.getResultList();
-		return new ArrayList<org.codemancer.db.Line>(lines);
-	}
-
-	/** Get unprocessed basic blocks.
-	 * @param requiredLevel the required level of processing to be omitted from the result
-	 * @return a list of unprocessed basic blocks
-	 */
-	public final List<org.codemancer.db.BasicBlock> getUnprocessedBasicBlocks(int requiredLevel) {
-		List<BasicBlock> bbs = em.createQuery(
-			"FROM BasicBlock WHERE processedLevel < :requiredLevel", BasicBlock.class)
-			.setParameter("requiredLevel", requiredLevel)
-			.getResultList();
-		return new ArrayList<org.codemancer.db.BasicBlock>(bbs);
-	}
-
-	/** Get unprocessed extended basic blocks.
-	 * @param requiredLevel the required level of processing to be omitted from the result
-	 * @return a list of unprocessed extended basic blocks
-	 */
-	public final List<org.codemancer.db.ExtendedBasicBlock> getUnprocessedExtendedBasicBlocks(int requiredLevel) {
-		List<ExtendedBasicBlock> ebbs = em.createQuery(
-			"FROM ExtendedBasicBlock WHERE processedLevel < :requiredLevel", ExtendedBasicBlock.class)
-			.setParameter("requiredLevel", requiredLevel)
-			.getResultList();
-		return new ArrayList<org.codemancer.db.ExtendedBasicBlock>(ebbs);
-	}
-
-	/** Get basic blocks in a given extended basic block.
-	 * @param ebb the extended basic block
-	 * @return a list of basic blocks
-	 */
-	public final List<org.codemancer.db.BasicBlock> getBasicBlocksIn(org.codemancer.db.ExtendedBasicBlock ebb) {
-		List<BasicBlock> bbs = em.createQuery(
-			"FROM BasicBlock WHERE ebb = :ebb", BasicBlock.class)
-			.setParameter("ebb", ebb)
-			.getResultList();
-		return new ArrayList<org.codemancer.db.BasicBlock>(bbs);
-	}
-
-	/** Get basic blocks in a given subroutine.
-	 * @param sub the subroutine
-	 * @return a list of basic blocks
-	 */
-	public final List<org.codemancer.db.BasicBlock> getBasicBlocksIn(org.codemancer.db.Subroutine sub) {
-		List<BasicBlock> bbs = em.createQuery(
-			"FROM BasicBlock WHERE ebb.id IN (SELECT id FROM ExtendedBasicBlock WHERE subroutine = :sub)", BasicBlock.class)
-			.setParameter("sub", sub)
-			.getResultList();
-		return new ArrayList<org.codemancer.db.BasicBlock>(bbs);
-	}
-
-	/** Get extended basic blocks in a given subroutine.
-	 * @param sub the subroutine
-	 * @return a list of extended basic blocks
-	 */
-	public final List<org.codemancer.db.ExtendedBasicBlock> getExtendedBasicBlocksIn(org.codemancer.db.Subroutine sub) {
-		List<ExtendedBasicBlock> ebbs = em.createQuery(
-			"FROM ExtendedBasicBlock WHERE subroutine = :sub", ExtendedBasicBlock.class)
-			.setParameter("sub", sub)
-			.getResultList();
-		return new ArrayList<org.codemancer.db.ExtendedBasicBlock>(ebbs);
-	}
-
-	/** Get all references to a given address range.
-	 * @param minAddr the lowest address to include
-	 * @param maxAddr the highest address to include
-	 * @return a list of references
-	 */
-	public final List<org.codemancer.db.Reference> getReferences(long minAddr, long maxAddr) {
-		List<Reference> references = em.createQuery(
-			"FROM Reference WHERE (dstAddr >= :minAddr) AND (dstAddr <= :maxAddr) ORDER BY minAddr", Reference.class)
-			.setParameter("minAddr", minAddr)
-			.setParameter("maxAddr", maxAddr)
-			.getResultList();
-		return new ArrayList<org.codemancer.db.Reference>(references);
-	}
-
-	/** Get all lines of disassembled code in given address range.
-	 * @param minRev the earliest revision for which results are required
-	 * @param maxRev the latest revision for which results are required
-	 * @param minAddr the lowest address to include
-	 * @param maxAddr the highest address to include
-	 * @return a list of lines
-	 */
-	public final List<org.codemancer.db.Line> getLines(long minRev, long maxRev, long minAddr, long maxAddr) {
-		List<Line> lines = em.createQuery(
-			"FROM Line where (minRev >= :minRev) AND (minRev <= :maxRev) AND (maxRev = -1) AND (minAddr >= :minAddr) AND (maxAddr <= :maxAddr) ORDER BY minAddr", Line.class)
-			.setParameter("minRev", minRev)
-			.setParameter("maxRev", maxRev)
-			.setParameter("minAddr", minAddr)
-			.setParameter("maxAddr", maxAddr)
-			.getResultList();
-		return new ArrayList<org.codemancer.db.Line>(lines);
-	}
-
-	/** Get all lines of disassembled code that lie within a given set of address ranges.
-	 * @param minRev the earliest revision for which results are required
-	 * @param maxRev the latest revision for which results are required
-	 * @param ranges the set of address ranges
-	 * @return a list of lines
-	 */
-	public final List<org.codemancer.db.Line> getLines(long minRev, long maxRev, AddressRangeSet ranges) {
-		List<Line> lines = em.createQuery(
-			"FROM Line where (minRev >= :minRev) AND (minRev <= :maxRev) AND (maxRev = -1) AND " + ranges.asJPQL("minAddr") + " ORDER BY minAddr", Line.class)
-			.setParameter("minRev", minRev)
-			.setParameter("maxRev", maxRev)
-			.getResultList();
-		return new ArrayList<org.codemancer.db.Line>(lines);
-	}
-
-	/** Get all basic blocks.
-	 * @return a list of basic blocks
-	 */
-	public final List<org.codemancer.db.BasicBlock> getBasicBlocks() {
-		List<BasicBlock> bbs = em.createQuery(
-			"FROM BasicBlock ORDER BY minAddr", BasicBlock.class)
-			.getResultList();
-		return new ArrayList<org.codemancer.db.BasicBlock>(bbs);
-	}
-
-	/** Get all extended basic blocks.
-	 * @return a list of extended basic blocks
-	 */
-	public final List<org.codemancer.db.ExtendedBasicBlock> getExtendedBasicBlocks() {
-		List<ExtendedBasicBlock> ebbs = em.createQuery(
-			"FROM ExtendedBasicBlock ORDER BY entryAddr", ExtendedBasicBlock.class)
-			.getResultList();
-		return new ArrayList<org.codemancer.db.ExtendedBasicBlock>(ebbs);
-
-	}
-
-	/** Get subroutine with given entry address.
-	 * @param entryAddr the required entry address
-	 * @param rev the revision number for which a result is required
-	 * @return the subroutine with that entry address, or null if not found
-	 */
-	public final org.codemancer.db.Subroutine getSubroutineAt(long entryAddr, long rev) {
-		List<Subroutine> subroutines = em.createQuery(
-			"FROM Subroutine WHERE (entryAddr = :entryAddr) AND (minRev <= :rev) AND ((maxRev >= :rev) OR (maxRev = -1))", Subroutine.class)
-			.setParameter("entryAddr", entryAddr)
-			.setParameter("rev", rev)
-			.getResultList();
-		if (subroutines.isEmpty()) {
-			return null;
-		} else {
-			return subroutines.get(0);
+	public final org.codemancer.db.Comments getComments() {
+		if (comments == null) {
+			comments = new Comments(em);
 		}
+		return comments;
 	}
 
-	/** Get all subroutines.
-	 * @return a list of subroutines
-	 */
-	public final List<org.codemancer.db.Subroutine> getSubroutines() {
-		List<Subroutine> subroutines = em.createQuery(
-			"FROM Subroutine ORDER BY entryAddr", Subroutine.class)
-			.getResultList();
-		return new ArrayList<org.codemancer.db.Subroutine>(subroutines);
-	}
-
-	/** Get changed subroutines.
-	 * Subroutines are listed at most once for each entry address, and then
-	 * only if a change has occurred within the given range of revisions.
-	 * It is the state as of revision maxRev that is reported. Subroutines
-	 * that have been deleted with no replacement are represented by a
-	 * mapping to null.
-	 * @param minRev the earliest revision for which results are required
-	 * @param maxRev the latest revision for which results are required
-	 * @return the subroutines that have changed, indexed by entry address
-	 */
-	public final Map<Long, org.codemancer.db.Subroutine> getSubroutines(long minRev, long maxRev) {
-		List<Subroutine> subroutines = em.createQuery(
-			"FROM Subroutine where ((minRev >= :minRev) AND (minRev <= :maxRev)) OR ((maxRev >= :minRev) AND (maxRev <= :maxRev)) ORDER BY minRev", Subroutine.class)
-			.setParameter("minRev", minRev)
-			.setParameter("maxRev", maxRev)
-			.getResultList();
-
-		Map<Long, org.codemancer.db.Subroutine> filteredSubroutines = new HashMap<Long, org.codemancer.db.Subroutine>();
-		for (Subroutine subroutine: subroutines) {
-			if ((subroutine.getMaxRev() >= maxRev) || (subroutine.getMaxRev() == -1)) {
-				filteredSubroutines.put(subroutine.getEntryAddr(), subroutine);
-			} else {
-				filteredSubroutines.put(subroutine.getEntryAddr(), null);
-			}
+	public final org.codemancer.db.BasicBlocks getBasicBlocks() {
+		if (basicBlocks == null) {
+			basicBlocks = new BasicBlocks(em);
 		}
+		return basicBlocks;
+	}
 
-		return filteredSubroutines;
+	public final org.codemancer.db.ExtendedBasicBlocks getExtendedBasicBlocks() {
+		if (extendedBasicBlocks == null) {
+			extendedBasicBlocks = new ExtendedBasicBlocks(em);
+		}
+		return extendedBasicBlocks;
+	}
+
+	public final org.codemancer.db.Subroutines getSubroutines() {
+		if (subroutines == null) {
+			subroutines = new Subroutines(em);
+		}
+		return subroutines;
+	}
+
+	public final org.codemancer.db.SsaExpressions getSsaExpressions() {
+		if (ssaExpressions == null) {
+			ssaExpressions = new SsaExpressions(em);
+		}
+		return ssaExpressions;
+	}
+
+	public final org.codemancer.db.SsaMappings getSsaMappings() {
+		if (ssaMappings == null) {
+			ssaMappings = new SsaMappings(em);
+		}
+		return ssaMappings;
 	}
 }
