@@ -35,4 +35,10 @@ public interface References {
 	 * @return a list of unprocessed references
 	 */
 	List<Reference> getUnprocessed(int requiredLevel);
+
+	/** Get next address that is the destination of a reference.
+	 * @param addr the address at which to begin the search
+	 * @return the destination address, or null if none found
+	 */
+	Long findNextDestination(long addr);
 }

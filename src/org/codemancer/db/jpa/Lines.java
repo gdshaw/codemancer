@@ -29,6 +29,15 @@ class Lines implements org.codemancer.db.Lines {
 		return line;
 	}
 
+	public final List<org.codemancer.db.Line> getMembersOf(org.codemancer.db.BasicBlock bb) {
+		List<Line> lines = em.createQuery(
+			"FROM Line WHERE maxRev = -1 AND minAddr >= :minAddr AND minAddr <= :maxAddr ORDER BY minAddr", Line.class)
+			.setParameter("minAddr", bb.getMinAddr())
+			.setParameter("maxAddr", bb.getMaxAddr())
+			.getResultList();
+		return new ArrayList<org.codemancer.db.Line>(lines);
+	}
+
 	public final List<org.codemancer.db.Line> getChanges(long minRev, long maxRev, long minAddr, long maxAddr) {
 		List<Line> lines = em.createQuery(
 			"FROM Line where (minRev >= :minRev) AND (minRev <= :maxRev) AND (maxRev = -1) AND (minAddr >= :minAddr) AND (maxAddr <= :maxAddr) ORDER BY minAddr", Line.class)
@@ -55,6 +64,19 @@ class Lines implements org.codemancer.db.Lines {
 			.setParameter("requiredLevel", requiredLevel)
 			.getResultList();
 		return new ArrayList<org.codemancer.db.Line>(lines);
+	}
+
+	public final Long findFirstAddr(long addr) {
+		List<Line> existingLines = em.createQuery(
+			"FROM Line WHERE maxRev = -1 AND minAddr >= :addr ORDER BY minAddr", Line.class)
+			.setParameter("addr", addr)
+			.setMaxResults(1)
+			.getResultList();
+		Long stopAddr = null;
+		if (!existingLines.isEmpty()) {
+			stopAddr = existingLines.get(0).getMinAddr();
+		}
+		return stopAddr;
 	}
 
 	public final long count(long rev) {

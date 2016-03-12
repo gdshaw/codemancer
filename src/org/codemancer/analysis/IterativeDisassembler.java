@@ -88,23 +88,12 @@ public class IterativeDisassembler {
 
 		// Determine address at which disassembly should stop as a result of
 		// reaching an address which has already been disassembled.
-		List<Line> existingLines = em.createQuery(
-			"FROM Line " +
-			"WHERE maxRev = -1 " +
-			"AND minAddr >= :addr " +
-			"ORDER BY minAddr", Line.class)
-			.setParameter("addr", addr)
-			.setMaxResults(1)
-			.getResultList();
-		long stopAddr = 0;
-		if (!existingLines.isEmpty()) {
-			stopAddr = existingLines.get(0).getMinAddr();
-		}
+		Long stopAddr = db.getLines().findFirstAddr(addr);
 
 		// Disassemble until one of the termination conditions is met.
-		while ((addr < stopAddr) || (stopAddr == 0)) {
+		while ((stopAddr == null) || (addr < stopAddr)) {
 			// Fill/refill buffer.
-			while ((buffer.length() < 64) && ((reader.tell() < stopAddr) || (stopAddr == 0))) {
+			while ((buffer.length() < 64) && ((stopAddr == null) || (reader.tell() < stopAddr))) {
 				byte newByte = reader.get();
 				BitString newBits = new ShortBitString(newByte, 8, arch.isBigEndian());
 				buffer = buffer.concat(newBits);

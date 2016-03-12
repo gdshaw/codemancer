@@ -18,7 +18,7 @@ public interface BasicBlocks {
 	 *  otherwise false
 	 * @return the newly-created basic block
 	 */
-        BasicBlock make(long minRev, long maxRev, long minAddr, long maxAddr, boolean fallThrough);
+	BasicBlock make(long minRev, long maxRev, long minAddr, long maxAddr, boolean fallThrough);
 
 	/** Get basic block containing a given address.
 	 * @param addr an address within the requested basic block

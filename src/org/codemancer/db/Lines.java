@@ -21,6 +21,12 @@ public interface Lines {
 	 */
 	Line make(long minRev, long maxRev, long minAddr, long maxAddr, String instruction);
 
+	/** Get lines in a given basic block.
+	 * @param bb the basic block
+	 * @return a list of lines
+	 */
+	List<Line> getMembersOf(BasicBlock bb);
+
 	/** Get all lines of disassembled code in given address range.
 	 * @param minRev the earliest revision for which results are required
 	 * @param maxRev the latest revision for which results are required
@@ -28,7 +34,7 @@ public interface Lines {
 	 * @param maxAddr the highest address to include
 	 * @return a list of lines
 	 */
-	List<org.codemancer.db.Line> getChanges(long minRev, long maxRev, long minAddr, long maxAddr);
+	List<Line> getChanges(long minRev, long maxRev, long minAddr, long maxAddr);
 
 	/** Get all lines of disassembled code that lie within a given set of address ranges.
 	 * @param minRev the earliest revision for which results are required
@@ -36,13 +42,19 @@ public interface Lines {
 	 * @param ranges the set of address ranges
 	 * @return a list of lines
 	 */
-	List<org.codemancer.db.Line> getChanges(long minRev, long maxRev, AddressRangeSet ranges);
+	List<Line> getChanges(long minRev, long maxRev, AddressRangeSet ranges);
 
 	/** Get unprocessed lines of disassembled code.
 	 * @param requiredLevel the required level of processing to be omitted from the result
 	 * @return a list of unprocessed lines
 	 */
-	List<org.codemancer.db.Line> getUnprocessed(int requiredLevel);
+	List<Line> getUnprocessed(int requiredLevel);
+
+	/** Find address of first disassembled line, at or following a given address.
+	 * @param addr the address at which to begin the search
+	 * @return the address of the first disassembled line, or null if not found
+	 */
+	Long findFirstAddr(long addr);
 
 	/** Get the number of disassembled lines in the database.
 	 * @param rev the revision for which results are required

@@ -44,4 +44,17 @@ class References implements org.codemancer.db.References {
 			.getResultList();
 		return new ArrayList<org.codemancer.db.Reference>(references);
 	}
+
+	public final Long findNextDestination(long addr) {
+		List<Reference> existingLines = em.createQuery(
+			"FROM Reference WHERE maxRev = -1 AND dstAddr > :addr ORDER BY dstAddr", Reference.class)
+			.setParameter("addr", addr)
+			.setMaxResults(1)
+			.getResultList();
+		Long stopAddr = null;
+		if (!existingLines.isEmpty()) {
+			stopAddr = existingLines.get(0).getDstAddr();
+		}
+		return stopAddr;
+	}
 }

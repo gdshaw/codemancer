@@ -86,6 +86,22 @@ class BasicBlocks implements org.codemancer.db.BasicBlocks {
 		return new ArrayList<org.codemancer.db.BasicBlock>(bbs);
 	}
 
+	public final Long findNextDestination(long addr) {
+		List<Reference> existingLines = em.createQuery(
+			"FROM Reference " +
+			"WHERE maxRev = -1 " +
+			"AND dstAddr > :addr " +
+			"ORDER BY dstAddr", Reference.class)
+			.setParameter("addr", addr)
+			.setMaxResults(1)
+			.getResultList();
+		long stopAddr = 0;
+		if (!existingLines.isEmpty()) {
+			stopAddr = existingLines.get(0).getDstAddr();
+		}
+		return stopAddr;
+	}
+
 	public final long count(long rev) {
 		return em.createQuery("SELECT COUNT(minAddr) FROM BasicBlock WHERE (minRev <= :rev) AND ((maxRev >= :rev) OR (maxRev = -1))", Long.class)
 			.setParameter("rev", rev)

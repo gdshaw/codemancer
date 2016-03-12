@@ -84,25 +84,14 @@ public class BasicBlockDetector {
 
 		// Determine address at which disassembly would stop as a result of
 		// reaching the destination of a branch or call instruction.
-		List<Reference> existingLines = em.createQuery(
-			"FROM Reference " +
-			"WHERE maxRev = -1 " +
-			"AND dstAddr > :addr " +
-			"ORDER BY dstAddr", Reference.class)
-			.setParameter("addr", addr)
-			.setMaxResults(1)
-			.getResultList();
-		long stopAddr = 0;
-		if (!existingLines.isEmpty()) {
-			stopAddr = existingLines.get(0).getDstAddr();
-		}
+		Long stopAddr = db.getReferences().findNextDestination(addr);
 
 		// Disassemble until one of the termination conditions is met.
 		long startAddr = addr;
 		boolean fallThrough = false;
-		while ((addr < stopAddr) || (stopAddr == 0)) {
+		while ((stopAddr == null) || (addr < stopAddr)) {
 			// Fill/refill buffer.
-			while ((buffer.length() < 64) && ((reader.tell() < stopAddr) || (stopAddr == 0))) {
+			while ((buffer.length() < 64) && ((stopAddr == null) || (reader.tell() < stopAddr))) {
 				byte newByte = reader.get();
 				BitString newBits = new ShortBitString(newByte, 8, arch.isBigEndian());
 				buffer = buffer.concat(newBits);
@@ -151,17 +140,8 @@ public class BasicBlockDetector {
 		}
 
 		if (addr > startAddr) {
-			BasicBlock block = db.getBasicBlocks().make(0, -1, startAddr, addr - 1, fallThrough);
-
-			List<Line> lines = em.createQuery(
-				"FROM Line " +
-				"WHERE maxRev = -1 " +
-				"AND minAddr >= :minAddr " +
-				"AND minAddr <= :maxAddr " +
-				"ORDER BY minAddr", Line.class)
-				.setParameter("minAddr", block.getMinAddr())
-				.setParameter("maxAddr", block.getMaxAddr())
-				.getResultList();
+			BasicBlock bb = db.getBasicBlocks().make(0, -1, startAddr, addr - 1, fallThrough);
+			List<Line> lines = db.getLines().getMembersOf(bb);
 			for (Line line: lines) {
 				line.setProcessed(Fact.DONE_BASIC_BLOCK_DETECTOR);
 			}
