@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Arrays;
-import javax.persistence.EntityManager;
 
 import org.codemancer.cpudl.State;
 import org.codemancer.cpudl.Style;
@@ -38,9 +37,6 @@ public class SsaStateRecorder implements State {
 	/** The database in which mappings are to be recorded. */
 	private Database db;
 
-	/** The entity manager for the database. */
-	private EntityManager em;
-
 	/** The subroutine that will allocate any machine-generated SSA expression names. */
 	private Subroutine subroutine;
 
@@ -62,7 +58,6 @@ public class SsaStateRecorder implements State {
 	 */
 	public SsaStateRecorder(Database db, Subroutine subroutine) {
 		this.db = db;
-		this.em = db.getEntityManager();
 		this.subroutine = subroutine;
 		this.liveExpressions = new HashMap<String, SsaExpression>();
 		this.liveTemporaries = new HashMap<String, Expression>();
@@ -73,7 +68,6 @@ public class SsaStateRecorder implements State {
 	 */
 	public SsaStateRecorder(SsaStateRecorder state) {
 		this.db = state.db;
-		this.em = state.em;
 		this.subroutine = state.subroutine;
 		this.liveExpressions = (HashMap<String, SsaExpression>)state.liveExpressions.clone();
 		this.liveTemporaries = new HashMap<String, Expression>();

@@ -8,7 +8,6 @@ package org.codemancer.analysis;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.ArrayList;
-import javax.persistence.EntityManager;
 
 import org.codemancer.loader.ObjectFile;
 import org.codemancer.cpudl.expr.Expression;
@@ -62,8 +61,6 @@ public class ExtendedBasicBlockDetector {
 	 * @return true if all pending blocks have been processed, otherwise false
 	 */
 	public boolean detectNext(Register pc, List<Expression> links) {
-		EntityManager em = db.getEntityManager();
-
 		if (pendingIndex == pendingList.size()) {
 			if (done) return true;
 			pendingList = db.getBasicBlocks().getUnprocessed(Fact.DONE_EXTENDED_BASIC_BLOCK_DETECTOR);

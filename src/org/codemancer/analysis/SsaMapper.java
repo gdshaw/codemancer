@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.ArrayDeque;
 import java.io.IOException;
-import javax.persistence.EntityManager;
 
 import org.codemancer.loader.ObjectFile;
 import org.codemancer.loader.ObjectFileReader;
@@ -66,9 +65,6 @@ public class SsaMapper {
 	/** A database corresponding to the object file. */
 	private Database db;
 
-	/** The entity manager for the database. */
-	EntityManager em;
-
 	/** The architecture to be used when disassembling. */
 	private Architecture arch;
 
@@ -100,7 +96,6 @@ public class SsaMapper {
 		this.obj = obj;
 		this.reader = new ObjectFileReader(obj);
 		this.db = db;
-		this.em = db.getEntityManager();
 		this.arch = arch;
 		this.features = new FeatureSet(arch);
 	}
@@ -213,8 +208,6 @@ public class SsaMapper {
 	 * @return true if all pending blocks have been processed, otherwise false
 	 */
 	public boolean mapNext(Register pc, List<Expression> links) {
-		EntityManager em = db.getEntityManager();
-
 		// If the pending blocks queue is empty then attempt to refill it.
 		if (pendingBlocks.isEmpty()) {
 			// Attempt to refill the blocks queue.

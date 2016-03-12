@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.ArrayDeque;
 import java.io.IOException;
-import javax.persistence.EntityManager;
 
 import org.codemancer.loader.ObjectFile;
 import org.codemancer.loader.ObjectFileReader;
@@ -46,9 +45,6 @@ public class CommentGenerator {
 	/** A database corresponding to the object file. */
 	private Database db;
 
-	/** The entity manager for the database. */
-	EntityManager em;
-
 	/** The architecture to be used when disassembling. */
 	private Architecture arch;
 
@@ -67,7 +63,6 @@ public class CommentGenerator {
 		this.obj = obj;
 		this.reader = new ObjectFileReader(obj);
 		this.db = db;
-		this.em = db.getEntityManager();
 		this.arch = arch;
 		this.features = new FeatureSet(arch);
 	}
@@ -78,7 +73,6 @@ public class CommentGenerator {
 	 * @param links a list of possible expressions for a subroutine return address
 	 */
 	private void comment(BasicBlock block, Register pc, List<Expression> links) {
-		EntityManager em = db.getEntityManager();
 		Type start = arch.getStart();
 
 		// Initialise buffer.
@@ -134,8 +128,6 @@ public class CommentGenerator {
 	 * @return true if all pending blocks have been processed, otherwise false
 	 */
 	public boolean commentNext(Register pc, List<Expression> links) {
-		EntityManager em = db.getEntityManager();
-
 		// If the pending blocks queue is empty then attempt to refill it.
 		if (pendingBlocks.isEmpty()) {
 			// Attempt to refill the blocks queue.

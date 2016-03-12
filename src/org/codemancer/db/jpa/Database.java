@@ -16,11 +16,11 @@ import org.codemancer.db.AddressRangeSet;
 
 /** A class to represent a Codemancer database. */
 public class Database implements org.codemancer.db.Database {
-	/** The entity manager for this database. */
-	private final EntityManager em;
-
 	/** The current revision number for this database. */
 	private final Revision revision;
+
+	/** The entity manager for this database. */
+	private final EntityManager em;
 
 	/** The collection of references for this database. */
 	private References references = null;
@@ -66,10 +66,6 @@ public class Database implements org.codemancer.db.Database {
 			em.getTransaction().commit();
 		}
 		revision = tempRevision;
-	}
-
-	public final EntityManager getEntityManager() {
-		return em;
 	}
 
 	public final EntityTransaction getTransaction() {

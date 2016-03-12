@@ -6,15 +6,9 @@
 package org.codemancer.db;
 
 import javax.persistence.EntityTransaction;
-import javax.persistence.EntityManager;
 
 /** An interface to represent a Codemancer database. */
 public interface Database {
-	/** Get entity manager.
-	 * @return the entity manager
-	 */
-	EntityManager getEntityManager();
-
 	/** Get transaction object.
 	 * @return a transaction object
 	 */

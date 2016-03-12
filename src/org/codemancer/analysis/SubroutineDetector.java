@@ -8,7 +8,6 @@ package org.codemancer.analysis;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.ArrayList;
-import javax.persistence.EntityManager;
 
 import org.codemancer.loader.ObjectFile;
 import org.codemancer.cpudl.expr.Expression;
@@ -61,8 +60,6 @@ public class SubroutineDetector {
 	 * @param block the block to be marked
 	 */
 	private void makeSubroutineEntryBlock(ExtendedBasicBlock block) {
-		EntityManager em = db.getEntityManager();
-
 		// Determine whether this block is already marked as part of a subroutine.
 		Subroutine subroutine = block.getSubroutine();
 		if (subroutine != null) {
@@ -96,8 +93,6 @@ public class SubroutineDetector {
 	 * @return true if all pending blocks have been processed, otherwise false
 	 */
 	public boolean detectNext(Register pc, List<Expression> links) {
-		EntityManager em = db.getEntityManager();
-
 		if (pendingIndex == pendingList.size()) {
 			if (done) return true;
 			pendingList = db.getExtendedBasicBlocks().getUnprocessed(Fact.DONE_SUBROUTINE_DETECTOR);

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.IOException;
-import javax.persistence.EntityManager;
 
 import org.codemancer.loader.ObjectFile;
 import org.codemancer.loader.ObjectFileReader;
@@ -79,7 +78,6 @@ public class IterativeDisassembler {
 	 * @param links a list of possible expressions for a subroutine return address
 	 */
 	private void disassemble(long addr, Register pc, List<Expression> links) {
-		EntityManager em = db.getEntityManager();
 		Type start = arch.getStart();
 
 		// Initialise buffer.

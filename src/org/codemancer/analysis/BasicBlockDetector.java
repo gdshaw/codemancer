@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import javax.persistence.EntityManager;
 
 import org.codemancer.loader.ObjectFile;
 import org.codemancer.loader.ObjectFileReader;
@@ -75,7 +74,6 @@ public class BasicBlockDetector {
 	 * @param links a list of possible expressions for a subroutine return address
 	 */
 	public void detect(long addr, Register pc, List<Expression> links) {
-		EntityManager em = db.getEntityManager();
 		Type start = arch.getStart();
 
 		// Initialise buffer.

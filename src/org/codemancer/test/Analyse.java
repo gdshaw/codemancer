@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import javax.persistence.EntityManager;
 
 import org.codemancer.cpudl.Architecture;
 import org.codemancer.cpudl.expr.Register;
@@ -43,7 +42,6 @@ class Analyse {
 		// Open connection to database.
 		String dbUrl = "jdbc:derby:" + projName + ";create=true";
 		Database db = new org.codemancer.db.jpa.Database(dbUrl);
-		EntityManager em = db.getEntityManager();
 
 		// Open object file.
 		RandomAccessFile file = new RandomAccessFile(imagePathname, "r");
