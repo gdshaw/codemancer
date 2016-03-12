@@ -102,12 +102,10 @@ public class SsaStateRecorder implements State {
 		SsaExpression expr = liveExpressions.get(regName);
 		if (expr == null) {
 			String ssaName = subroutine.allocateSsaName();
-			expr = new org.codemancer.db.jpa.SsaExpression(0, -1, subroutine, ssaName);
-			em.persist(expr);
+			expr = db.getSsaExpressions().make(0, -1, subroutine, ssaName);
 			liveExpressions.put(regName, expr);
 		}
-		SsaMapping mapping = new org.codemancer.db.jpa.SsaMapping(0, -1, curAddr, true, regName, expr);
-		em.persist(mapping);
+		SsaMapping mapping = db.getSsaMappings().make(0, -1, curAddr, true, regName, expr);
 		return new NamedValue(register.getType(), expr.getName());
 	}
 
@@ -121,12 +119,10 @@ public class SsaStateRecorder implements State {
 			expr = db.getSsaExpressions().get(subroutine, namedValue.getName());
 		} else {
 			String ssaName = subroutine.allocateSsaName();
-			expr = new org.codemancer.db.jpa.SsaExpression(0, -1, subroutine, ssaName);
-			em.persist(expr);
+			expr = db.getSsaExpressions().make(0, -1, subroutine, ssaName);
 		}
 		liveExpressions.put(regName, expr);
-		SsaMapping mapping = new org.codemancer.db.jpa.SsaMapping(0, -1, curAddr, false, regName, expr);
-		em.persist(mapping);
+		SsaMapping mapping = db.getSsaMappings().make(0, -1, curAddr, false, regName, expr);
 	}
 
 	public final Expression get(Memory memory) {

@@ -90,8 +90,7 @@ public class ExtendedBasicBlockDetector {
 			}
 
 			if (ebb == null) {
-				ebb = new org.codemancer.db.jpa.ExtendedBasicBlock(0, -1, addr);
-				em.persist(ebb);
+				ebb = db.getExtendedBasicBlocks().make(0, -1, addr);
 			}
 			block.setExtendedBasicBlock(ebb);
 			block.setProcessed(Fact.DONE_EXTENDED_BASIC_BLOCK_DETECTOR);

@@ -58,8 +58,7 @@ class Analyse {
 		db.getTransaction().begin();
 		for (Symbol symbol: obj.getSymbols()) {
 			if (symbol.isCode()) {
-				Reference ref = new org.codemancer.db.jpa.Reference(0, -1, -1, symbol.getValue(), false, false, true, true);
-				em.persist(ref);
+				Reference ref = db.getReferences().make(0, -1, -1, symbol.getValue(), false, false, true, true);
 			}
 		}
 		db.getTransaction().commit();

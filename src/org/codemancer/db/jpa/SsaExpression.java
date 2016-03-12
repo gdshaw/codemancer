@@ -36,7 +36,7 @@ public class SsaExpression extends Fact implements org.codemancer.db.SsaExpressi
 	 * @param subroutine the subroutine to which this SSA expression belongs
 	 * @param name the name of this SSA expression
 	 */
-	public SsaExpression(long minRev, long maxRev, org.codemancer.db.Subroutine subroutine, String name) {
+	protected SsaExpression(long minRev, long maxRev, org.codemancer.db.Subroutine subroutine, String name) {
 		super(minRev, maxRev);
 		this.subroutine = (Subroutine)subroutine;
 		this.name = name;

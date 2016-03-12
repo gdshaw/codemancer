@@ -21,6 +21,12 @@ class SsaMappings implements org.codemancer.db.SsaMappings {
 		this.em = em;
 	}
 
+	public final SsaMapping make(long minRev, long maxRev, long addr, boolean inbound, String name, org.codemancer.db.SsaExpression value) {
+		SsaMapping mapping = new SsaMapping(minRev, maxRev, addr, inbound, name, value);
+		em.persist(mapping);
+		return mapping;
+	}
+
 	public final List<org.codemancer.db.SsaMapping> get(long addr) {
 		List<SsaMapping> mappings = em.createQuery(
 			"FROM SsaMapping WHERE addr = :addr", SsaMapping.class)

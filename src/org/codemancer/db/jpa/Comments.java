@@ -21,6 +21,12 @@ class Comments implements org.codemancer.db.Comments {
 		this.em = em;
 	}
 
+	public final Comment make(long minRev, long maxRev, long addr, boolean auto, String content) {
+		Comment comment = new Comment(minRev, maxRev, addr, auto, content);
+		em.persist(comment);
+		return comment;
+	}
+
 	public final List<org.codemancer.db.Comment> get(long addr) {
 		List<Comment> comments = em.createQuery(
 			"FROM Comment WHERE addr = :addr", Comment.class)

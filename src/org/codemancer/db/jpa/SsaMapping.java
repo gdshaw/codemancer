@@ -46,7 +46,7 @@ public class SsaMapping extends Fact implements org.codemancer.db.SsaMapping {
 	 * @param name the name of the register containing the variable mapped
 	 * @param value the SSA expression to which the register is mapped
 	 */
-	public SsaMapping(long minRev, long maxRev, long addr, boolean inbound, String name, org.codemancer.db.SsaExpression value) {
+	protected SsaMapping(long minRev, long maxRev, long addr, boolean inbound, String name, org.codemancer.db.SsaExpression value) {
 		super(minRev, maxRev);
 		this.addr = addr;
 		this.inbound = inbound;

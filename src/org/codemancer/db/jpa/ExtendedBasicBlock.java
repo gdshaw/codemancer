@@ -45,7 +45,7 @@ public class ExtendedBasicBlock extends Fact implements org.codemancer.db.Extend
 	 * @param maxRev the highest revision number for which this extended basic block is present
 	 * @param entryAddr the entry point for this extended basic block
 	 */
-	public ExtendedBasicBlock(long minRev, long maxRev, long entryAddr) {
+	protected ExtendedBasicBlock(long minRev, long maxRev, long entryAddr) {
 		super(minRev, maxRev);
 		this.entryAddr = entryAddr;
 		this.fallThrough = fallThrough;

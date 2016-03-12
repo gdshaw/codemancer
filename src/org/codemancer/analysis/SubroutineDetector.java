@@ -86,8 +86,7 @@ public class SubroutineDetector {
 		}
 
 		// Now create a new subroutine object for the current block.
-		subroutine = new org.codemancer.db.jpa.Subroutine(0, -1, block.getEntryAddr());
-		em.persist(subroutine);
+		subroutine = db.getSubroutines().make(0, -1, block.getEntryAddr());
 		block.setSubroutine(subroutine);
 	}
 

@@ -118,8 +118,7 @@ public class CommentGenerator {
 			SsaStatePlayer state = new SsaStatePlayer(reader, db, arch, addr);
 			instr.evaluate(state);
 			String commentString = state.getComment();
-			Comment comment = new org.codemancer.db.jpa.Comment(0, -1, addr, true, commentString);
-			em.persist(comment);
+			Comment comment = db.getComments().make(0, -1, addr, true, commentString);
 
 			// Advance the address to the next instruction.
 			addr += byteCount;

@@ -21,6 +21,12 @@ class ExtendedBasicBlocks implements org.codemancer.db.ExtendedBasicBlocks {
 		this.em = em;
 	}
 
+	public final ExtendedBasicBlock make(long minRev, long maxRev, long entryAddr) {
+		ExtendedBasicBlock ebb = new ExtendedBasicBlock(minRev, maxRev, entryAddr);
+		em.persist(ebb);
+		return ebb;
+	}
+
 	public final List<org.codemancer.db.ExtendedBasicBlock> get() {
 		List<ExtendedBasicBlock> ebbs = em.createQuery(
 			"FROM ExtendedBasicBlock ORDER BY entryAddr", ExtendedBasicBlock.class)

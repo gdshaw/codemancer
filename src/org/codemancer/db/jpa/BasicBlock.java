@@ -54,7 +54,7 @@ public class BasicBlock extends Fact implements org.codemancer.db.BasicBlock {
 	 * @param fallThrough true if execution call fall through to the next basic block,
 	 *  otherwise false
 	 */
-	public BasicBlock(long minRev, long maxRev, long minAddr, long maxAddr, boolean fallThrough) {
+	protected BasicBlock(long minRev, long maxRev, long minAddr, long maxAddr, boolean fallThrough) {
 		super(minRev, maxRev);
 		this.minAddr = minAddr;
 		this.maxAddr = maxAddr;

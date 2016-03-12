@@ -21,6 +21,12 @@ class BasicBlocks implements org.codemancer.db.BasicBlocks {
 		this.em = em;
 	}
 
+	public final BasicBlock make(long minRev, long maxRev, long minAddr, long maxAddr, boolean fallThrough) {
+		BasicBlock bb = new BasicBlock(minRev, maxRev, minAddr, maxAddr, fallThrough);
+		em.persist(bb);
+		return bb;
+	}
+
 	public final org.codemancer.db.BasicBlock getContaining(long addr) {
 		List<BasicBlock> blocks = em.createQuery(
 			"FROM BasicBlock WHERE minAddr <= :addr AND maxAddr >= :addr", BasicBlock.class)

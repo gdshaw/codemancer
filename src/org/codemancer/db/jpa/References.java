@@ -21,6 +21,13 @@ class References implements org.codemancer.db.References {
 		this.em = em;
 	}
 
+	public final Reference make(long minRev, long maxRev, long srcAddr, long dstAddr, boolean internal,
+		boolean dataRef, boolean codeRef, boolean subRef) {
+		Reference reference = new Reference(minRev, maxRev, srcAddr, dstAddr, internal, dataRef, codeRef, subRef);
+		em.persist(reference);
+		return reference;
+	}
+
 	public final List<org.codemancer.db.Reference> getByDstAddr(long minAddr, long maxAddr) {
 		List<Reference> references = em.createQuery(
 			"FROM Reference WHERE (dstAddr >= :minAddr) AND (dstAddr <= :maxAddr) ORDER BY minAddr", Reference.class)

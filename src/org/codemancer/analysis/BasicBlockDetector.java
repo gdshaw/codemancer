@@ -151,8 +151,7 @@ public class BasicBlockDetector {
 		}
 
 		if (addr > startAddr) {
-			BasicBlock block = new org.codemancer.db.jpa.BasicBlock(0, -1, startAddr, addr - 1, fallThrough);
-			em.persist(block);
+			BasicBlock block = db.getBasicBlocks().make(0, -1, startAddr, addr - 1, fallThrough);
 
 			List<Line> lines = em.createQuery(
 				"FROM Line " +

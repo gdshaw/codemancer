@@ -40,7 +40,7 @@ public class Segment extends Fact implements org.codemancer.db.Segment {
 	 * @param firstAddr the first address mapped
 	 * @param lastAddr the last address mapped
 	 */
-	public Segment(long minRev, long maxRev, org.codemancer.db.AddressSpace addrSpace, long firstAddr, long lastAddr) {
+	protected Segment(long minRev, long maxRev, org.codemancer.db.AddressSpace addrSpace, long firstAddr, long lastAddr) {
 		super(minRev, maxRev);
 		this.addrSpace = (AddressSpace)addrSpace;
 		this.firstAddr = firstAddr;

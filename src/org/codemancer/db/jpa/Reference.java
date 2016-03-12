@@ -62,7 +62,7 @@ public class Reference extends Fact implements org.codemancer.db.Reference {
 	 * @param codeRef true if there is evidence that this is a reference to code, otherwise false
 	 * @param subRef true if there is evidence that this is a reference to a subroutine, otherwise false
 	 */
-	public Reference(long minRev, long maxRev, long srcAddr, long dstAddr, boolean internal,
+	protected Reference(long minRev, long maxRev, long srcAddr, long dstAddr, boolean internal,
 		boolean dataRef, boolean codeRef, boolean subRef) {
 		super(minRev, maxRev);
 		this.srcAddr = srcAddr;

@@ -36,7 +36,7 @@ public class Line extends Fact implements org.codemancer.db.Line {
 	 * @param maxAddr the last address occupied by this line
 	 * @param instruction the disassembled instruction
 	 */
-	public Line(long minRev, long maxRev, long minAddr, long maxAddr, String instruction) {
+	protected Line(long minRev, long maxRev, long minAddr, long maxAddr, String instruction) {
 		super(minRev, maxRev);
 		this.minAddr = minAddr;
 		this.maxAddr = maxAddr;

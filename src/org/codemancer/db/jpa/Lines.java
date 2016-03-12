@@ -23,6 +23,12 @@ class Lines implements org.codemancer.db.Lines {
 		this.em = em;
 	}
 
+	public final Line make(long minRev, long maxRev, long minAddr, long maxAddr, String instruction) {
+		Line line = new Line(minRev, maxRev, minAddr, maxAddr, instruction);
+		em.persist(line);
+		return line;
+	}
+
 	public final List<org.codemancer.db.Line> getChanges(long minRev, long maxRev, long minAddr, long maxAddr) {
 		List<Line> lines = em.createQuery(
 			"FROM Line where (minRev >= :minRev) AND (minRev <= :maxRev) AND (maxRev = -1) AND (minAddr >= :minAddr) AND (maxAddr <= :maxAddr) ORDER BY minAddr", Line.class)

@@ -29,7 +29,7 @@ public class Subroutine extends Fact implements org.codemancer.db.Subroutine {
 	 * @param maxRev the highest revision number for which this subroutine is present
 	 * @param entryAddr the entry point for this subroutine
 	 */
-	public Subroutine(long minRev, long maxRev, long entryAddr) {
+	protected Subroutine(long minRev, long maxRev, long entryAddr) {
 		super(minRev, maxRev);
 		this.entryAddr = entryAddr;
 	}

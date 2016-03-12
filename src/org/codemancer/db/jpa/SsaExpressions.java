@@ -19,6 +19,12 @@ class SsaExpressions implements org.codemancer.db.SsaExpressions {
 		this.em = em;
 	}
 
+	public final SsaExpression make(long minRev, long maxRev, org.codemancer.db.Subroutine subroutine, String name) {
+		SsaExpression expr = new SsaExpression(minRev, maxRev, subroutine, name);
+		em.persist(expr);
+		return expr;
+	}
+
 	public final org.codemancer.db.SsaExpression get(org.codemancer.db.Subroutine subroutine, String name) {
 		return em.createQuery(
 			"FROM SsaExpression WHERE subroutine = :subroutine AND name = :name", SsaExpression.class)

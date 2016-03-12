@@ -23,6 +23,12 @@ class Subroutines implements org.codemancer.db.Subroutines {
 		this.em = em;
 	}
 
+	public final Subroutine make(long minRev, long maxRev, long entryAddr) {
+		Subroutine subroutine = new Subroutine(minRev, maxRev, entryAddr);
+		em.persist(subroutine);
+		return subroutine;
+	}
+
 	public final org.codemancer.db.Subroutine getStarting(long entryAddr, long rev) {
 		List<Subroutine> subroutines = em.createQuery(
 			"FROM Subroutine WHERE (entryAddr = :entryAddr) AND (minRev <= :rev) AND ((maxRev >= :rev) OR (maxRev = -1))", Subroutine.class)
