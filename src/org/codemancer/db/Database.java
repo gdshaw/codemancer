@@ -14,10 +14,21 @@ public interface Database {
 	 */
 	EntityTransaction getTransaction();
 
-	/** Get current revision number.
-	 * @return the object representing the current revision number
+	/** Get specified revision.
+	 * @param rev the required revision number
+	 * @return the revision
 	 */
-	Revision getRevision();
+	Revision getRevision(long rev);
+
+	/** Get current revision.
+	 * @return the highest committed revision
+	 */
+	Revision getCurrentRevision();
+
+	/** Get next revision.
+	 * @return the lowest uncommitted revision
+	 */
+	Revision getNextRevision();
 
 	/** Get collection of lines for this database.
 	 * @return the collection of lines

@@ -44,9 +44,8 @@ public class ChangesetHandler implements HttpHandler {
 
 			// Open database then wait for specified revision if it is not already available.
 			Database db = server.open(dbName);
-			Revision revision = db.getRevision();
-			revision.await(minRev);
-			long curRev = revision.get();
+			db.getRevision(minRev).await();
+			long curRev = db.getCurrentRevision().get();
 
 			// Construct required address range, either from sub or from minaddr/maxaddr
 			// parameters.
@@ -85,12 +84,12 @@ public class ChangesetHandler implements HttpHandler {
 
 			StringBuilder response = new StringBuilder();
 			response.append("({\"rev\":");
-			response.append(new Long(revision.get()).toString());
+			response.append(new Long(curRev).toString());
 
 			response.append(",\"areas\":[");
 			response.append("[\"sub\", \"subroutines\", [");
 
-			Map<Long, Subroutine> subroutines = db.getSubroutines().getChanged(minAreaRev, revision.get());
+			Map<Long, Subroutine> subroutines = db.getSubroutines().getChanged(minAreaRev, curRev);
 			boolean firstSubroutine = true;
 			for (Map.Entry<Long, Subroutine> entry: subroutines.entrySet()) {
 				if (firstSubroutine) {
@@ -108,7 +107,7 @@ public class ChangesetHandler implements HttpHandler {
 			response.append("]]]");
 
 			response.append(",\"lines\":[");
-			List<Line> lines = db.getLines().getChanges(minCodeRev, revision.get(), allRanges);
+			List<Line> lines = db.getLines().getChanges(minCodeRev, curRev, allRanges);
 			boolean firstLine = true;
 			for (Line line: lines) {
 				if (firstLine) {
