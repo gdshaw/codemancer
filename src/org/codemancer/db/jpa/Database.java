@@ -53,39 +53,33 @@ public class Database implements org.codemancer.db.Database {
 		props.setProperty("javax.persistence.jdbc.url", url);
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("org.codemancer", props);
 		em = emf.createEntityManager();
-	}
-
-	public final EntityTransaction getTransaction() {
-		return em.getTransaction();
+		em.getTransaction().begin();
 	}
 
 	public final org.codemancer.db.Revision getRevision(long rev) {
-		List<Revision> revisions = em.createQuery(
-			"FROM Revision WHERE rev = :rev", Revision.class)
+		List<RevisionData> data = em.createQuery(
+			"FROM RevisionData WHERE rev = :rev", RevisionData.class)
 			.setParameter("rev", rev)
 			.getResultList();
-		Revision revision = revisions.isEmpty() ? null : revisions.get(0);
+		Revision revision = data.isEmpty() ? null : new Revision(em, data.get(0));
 		if (revision == null) {
-			revision = new Revision(rev, (rev == 0));
-			em.getTransaction().begin();
-			em.persist(revision);
-			em.getTransaction().commit();
+			revision = new Revision(em, rev, (rev == 0));
 		}
 		return revision;
 	}
 
 	public final org.codemancer.db.Revision getCurrentRevision() {
-		List<Revision> revisions = em.createQuery(
-			"FROM Revision WHERE committed = TRUE ORDER BY rev DESC LIMIT 1", Revision.class)
+		List<RevisionData> data = em.createQuery(
+			"FROM RevisionData WHERE committed = TRUE ORDER BY rev DESC LIMIT 1", RevisionData.class)
 			.getResultList();
-		return (revisions.isEmpty()) ? getRevision(0) : revisions.get(0);
+		return getRevision(data.isEmpty() ? 0 : data.get(0).rev);
 	}
 
 	public final org.codemancer.db.Revision getNextRevision() {
-		List<Revision> revisions = em.createQuery(
-			"FROM Revision WHERE committed = FALSE ORDER BY rev ASC LIMIT 1", Revision.class)
+		List<RevisionData> data = em.createQuery(
+			"FROM RevisionData WHERE committed = TRUE ORDER BY rev DESC LIMIT 1", RevisionData.class)
 			.getResultList();
-		return revisions.isEmpty() ? getRevision(getCurrentRevision().get() + 1) : revisions.get(0);
+		return getRevision(data.isEmpty() ? 1 : 1 + data.get(0).rev);
 	}
 
 	public final org.codemancer.db.Lines getLines() {

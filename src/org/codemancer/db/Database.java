@@ -5,15 +5,8 @@
 
 package org.codemancer.db;
 
-import javax.persistence.EntityTransaction;
-
 /** An interface to represent a Codemancer database. */
 public interface Database {
-	/** Get transaction object.
-	 * @return a transaction object
-	 */
-	EntityTransaction getTransaction();
-
 	/** Get specified revision.
 	 * @param rev the required revision number
 	 * @return the revision

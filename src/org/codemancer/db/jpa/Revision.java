@@ -4,49 +4,51 @@
 
 package org.codemancer.db.jpa;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.EntityManager;
 
 /** A class to represent a Codemancer database revision. */
-@Entity
 public class Revision implements org.codemancer.db.Revision {
-	/** The revision number. */
-	@Id
-	private long rev;
+	/** The entity manager for the database to which this revision refers. */
+	private EntityManager em;
 
-	/** True if this revision has been committed, otherwise false. */
-	private boolean committed;
+	/** The persistent revision data for this revision. */
+	private RevisionData data;
 
-	/** Construct default revision.
-	 * A default constructor is required by the JPA.
+	/** Construct revision.
+	 * @param em the entity manager for the database to which this revision refers
+	 * @param data the persistent revision data
 	 */
-	protected Revision() {
-		this.rev = 0;
-		this.committed = true;
+	protected Revision(EntityManager em, RevisionData data) {
+		this.em = em;
+		this.data = data;
 	}
 
 	/** Construct revision.
+	 * @param em the entity manager for the database to which this revision refers
 	 * @param rev the revision number
 	 * @param committed true if this revision has been committed, otherwise false
 	 */
-	protected Revision(long rev, boolean committed) {
-		this.rev = rev;
-		this.committed = committed;
+	protected Revision(EntityManager em, long rev, boolean committed) {
+		this.em = em;
+		this.data = new RevisionData();
+		this.data.rev = rev;
+		this.data.committed = committed;
+		em.persist(this.data);
 	}
 
 	/** Get the revision number for this revision.
 	 * @return the revision number
 	 */
 	public final synchronized long get() {
-		return rev;
+		return data.rev;
 	}
 
 	public final synchronized boolean isCommitted() {
-		return committed;
+		return data.committed;
 	}
 
 	public final synchronized void await() {
-		while (!committed) {
+		while (!data.committed) {
 			try {
 				wait();
 			} catch (InterruptedException ex) {
@@ -56,7 +58,9 @@ public class Revision implements org.codemancer.db.Revision {
 	}
 
 	public final synchronized void commit() {
-		committed = true;
+		data.committed = true;
+		em.getTransaction().commit();
+		em.getTransaction().begin();
 		notifyAll();
 	}
 }
