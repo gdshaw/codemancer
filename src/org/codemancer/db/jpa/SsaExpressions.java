@@ -9,18 +9,23 @@ import javax.persistence.EntityManager;
 
 /** A class to represent the collection of SSA expressions in a Codemancer database. */
 class SsaExpressions implements org.codemancer.db.SsaExpressions {
+	/** The database to which this collection belongs. */
+	private final Database db;
+
 	/** The entity manager for the database. */
 	private final EntityManager em;
 
 	/** Construct collection of SSA expressions.
+	 * @param db the database
 	 * @param em the entity manager for the database
 	 */
-	protected SsaExpressions(EntityManager em) {
+	protected SsaExpressions(Database db, EntityManager em) {
+		this.db = db;
 		this.em = em;
 	}
 
-	public final SsaExpression make(long minRev, long maxRev, org.codemancer.db.Subroutine subroutine, String name) {
-		SsaExpression expr = new SsaExpression(minRev, maxRev, subroutine, name);
+	public final SsaExpression make(org.codemancer.db.Subroutine subroutine, String name) {
+		SsaExpression expr = new SsaExpression(db.getNextRevision().get(), -1, subroutine, name);
 		em.persist(expr);
 		return expr;
 	}

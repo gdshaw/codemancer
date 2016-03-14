@@ -87,7 +87,7 @@ public class ExtendedBasicBlockDetector {
 			}
 
 			if (ebb == null) {
-				ebb = db.getExtendedBasicBlocks().make(0, -1, addr);
+				ebb = db.getExtendedBasicBlocks().make(addr);
 			}
 			block.setExtendedBasicBlock(ebb);
 			block.setProcessed(Fact.DONE_EXTENDED_BASIC_BLOCK_DETECTOR);

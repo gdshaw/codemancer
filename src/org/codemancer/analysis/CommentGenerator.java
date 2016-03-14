@@ -112,7 +112,7 @@ public class CommentGenerator {
 			SsaStatePlayer state = new SsaStatePlayer(reader, db, arch, addr);
 			instr.evaluate(state);
 			String commentString = state.getComment();
-			Comment comment = db.getComments().make(0, -1, addr, true, commentString);
+			Comment comment = db.getComments().make(addr, true, commentString);
 
 			// Advance the address to the next instruction.
 			addr += byteCount;

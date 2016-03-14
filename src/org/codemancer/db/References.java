@@ -10,9 +10,6 @@ import java.util.List;
 /** An interface to represent the collection of references in a Codemancer database. */
 public interface References {
 	/** Make new reference.
-	 * @param minRev the lowest database revision to which this reference is applicable
-	 * @param maxRev the highest database revision to which this reference is applicable,
-	 *  or -1 for all higher revisions
 	 * @param srcAddr the address from which this reference originates, or -1 if not applicable
 	 * @param dstAddr the address to which this reference refers
 	 * @param dataRef true if there is evidence that this is a reference to data, otherwise false
@@ -20,8 +17,7 @@ public interface References {
 	 * @param subRef true if there is evidence that this is a reference to a subroutine, otherwise false
 	 * @return the newly-created reference
 	 */
-	Reference make(long minRev, long maxRev, long srcAddr, long dstAddr, boolean internal,
-		boolean dataRef, boolean codeRef, boolean subRef);
+	Reference make(long srcAddr, long dstAddr, boolean internal, boolean dataRef, boolean codeRef, boolean subRef);
 
 	/** Get all references to a given address range.
 	 * @param minAddr the lowest address to include

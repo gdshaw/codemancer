@@ -10,12 +10,10 @@ import java.util.List;
 /** An interface to represent the collection of extended basic blocks in a Codemancer database. */
 public interface ExtendedBasicBlocks {
 	/** Make new extended basic block.
-	 * @param minRev the lowest revision number for which this extended basic block is present
-	 * @param maxRev the highest revision number for which this extended basic block is present
 	 * @param entryAddr the entry point for this extended basic block
 	 * @return the newly-created extended basic block
 	 */
-	ExtendedBasicBlock make(long minRev, long maxRev, long entryAddr);
+	ExtendedBasicBlock make(long entryAddr);
 
 	/** Get all extended basic blocks.
 	 * @return a list of extended basic blocks

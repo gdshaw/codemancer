@@ -11,18 +11,23 @@ import javax.persistence.EntityManager;
 
 /** A class to represent the collection of comments in a Codemancer database. */
 class Comments implements org.codemancer.db.Comments {
+	/** The database to which this collection belongs. */
+	private final Database db;
+
 	/** The entity manager for the database. */
 	private final EntityManager em;
 
 	/** Construct collection of comments.
+	 * @param db the database
 	 * @param em the entity manager for the database
 	 */
-	protected Comments(EntityManager em) {
+	protected Comments(Database db, EntityManager em) {
+		this.db = db;
 		this.em = em;
 	}
 
-	public final Comment make(long minRev, long maxRev, long addr, boolean auto, String content) {
-		Comment comment = new Comment(minRev, maxRev, addr, auto, content);
+	public final Comment make(long addr, boolean auto, String content) {
+		Comment comment = new Comment(db.getNextRevision().get(), -1, addr, auto, content);
 		em.persist(comment);
 		return comment;
 	}

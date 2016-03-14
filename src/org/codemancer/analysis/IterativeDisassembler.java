@@ -127,7 +127,7 @@ public class IterativeDisassembler {
 			long byteCount = bitCount >> 3;
 
 			// Record the instruction as a line object.
-			db.getLines().make(0, -1, addr, addr + byteCount - 1, asm);
+			db.getLines().make(addr, addr + byteCount - 1, asm);
 
 			// Record branches and subroutine calls.
 			for (Expression dst: classifier.getDestinationAddresses()) {
@@ -137,7 +137,7 @@ public class IterativeDisassembler {
 					long dstAddr = dstConstant.getValue();
 					boolean isSub = classifier.isCall();
 					boolean isCode = isSub | classifier.isBranch();
-					db.getReferences().make(0, -1, addr, dstAddr, true, false, isCode, isSub);
+					db.getReferences().make(addr, dstAddr, true, false, isCode, isSub);
 				}
 			}
 

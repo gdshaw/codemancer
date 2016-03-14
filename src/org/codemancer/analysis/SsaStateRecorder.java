@@ -96,10 +96,10 @@ public class SsaStateRecorder implements State {
 		SsaExpression expr = liveExpressions.get(regName);
 		if (expr == null) {
 			String ssaName = subroutine.allocateSsaName();
-			expr = db.getSsaExpressions().make(0, -1, subroutine, ssaName);
+			expr = db.getSsaExpressions().make(subroutine, ssaName);
 			liveExpressions.put(regName, expr);
 		}
-		SsaMapping mapping = db.getSsaMappings().make(0, -1, curAddr, true, regName, expr);
+		SsaMapping mapping = db.getSsaMappings().make(curAddr, true, regName, expr);
 		return new NamedValue(register.getType(), expr.getName());
 	}
 
@@ -113,10 +113,10 @@ public class SsaStateRecorder implements State {
 			expr = db.getSsaExpressions().get(subroutine, namedValue.getName());
 		} else {
 			String ssaName = subroutine.allocateSsaName();
-			expr = db.getSsaExpressions().make(0, -1, subroutine, ssaName);
+			expr = db.getSsaExpressions().make(subroutine, ssaName);
 		}
 		liveExpressions.put(regName, expr);
-		SsaMapping mapping = db.getSsaMappings().make(0, -1, curAddr, false, regName, expr);
+		SsaMapping mapping = db.getSsaMappings().make(curAddr, false, regName, expr);
 	}
 
 	public final Expression get(Memory memory) {

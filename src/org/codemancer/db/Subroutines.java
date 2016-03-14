@@ -11,12 +11,10 @@ import java.util.Map;
 /** An interface to represent the collection of subroutines in a Codemancer database. */
 public interface Subroutines {
 	/** Make new subroutine.
-	 * @param minRev the lowest revision number for which this subroutine is present
-	 * @param maxRev the highest revision number for which this subroutine is present
 	 * @param entryAddr the entry point for this subroutine
 	 * @return the newly-created subroutine
 	 */
-	Subroutine make(long minRev, long maxRev, long entryAddr);
+	Subroutine make(long entryAddr);
 
 	/** Get subroutine with given entry address.
 	 * @param entryAddr the required entry address

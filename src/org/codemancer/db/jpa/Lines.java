@@ -13,18 +13,23 @@ import org.codemancer.db.AddressRangeSet;
 
 /** A class to represent the collection of lines in a Codemancer database. */
 class Lines implements org.codemancer.db.Lines {
+	/** The database to which this collection belongs. */
+	private final Database db;
+
 	/** The entity manager for the database. */
 	private final EntityManager em;
 
 	/** Construct collection of lines.
+	 * @param db the database
 	 * @param em the entity manager for the database
 	 */
-	protected Lines(EntityManager em) {
+	protected Lines(Database db, EntityManager em) {
+		this.db = db;
 		this.em = em;
 	}
 
-	public final Line make(long minRev, long maxRev, long minAddr, long maxAddr, String instruction) {
-		Line line = new Line(minRev, maxRev, minAddr, maxAddr, instruction);
+	public final Line make(long minAddr, long maxAddr, String instruction) {
+		Line line = new Line(db.getNextRevision().get(), -1, minAddr, maxAddr, instruction);
 		em.persist(line);
 		return line;
 	}

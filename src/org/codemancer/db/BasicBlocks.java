@@ -10,15 +10,13 @@ import java.util.List;
 /** An interface to represent the collection of basic blocks in a Codemancer database. */
 public interface BasicBlocks {
 	/** Make new basic block.
-	 * @param minRev the lowest revision number for which this basic block is present
-	 * @param maxRev the highest revision number for which this basic block is present
 	 * @param minAddr the first address that is part of this basic block
 	 * @param maxAddr the last address that is part of this basic block
 	 * @param fallThrough true if execution call fall through to the next basic block,
 	 *  otherwise false
 	 * @return the newly-created basic block
 	 */
-	BasicBlock make(long minRev, long maxRev, long minAddr, long maxAddr, boolean fallThrough);
+	BasicBlock make(long minAddr, long maxAddr, boolean fallThrough);
 
 	/** Get basic block containing a given address.
 	 * @param addr an address within the requested basic block

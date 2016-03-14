@@ -10,13 +10,11 @@ import java.util.List;
 /** An interface to represent the collection of SSA expressions in a Codemancer database. */
 public interface SsaExpressions {
 	/** Make new SSA expression.
-	 * @param minRev the lowest revision number for which the expression applies
-	 * @param maxRev the highest revision number for which the expression applies
 	 * @param subroutine the subroutine to which the SSA expression belongs
 	 * @param name the name of the SSA expression
 	 * @return the newly-created SSA expression
 	 */
-	SsaExpression make(long minRev, long maxRev, org.codemancer.db.Subroutine subroutine, String name);
+	SsaExpression make(org.codemancer.db.Subroutine subroutine, String name);
 
 	/** Get SSA expression with a given name in a given subroutine.
 	 * @param subroutine the subroutine containing the required expression

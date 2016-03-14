@@ -11,19 +11,24 @@ import javax.persistence.EntityManager;
 
 /** A class to represent the collection of references in a Codemancer database. */
 class References implements org.codemancer.db.References {
+	/** The database to which this collection belongs. */
+	private final Database db;
+
 	/** The entity manager for the database. */
 	private final EntityManager em;
 
 	/** Construct collection of references.
+	 * @param db the database
 	 * @param em the entity manager for the database
 	 */
-	protected References(EntityManager em) {
+	protected References(Database db, EntityManager em) {
+		this.db = db;
 		this.em = em;
 	}
 
-	public final Reference make(long minRev, long maxRev, long srcAddr, long dstAddr, boolean internal,
+	public final Reference make(long srcAddr, long dstAddr, boolean internal,
 		boolean dataRef, boolean codeRef, boolean subRef) {
-		Reference reference = new Reference(minRev, maxRev, srcAddr, dstAddr, internal, dataRef, codeRef, subRef);
+		Reference reference = new Reference(db.getNextRevision().get(), -1, srcAddr, dstAddr, internal, dataRef, codeRef, subRef);
 		em.persist(reference);
 		return reference;
 	}

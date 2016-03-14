@@ -11,18 +11,23 @@ import javax.persistence.EntityManager;
 
 /** A class to represent the collection of basic blocks in a Codemancer database. */
 class BasicBlocks implements org.codemancer.db.BasicBlocks {
+	/** The database to which this collection belongs. */
+	private final Database db;
+
 	/** The entity manager for the database. */
 	private final EntityManager em;
 
 	/** Construct collection of basic blocks.
+	 * @param db the database
 	 * @param em the entity manager for the database
 	 */
-	protected BasicBlocks(EntityManager em) {
+	protected BasicBlocks(Database db, EntityManager em) {
+		this.db = db;
 		this.em = em;
 	}
 
-	public final BasicBlock make(long minRev, long maxRev, long minAddr, long maxAddr, boolean fallThrough) {
-		BasicBlock bb = new BasicBlock(minRev, maxRev, minAddr, maxAddr, fallThrough);
+	public final BasicBlock make(long minAddr, long maxAddr, boolean fallThrough) {
+		BasicBlock bb = new BasicBlock(db.getNextRevision().get(), -1, minAddr, maxAddr, fallThrough);
 		em.persist(bb);
 		return bb;
 	}

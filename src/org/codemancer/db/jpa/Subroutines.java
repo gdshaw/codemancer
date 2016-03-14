@@ -13,18 +13,23 @@ import javax.persistence.EntityManager;
 
 /** A class to represent the collection of subroutines in a Codemancer database. */
 class Subroutines implements org.codemancer.db.Subroutines {
+	/** The database to which this collection belongs. */
+	private final Database db;
+
 	/** The entity manager for the database. */
 	private final EntityManager em;
 
 	/** Construct collection of subroutines.
+	 * @param db the database
 	 * @param em the entity manager for the database
 	 */
-	protected Subroutines(EntityManager em) {
+	protected Subroutines(Database db, EntityManager em) {
+		this.db = db;
 		this.em = em;
 	}
 
-	public final Subroutine make(long minRev, long maxRev, long entryAddr) {
-		Subroutine subroutine = new Subroutine(minRev, maxRev, entryAddr);
+	public final Subroutine make(long entryAddr) {
+		Subroutine subroutine = new Subroutine(db.getNextRevision().get(), -1, entryAddr);
 		em.persist(subroutine);
 		return subroutine;
 	}

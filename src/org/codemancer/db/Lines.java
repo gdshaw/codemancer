@@ -12,14 +12,12 @@ import org.codemancer.db.AddressRangeSet;
 /** An interface to represent the collection of lines in a Codemancer database. */
 public interface Lines {
 	/** Make new disassembled line of assembly language.
-	 * @param minRev the lowest revision number for which this line is present
-	 * @param maxRev the highest revision number for which this line is present
 	 * @param minAddr the first address occupied by this line
 	 * @param maxAddr the last address occupied by this line
 	 * @param instruction the disassembled instruction
 	 * @return the newly-created line
 	 */
-	Line make(long minRev, long maxRev, long minAddr, long maxAddr, String instruction);
+	Line make(long minAddr, long maxAddr, String instruction);
 
 	/** Get lines in a given basic block.
 	 * @param bb the basic block

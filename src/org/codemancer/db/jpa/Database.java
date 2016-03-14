@@ -84,56 +84,56 @@ public class Database implements org.codemancer.db.Database {
 
 	public final org.codemancer.db.Lines getLines() {
 		if (lines == null) {
-			lines = new Lines(em);
+			lines = new Lines(this, em);
 		}
 		return lines;
 	}
 
 	public final org.codemancer.db.References getReferences() {
 		if (references == null) {
-			references = new References(em);
+			references = new References(this, em);
 		}
 		return references;
 	}
 
 	public final org.codemancer.db.Comments getComments() {
 		if (comments == null) {
-			comments = new Comments(em);
+			comments = new Comments(this, em);
 		}
 		return comments;
 	}
 
 	public final org.codemancer.db.BasicBlocks getBasicBlocks() {
 		if (basicBlocks == null) {
-			basicBlocks = new BasicBlocks(em);
+			basicBlocks = new BasicBlocks(this, em);
 		}
 		return basicBlocks;
 	}
 
 	public final org.codemancer.db.ExtendedBasicBlocks getExtendedBasicBlocks() {
 		if (extendedBasicBlocks == null) {
-			extendedBasicBlocks = new ExtendedBasicBlocks(em);
+			extendedBasicBlocks = new ExtendedBasicBlocks(this, em);
 		}
 		return extendedBasicBlocks;
 	}
 
 	public final org.codemancer.db.Subroutines getSubroutines() {
 		if (subroutines == null) {
-			subroutines = new Subroutines(em);
+			subroutines = new Subroutines(this, em);
 		}
 		return subroutines;
 	}
 
 	public final org.codemancer.db.SsaExpressions getSsaExpressions() {
 		if (ssaExpressions == null) {
-			ssaExpressions = new SsaExpressions(em);
+			ssaExpressions = new SsaExpressions(this, em);
 		}
 		return ssaExpressions;
 	}
 
 	public final org.codemancer.db.SsaMappings getSsaMappings() {
 		if (ssaMappings == null) {
-			ssaMappings = new SsaMappings(em);
+			ssaMappings = new SsaMappings(this, em);
 		}
 		return ssaMappings;
 	}

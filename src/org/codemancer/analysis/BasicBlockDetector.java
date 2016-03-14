@@ -138,7 +138,7 @@ public class BasicBlockDetector {
 		}
 
 		if (addr > startAddr) {
-			BasicBlock bb = db.getBasicBlocks().make(0, -1, startAddr, addr - 1, fallThrough);
+			BasicBlock bb = db.getBasicBlocks().make(startAddr, addr - 1, fallThrough);
 			List<Line> lines = db.getLines().getMembersOf(bb);
 			for (Line line: lines) {
 				line.setProcessed(Fact.DONE_BASIC_BLOCK_DETECTOR);

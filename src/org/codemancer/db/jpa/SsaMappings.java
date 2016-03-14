@@ -11,18 +11,23 @@ import javax.persistence.EntityManager;
 
 /** A class to represent the collection of SSA mappings in a Codemancer database. */
 class SsaMappings implements org.codemancer.db.SsaMappings {
+	/** The database to which this collection belongs. */
+	private final Database db;
+
 	/** The entity manager for the database. */
 	private final EntityManager em;
 
 	/** Construct collection of SSA mappings.
+	 * @param db the database
 	 * @param em the entity manager for the database
 	 */
-	protected SsaMappings(EntityManager em) {
+	protected SsaMappings(Database db, EntityManager em) {
+		this.db = db;
 		this.em = em;
 	}
 
-	public final SsaMapping make(long minRev, long maxRev, long addr, boolean inbound, String name, org.codemancer.db.SsaExpression value) {
-		SsaMapping mapping = new SsaMapping(minRev, maxRev, addr, inbound, name, value);
+	public final SsaMapping make(long addr, boolean inbound, String name, org.codemancer.db.SsaExpression value) {
+		SsaMapping mapping = new SsaMapping(db.getNextRevision().get(), -1, addr, inbound, name, value);
 		em.persist(mapping);
 		return mapping;
 	}

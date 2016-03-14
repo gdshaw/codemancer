@@ -55,7 +55,7 @@ class Analyse {
 		// Create external reference for each symbol in object file.
 		for (Symbol symbol: obj.getSymbols()) {
 			if (symbol.isCode()) {
-				Reference ref = db.getReferences().make(0, -1, -1, symbol.getValue(), false, false, true, true);
+				Reference ref = db.getReferences().make(-1, symbol.getValue(), false, false, true, true);
 			}
 		}
 		db.getNextRevision().commit();

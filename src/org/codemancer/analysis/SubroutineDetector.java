@@ -83,7 +83,7 @@ public class SubroutineDetector {
 		}
 
 		// Now create a new subroutine object for the current block.
-		subroutine = db.getSubroutines().make(0, -1, block.getEntryAddr());
+		subroutine = db.getSubroutines().make(block.getEntryAddr());
 		block.setSubroutine(subroutine);
 	}
 
